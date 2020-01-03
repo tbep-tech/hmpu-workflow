@@ -41,14 +41,12 @@ acresdbf <- dbfs %>%
         group_by(FLUCCSCODE) %>% 
         group_by(FLUCCSCODE) %>%
         summarise(
-          Acres = sum(Acres)
+          areaac = sum(Acres)
         )
       
       return(dat_are)
       
     })
-  ) %>% 
-  select(-value) %>% 
-  unnest(ests)
+  )
 
 save(acresdbf, file = here('data', 'acresdbf.RData'), compress = 'xz')

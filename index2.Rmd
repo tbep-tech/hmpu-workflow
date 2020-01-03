@@ -14,7 +14,7 @@ library(sf)
 library(patchwork)
 library(here)
 
-data(acres)
+data(acresdbf)
 
 fluccs <- tibble(
   descriptor = c('Mangrove Swamps', 'Salt Marshes', 'Salt Barrens', 'Streams and Waterways', 'Lakes', 'Wetland Hardwood Forests', 'Wetland Coniferous Forests',
@@ -30,7 +30,7 @@ fluccs <- tibble(
 
 ```{r}
 # format results
-acresall <- acres %>%
+acresall <- acresdbf %>%
   select(-value) %>%
   unnest(cols = ests) %>%
   mutate(FLUCCSCODE = as.character(FLUCCSCODE)) %>% 
@@ -44,7 +44,7 @@ knitr::kable(acresall, digits = 0)
 
 ```{r, fig.height = 8, fig.width = 8}
 # compare with ESA
-cmp <- acres %>%
+cmp <- acresdbf %>%
   select(-value) %>%
   unnest(cols = ests) %>%
   mutate(FLUCCSCODE = as.character(FLUCCSCODE)) %>% 
