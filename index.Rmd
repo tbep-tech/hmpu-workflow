@@ -4,7 +4,7 @@ output:
     code_folding: hide
 ---
   
-# Land use changes
+# Land use changes {.tabset .tabset-pills}
   
 ```{r setup, message = F, warning = F, results = 'hide', echo = FALSE}
 knitr::opts_chunk$set(echo = TRUE, warning = F, message = F, echo = T, fig.path = 'figs/', dev.args = list(family = 'serif'), fig.path = 'figures/')
@@ -14,87 +14,77 @@ library(sf)
 library(patchwork)
 library(here)
 
-data(acres)
-
-fluccs <- tibble(
-  descriptor = c('Mangrove Swamps', 'Salt Marshes', 'Salt Barrens', 'Streams and Waterways', 'Lakes', 'Wetland Hardwood Forests', 'Wetland Coniferous Forests',
-                 'Wetland Forested Mixed', 'Vegetated Non-Forested Wetlands', 'Dry Prairie', 'Shrub and Brushland', 'Mixed Rangeland', 'Upland Coniferous Forests',
-                 'Upland Hardwood Forests', 'Upland Hardwood Forests'),
-  category = c('Tidal Wetlands', 'Tidal Wetlands', 'Tidal Wetlands', 'Freshwater Wetlands', 'Freshwater Wetlands', 'Freshwater Wetlands', 'Freshwater Wetlands',
-               'Freshwater Wetlands', 'Freshwater Wetlands', 'Native Uplands', 'Native Uplands', 'Native Uplands', 'Native Uplands', 'Native Uplands',
-               'Native Uplands'),
-  FLUCCSCODE = c('6120', '6420', '6600', '5100', '5200', '6100', '6200', '6300', '6400', '3100', '3200', '3300', '4100', '4200', '4300')
-)
-
+data(acresdbf)
 ```
+
+## Group
 
 ```{r}
 # format results
-acresall <- acres %>%
-  select(-value) %>%
-  unnest(cols = ests) %>%
-  mutate(FLUCCSCODE = as.character(FLUCCSCODE)) %>% 
-  left_join(fluccs, by = 'FLUCCSCODE') %>%
-  spread(name, areaac) %>%
-  arrange(category, descriptor)
+sums <- acresdbf %>%
+  filter(var %in% 'HMPU_GROUP') %>% 
+  select(-var) %>% 
+  bind_rows(group_by(., name) %>%
+              summarise(areaac = sum(areaac)) %>%
+              mutate(val = 'Total')) %>%
+  bind_rows(group_by(., val) %>%
+              summarise(areaac = sum(areaac)) %>%
+              mutate(name = 'Total')) %>%
+  spread(name, areaac, fill = NA)
 
-knitr::kable(acresall, digits = 0)
+alltot <- sums %>% 
+  filter(val != 'Total')
+coltot <- sums %>% 
+  filter(val == 'Total')
+totab <- bind_rows(alltot, coltot) 
+
+knitr::kable(totab, digits = 0)
 ```
 
+## Class
 
-```{r, fig.height = 8, fig.width = 8}
-# compare with ESA
-cmp <- acres %>%
-  select(-value) %>%
-  unnest(cols = ests) %>%
-  mutate(FLUCCSCODE = as.character(FLUCCSCODE)) %>% 
-  left_join(fluccs, by = 'FLUCCSCODE') %>%
-  select(FLUCCSCODE, name, areaac)
+```{r}
+# format results
+sums <- acresdbf %>%
+  filter(var %in% 'HMPU_CLASS') %>% 
+  select(-var) %>% 
+  bind_rows(group_by(., name) %>%
+              summarise(areaac = sum(areaac)) %>%
+              mutate(val = 'Total')) %>%
+  bind_rows(group_by(., val) %>%
+              summarise(areaac = sum(areaac)) %>%
+              mutate(name = 'Total')) %>%
+  spread(name, areaac, fill = NA)
 
-# esa
-orig <- read_csv(here('data-raw', 'orig.csv')) %>%
-  filter(FLUCCSCODE %in% c('6120', '6600', '6420')) %>%
-  gather('name', 'areaac', -FLUCCSCODE)
+alltot <- sums %>% 
+  filter(val != 'Total')
+coltot <- sums %>% 
+  filter(val == 'Total')
+totab <- bind_rows(alltot, coltot) 
 
-# combine our estimates with ESA, format for first plot
-toplo <- orig %>%
-  left_join(cmp, by = c('FLUCCSCODE', 'name')) %>%
-  gather('dataset', 'acres', areaac.x, areaac.y) %>%
-  mutate(
-    dataset = case_when(
-      dataset == 'areaac.x' ~ 'ESA estimate',
-      dataset == 'areaac.y' ~ 'TBEP estimate'
-    )
-  ) %>%
-  left_join(fluccs, by = 'FLUCCSCODE')
-
-p1 <- ggplot(toplo, aes(x = name, y = acres, fill = dataset)) +
-  geom_bar(stat = 'identity', position = position_dodge()) +
-  facet_wrap(~descriptor, ncol = 1, scales = 'free_y') +
-  theme_bw(base_family = 'serif') +
-  theme(
-    legend.title = element_blank(),
-    axis.title.x = element_blank(),
-    strip.background = element_blank(),
-    legend.position = 'top'
-  )
-
-# second plot
-toplo2 <- toplo %>%
-  spread(dataset, acres)
-
-p2 <- ggplot(toplo2, aes(x = `ESA estimate`, y = `TBEP estimate`, colour = name)) +
-  geom_point(size = 3, alpha = 0.6) +
-  geom_abline(intercept = 0, slope = 1, linetype = 'dashed') +
-  facet_wrap(~descriptor, ncol = 1, scales = 'free') +
-  theme_bw(base_family = 'serif') +
-  theme(
-    legend.title = element_blank(),
-    strip.background = element_blank(),
-    legend.position = 'top'
-  ) +
-  labs(subtitle = 'Dashed is 1:1 line')
-
-p1 + p2 + plot_layout(ncol = 2)
+knitr::kable(totab, digits = 0)
 ```
 
+## Descriptor
+
+```{r}
+# format results
+sums <- acresdbf %>%
+  filter(var %in% 'HMPU_DESCRIPTOR') %>% 
+  select(-var) %>% 
+  bind_rows(group_by(., name) %>%
+              summarise(areaac = sum(areaac)) %>%
+              mutate(val = 'Total')) %>%
+  bind_rows(group_by(., val) %>%
+              summarise(areaac = sum(areaac)) %>%
+              mutate(name = 'Total')) %>%
+  spread(name, areaac, fill = NA)
+
+alltot <- sums %>% 
+  filter(val != 'Total')
+coltot <- sums %>% 
+  filter(val == 'Total')
+totab <- bind_rows(alltot, coltot) 
+
+knitr::kable(totab, digits = 0)
+```

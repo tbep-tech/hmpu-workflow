@@ -76,16 +76,8 @@ library(foreign)
 
 prj <- 4326
 
-fluccs <- tibble(
-  descriptor = c('Mangrove Swamps', 'Salt Marshes', 'Salt Barrens', 'Streams and Waterways', 'Lakes', 'Wetland Hardwood Forests', 'Wetland Coniferous Forests',
-                 'Wetland Forested Mixed', 'Vegetated Non-Forested Wetlands', 'Dry Prairie', 'Shrub and Brushland', 'Mixed Rangeland', 'Upland Coniferous Forests',
-                 'Upland Hardwood Forests', 'Upland Hardwood Forests'),
-  category = c('Tidal Wetlands', 'Tidal Wetlands', 'Tidal Wetlands', 'Freshwater Wetlands', 'Freshwater Wetlands', 'Freshwater Wetlands', 'Freshwater Wetlands',
-               'Freshwater Wetlands', 'Freshwater Wetlands', 'Native Uplands', 'Native Uplands', 'Native Uplands', 'Native Uplands', 'Native Uplands',
-               'Native Uplands'),
-  FLUCCSCODE = c('6120', '6420', '6600', '5100', '5200', '6100', '6200', '6300', '6400', '3100', '3200', '3300', '4100', '4200', '4300')
-)
-
+fluccs <- read.csv(here('data-raw', 'FLUCCShabsclass.csv'), stringsAsFactors = F)
+                   
 # https://data-swfwmd.opendata.arcgis.com/search?groupIds=880fc95697ce45c3a8b078bb752faf40
 dbfs <- list(
   `2017` = 'T:/04_STAFF/ED/04_DATA/2020_HMPU_Analysis/Reprojected/2017_LULC_Clipped_Dissolve.dbf',
@@ -109,17 +101,22 @@ acresdbf <- dbfs %>%
       
       # get area
       dat_are <- dat_raw %>%
+        select(FLUCCSCODE, Acres) %>% 
         filter(FLUCCSCODE %in% fluccs$FLUCCSCODE) %>% 
-        group_by(FLUCCSCODE) %>% 
-        group_by(FLUCCSCODE) %>%
+        left_join(fluccs, by = 'FLUCCSCODE') %>% 
+        select(-FLUCCSCODE, -FIRST_FLUC) %>% 
+        gather('var', 'val', -Acres) %>% 
+        group_by(var, val) %>% 
         summarise(
           areaac = sum(Acres)
         )
-      
+
       return(dat_are)
       
     })
-  )
+  ) %>% 
+  select(-value) %>% 
+  unnest(ests)
 
 save(acresdbf, file = here('data', 'acresdbf.RData'), compress = 'xz')
 
