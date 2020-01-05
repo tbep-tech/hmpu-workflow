@@ -2,23 +2,9 @@
 
 library(sf)
 library(tidyverse)
-library(patchwork)
 library(here)
-
-prj <- 4326
-
-fluccs <- tibble(
-  descriptor = c('Mangrove Swamps', 'Salt Marshes', 'Salt Barrens', 'Streams and Waterways', 'Lakes', 'Wetland Hardwood Forests', 'Wetland Coniferous Forests',
-                 'Wetland Forested Mixed', 'Vegetated Non-Forested Wetlands', 'Dry Prairie', 'Shrub and Brushland', 'Mixed Rangeland', 'Upland Coniferous Forests',
-                 'Upland Hardwood Forests', 'Upland Hardwood Forests'),
-  category = c('Tidal Wetlands', 'Tidal Wetlands', 'Tidal Wetlands', 'Freshwater Wetlands', 'Freshwater Wetlands', 'Freshwater Wetlands', 'Freshwater Wetlands',
-               'Freshwater Wetlands', 'Freshwater Wetlands', 'Native Uplands', 'Native Uplands', 'Native Uplands', 'Native Uplands', 'Native Uplands',
-               'Native Uplands'),
-  FLUCCSCODE = c('6120', '6420', '6600', '5100', '5200', '6100', '6200', '6300', '6400', '3100', '3200', '3300', '4100', '4200', '4300')
-)
-
-shed <- st_read('T:/05_GIS/BOUNDARIES/TBEP_Watershed_Correct_Projection.shp') %>%
-  st_transform(crs = prj)
+library(doParallel)
+library(foreach)
 
 # https://data-swfwmd.opendata.arcgis.com/search?groupIds=880fc95697ce45c3a8b078bb752faf40
 urls <- list(
@@ -34,39 +20,75 @@ urls <- list(
 
 # process through each year
 acres <- urls %>%
-  enframe %>%
-  mutate(
-    ests = purrr::map(value, function(x){
-      
-      cat(x, '\n')
-      dat_raw <- st_read(x)
-      
-      # crop by watershed and select fluccs
-      dat_crp <- dat_raw %>%
-        st_transform(crs = prj) %>%
-        select(FLUCCSCODE) %>%
-        filter(FLUCCSCODE %in% fluccs$FLUCCSCODE) %>%
-        st_intersection(shed)
-      
-      # get area
-      dat_are <- dat_crp %>%
-        mutate(
-          aream2 = st_area(.),
-          aream2 = as.numeric(aream2),
-          areaac = aream2 / 4047
-        ) %>%
-        st_set_geometry(NULL) %>%
-        group_by(FLUCCSCODE) %>%
-        summarise(
-          areaac = sum(areaac)
-        )
-      
-      return(dat_are)
-      
-    })
-  )
+  enframe 
 
-save(acres, file = here('data', 'acres.RData'), compress = 'xz')
+# setup parallel backend
+ncores <- detectCores() - 1 
+cl <- makeCluster(ncores)
+registerDoParallel(cl)
+strt <- Sys.time()
+
+res <- foreach(i = 1:nrow(acres), .packages = c('tidyverse', 'sf', 'here')) %dopar% {
+  
+  sink('log.txt')
+  cat(i, 'of', nrow(acres), '\n')
+  print(Sys.time()-strt)
+  sink()
+ 
+  prj <- 4326
+  
+  fluccs <- read.csv(here('data-raw', 'FLUCCShabsclass.csv'), stringsAsFactors = F)
+  
+  shed <- st_read('T:/05_GIS/BOUNDARIES/TBEP_Watershed_Correct_Projection.shp') %>%
+    st_transform(crs = prj)
+
+  # import file
+  dat_raw <- acres[i, ] %>% 
+    pull(value) %>% 
+    .[[1]] %>% 
+    st_read
+  
+  # crop by watershed and select fluccs
+  dat_crp <- dat_raw %>%
+    st_transform(crs = prj) %>%
+    select(FLUCCSCODE) %>%
+    filter(FLUCCSCODE %in% fluccs$FLUCCSCODE) %>%
+    st_intersection(shed)
+  
+  # get area
+  dat_are <- dat_crp %>%
+    mutate(
+      aream2 = st_area(.),
+      aream2 = as.numeric(aream2),
+      areaac = aream2 / 4047
+    ) %>%
+    st_set_geometry(NULL) %>%
+    group_by(FLUCCSCODE) %>%
+    summarise(
+      Acres = sum(areaac)
+    )
+  
+  # summarise by categories
+  dat_out <- dat_are %>% 
+    left_join(fluccs, by = 'FLUCCSCODE') %>% 
+    select(-FLUCCSCODE, -FIRST_FLUC) %>% 
+    gather('var', 'val', -Acres) %>% 
+    group_by(var, val) %>% 
+    summarise(
+      areaac = sum(Acres)
+    )
+  
+  return(dat_out)
+      
+}
+
+acresjso <- res %>% 
+  enframe %>% 
+  bind_cols(acres, .) %>% 
+  select(name, value1) %>% 
+  unnest(value1)
+
+save(acresjso, file = here('data', 'acresjso.RData'), compress = 'xz')
 
 # process local dbf -------------------------------------------------------
 

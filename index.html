@@ -441,7 +441,7 @@ summary {
 <div id="group" class="section level2">
 <h2>Group</h2>
 <pre class="r"><code># format results
-sums &lt;- acresdbf %&gt;%
+sums &lt;- dat %&gt;%
   filter(var %in% &#39;HMPU_GROUP&#39;) %&gt;% 
   select(-var) %&gt;% 
   bind_rows(group_by(., name) %&gt;%
@@ -541,7 +541,7 @@ knitr::kable(totab, digits = 0)</code></pre>
 <div id="class" class="section level2">
 <h2>Class</h2>
 <pre class="r"><code># format results
-sums &lt;- acresdbf %&gt;%
+sums &lt;- dat %&gt;%
   filter(var %in% &#39;HMPU_CLASS&#39;) %&gt;% 
   select(-var) %&gt;% 
   bind_rows(group_by(., name) %&gt;%
@@ -689,7 +689,7 @@ knitr::kable(totab, digits = 0)</code></pre>
 <div id="descriptor" class="section level2">
 <h2>Descriptor</h2>
 <pre class="r"><code># format results
-sums &lt;- acresdbf %&gt;%
+sums &lt;- dat %&gt;%
   filter(var %in% &#39;HMPU_DESCRIPTOR&#39;) %&gt;% 
   select(-var) %&gt;% 
   bind_rows(group_by(., name) %&gt;%

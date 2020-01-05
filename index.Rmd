@@ -15,13 +15,14 @@ library(patchwork)
 library(here)
 
 data(acresdbf)
+dat <- acresdbf
 ```
 
 ## Group
 
 ```{r}
 # format results
-sums <- acresdbf %>%
+sums <- dat %>%
   filter(var %in% 'HMPU_GROUP') %>% 
   select(-var) %>% 
   bind_rows(group_by(., name) %>%
@@ -45,7 +46,7 @@ knitr::kable(totab, digits = 0)
 
 ```{r}
 # format results
-sums <- acresdbf %>%
+sums <- dat %>%
   filter(var %in% 'HMPU_CLASS') %>% 
   select(-var) %>% 
   bind_rows(group_by(., name) %>%
@@ -69,7 +70,7 @@ knitr::kable(totab, digits = 0)
 
 ```{r}
 # format results
-sums <- acresdbf %>%
+sums <- dat %>%
   filter(var %in% 'HMPU_DESCRIPTOR') %>% 
   select(-var) %>% 
   bind_rows(group_by(., name) %>%
