@@ -60,11 +60,11 @@ FLUCCSCODE,FIRST_FLUC,HMPU_GROUP,HMPU_CLASS,HMPU_DESCRIPTOR
 5230,LAKES > 10 ACRES (4 HECTARES) < 100 ACRES,Open Water,Freshwater Wetlands,Lakes
 5240,LAKES < 10 ACRES (4 HECTARES) DOMINANT FEATURES,Open Water,Freshwater Wetlands,Lakes
 5250,MARSHY LAKES,Open Water,Freshwater Wetlands,Lakes
-5300,RESERVOIRS,Open Water,Freshwater Wetlands,Lakes
-5310,RESERVOIRS > 500 ACRES (202 HECTARES),Open Water,Freshwater Wetlands,Lakes
-5320,RESERVOIRS > 100 ACRES (40 HECTARES) & < 500 ACRES,Open Water,Freshwater Wetlands,Lakes
-5330,RESERVOIRS > 10 ACRES(4 HECTARES) & < 100 ACRES,Open Water,Freshwater Wetlands,Lakes
-5340,RESERVOIRS < 10 ACRES(4 HECTARES) W/DOMINANT FEATURES,Open Water,Freshwater Wetlands,Lakes
+5300,RESERVOIRS,Open Water,Freshwater Wetlands,Lakes_Reservoirs
+5310,RESERVOIRS > 500 ACRES (202 HECTARES),Open Water,Freshwater Wetlands,Lakes_Reservoirs
+5320,RESERVOIRS > 100 ACRES (40 HECTARES) & < 500 ACRES,Open Water,Freshwater Wetlands,Lakes_Reservoirs
+5330,RESERVOIRS > 10 ACRES(4 HECTARES) & < 100 ACRES,Open Water,Freshwater Wetlands,Lakes_Reservoirs
+5340,RESERVOIRS < 10 ACRES(4 HECTARES) W/DOMINANT FEATURES,Open Water,Freshwater Wetlands,Lakes_Reservoirs
 5400,BAYS AND ESTUARIES,Open Water,Subtidal,Estuary
 5700,MAJOR BODIES OF WATER,Open Water,Subtidal,Estuary
 5720,GULF OF MEXICO,Open Water,Subtidal,Estuary
