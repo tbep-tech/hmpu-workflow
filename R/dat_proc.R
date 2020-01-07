@@ -5,6 +5,7 @@ library(tidyverse)
 library(here)
 library(doParallel)
 library(foreach)
+library(tbeptools)
 
 # https://data-swfwmd.opendata.arcgis.com/search?groupIds=880fc95697ce45c3a8b078bb752faf40
 urls <- list(
@@ -28,7 +29,7 @@ cl <- makeCluster(ncores)
 registerDoParallel(cl)
 strt <- Sys.time()
 
-res <- foreach(i = 1:nrow(acres), .packages = c('tidyverse', 'sf', 'here')) %dopar% {
+res <- foreach(i = 1:nrow(acres), .packages = c('tidyverse', 'sf', 'here', 'tbeptools')) %dopar% {
   
   sink('log.txt')
   cat(i, 'of', nrow(acres), '\n')
@@ -39,9 +40,6 @@ res <- foreach(i = 1:nrow(acres), .packages = c('tidyverse', 'sf', 'here')) %dop
   
   fluccs <- read.csv(here('data-raw', 'FLUCCShabsclass.csv'), stringsAsFactors = F)
   
-  shed <- st_read('T:/05_GIS/BOUNDARIES/TBEP_Watershed_Correct_Projection.shp') %>%
-    st_transform(crs = prj)
-
   # import file
   dat_raw <- acres[i, ] %>% 
     pull(value) %>% 
@@ -53,7 +51,7 @@ res <- foreach(i = 1:nrow(acres), .packages = c('tidyverse', 'sf', 'here')) %dop
     st_transform(crs = prj) %>%
     select(FLUCCSCODE) %>%
     filter(FLUCCSCODE %in% fluccs$FLUCCSCODE) %>%
-    st_intersection(shed)
+    st_intersection(tbshed)
   
   # get area
   dat_are <- dat_crp %>%
