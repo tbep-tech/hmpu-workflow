@@ -436,12 +436,629 @@ summary {
 </div>
 
 
-<div id="land-use-changes" class="section level1 tabset tabset-pills">
+<div id="land-use-changes" class="section level1 tabset">
 <h1>Land use changes</h1>
-<div id="group" class="section level2">
-<h2>Group</h2>
+<div id="json-downloads" class="section level2 tabset tabset-pills">
+<h2>JSON downloads</h2>
+<div id="group" class="section level3">
+<h3>Group</h3>
 <pre class="r"><code># format results
-sums &lt;- dat %&gt;%
+sums &lt;- acresjso %&gt;%
+  filter(var %in% &#39;HMPU_GROUP&#39;) %&gt;% 
+  select(-var) %&gt;% 
+  bind_rows(group_by(., name) %&gt;%
+              summarise(areaac = sum(areaac)) %&gt;%
+              mutate(val = &#39;Total&#39;)) %&gt;%
+  bind_rows(group_by(., val) %&gt;%
+              summarise(areaac = sum(areaac)) %&gt;%
+              mutate(name = &#39;Total&#39;)) %&gt;%
+  spread(name, areaac, fill = NA)
+
+alltot &lt;- sums %&gt;% 
+  filter(val != &#39;Total&#39;)
+coltot &lt;- sums %&gt;% 
+  filter(val == &#39;Total&#39;)
+totab &lt;- bind_rows(alltot, coltot) 
+
+knitr::kable(totab, digits = 0)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">val</th>
+<th align="right">1990</th>
+<th align="right">1995</th>
+<th align="right">1999</th>
+<th align="right">2004</th>
+<th align="right">2007</th>
+<th align="right">2011</th>
+<th align="right">2014</th>
+<th align="right">2017</th>
+<th align="right">Total</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Developed</td>
+<td align="right">372447</td>
+<td align="right">393343</td>
+<td align="right">422716</td>
+<td align="right">479355</td>
+<td align="right">502711</td>
+<td align="right">516656</td>
+<td align="right">530839</td>
+<td align="right">536318</td>
+<td align="right">3754386</td>
+</tr>
+<tr class="even">
+<td align="left">Native</td>
+<td align="right">513400</td>
+<td align="right">460992</td>
+<td align="right">436621</td>
+<td align="right">398635</td>
+<td align="right">394818</td>
+<td align="right">395769</td>
+<td align="right">413105</td>
+<td align="right">384747</td>
+<td align="right">3398088</td>
+</tr>
+<tr class="odd">
+<td align="left">Open Water</td>
+<td align="right">236543</td>
+<td align="right">265815</td>
+<td align="right">269866</td>
+<td align="right">290707</td>
+<td align="right">183359</td>
+<td align="right">183488</td>
+<td align="right">179611</td>
+<td align="right">187344</td>
+<td align="right">1796733</td>
+</tr>
+<tr class="even">
+<td align="left">Restorable</td>
+<td align="right">571550</td>
+<td align="right">573791</td>
+<td align="right">564738</td>
+<td align="right">525243</td>
+<td align="right">498210</td>
+<td align="right">483184</td>
+<td align="right">455542</td>
+<td align="right">470687</td>
+<td align="right">4142946</td>
+</tr>
+<tr class="odd">
+<td align="left">Total</td>
+<td align="right">1693941</td>
+<td align="right">1693941</td>
+<td align="right">1693941</td>
+<td align="right">1693941</td>
+<td align="right">1579098</td>
+<td align="right">1579098</td>
+<td align="right">1579098</td>
+<td align="right">1579098</td>
+<td align="right">13092153</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="class" class="section level3">
+<h3>Class</h3>
+<pre class="r"><code># format results
+sums &lt;- acresjso %&gt;%
+  filter(var %in% &#39;HMPU_CLASS&#39;) %&gt;% 
+  select(-var) %&gt;% 
+  bind_rows(group_by(., name) %&gt;%
+              summarise(areaac = sum(areaac)) %&gt;%
+              mutate(val = &#39;Total&#39;)) %&gt;%
+  bind_rows(group_by(., val) %&gt;%
+              summarise(areaac = sum(areaac)) %&gt;%
+              mutate(name = &#39;Total&#39;)) %&gt;%
+  spread(name, areaac, fill = NA)
+
+alltot &lt;- sums %&gt;% 
+  filter(val != &#39;Total&#39;)
+coltot &lt;- sums %&gt;% 
+  filter(val == &#39;Total&#39;)
+totab &lt;- bind_rows(alltot, coltot) 
+
+knitr::kable(totab, digits = 0)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">val</th>
+<th align="right">1990</th>
+<th align="right">1995</th>
+<th align="right">1999</th>
+<th align="right">2004</th>
+<th align="right">2007</th>
+<th align="right">2011</th>
+<th align="right">2014</th>
+<th align="right">2017</th>
+<th align="right">Total</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Agriculture</td>
+<td align="right">430176</td>
+<td align="right">435582</td>
+<td align="right">414683</td>
+<td align="right">345889</td>
+<td align="right">319378</td>
+<td align="right">305734</td>
+<td align="right">285905</td>
+<td align="right">288724</td>
+<td align="right">2826069</td>
+</tr>
+<tr class="even">
+<td align="left">Emergent Tidal Wetlands</td>
+<td align="right">18004</td>
+<td align="right">18786</td>
+<td align="right">18756</td>
+<td align="right">20762</td>
+<td align="right">20677</td>
+<td align="right">20693</td>
+<td align="right">20832</td>
+<td align="right">20633</td>
+<td align="right">159143</td>
+</tr>
+<tr class="odd">
+<td align="left">Freshwater Wetlands</td>
+<td align="right">256890</td>
+<td align="right">254580</td>
+<td align="right">257748</td>
+<td align="right">273007</td>
+<td align="right">277675</td>
+<td align="right">282242</td>
+<td align="right">295320</td>
+<td align="right">283902</td>
+<td align="right">2181363</td>
+</tr>
+<tr class="even">
+<td align="left">Mining</td>
+<td align="right">101221</td>
+<td align="right">104189</td>
+<td align="right">113502</td>
+<td align="right">119337</td>
+<td align="right">120506</td>
+<td align="right">121637</td>
+<td align="right">127891</td>
+<td align="right">128419</td>
+<td align="right">936702</td>
+</tr>
+<tr class="odd">
+<td align="left">Native Forested Uplands</td>
+<td align="right">143726</td>
+<td align="right">125499</td>
+<td align="right">116472</td>
+<td align="right">99979</td>
+<td align="right">92500</td>
+<td align="right">91831</td>
+<td align="right">102893</td>
+<td align="right">88481</td>
+<td align="right">861381</td>
+</tr>
+<tr class="even">
+<td align="left">Native Non-Forested Uplands</td>
+<td align="right">91357</td>
+<td align="right">86949</td>
+<td align="right">74613</td>
+<td align="right">63498</td>
+<td align="right">62670</td>
+<td align="right">60930</td>
+<td align="right">62825</td>
+<td align="right">55656</td>
+<td align="right">558498</td>
+</tr>
+<tr class="odd">
+<td align="left">Subtidal</td>
+<td align="right">244471</td>
+<td align="right">243533</td>
+<td align="right">243513</td>
+<td align="right">242783</td>
+<td align="right">127993</td>
+<td align="right">128082</td>
+<td align="right">121926</td>
+<td align="right">128149</td>
+<td align="right">1480450</td>
+</tr>
+<tr class="even">
+<td align="left">Urban</td>
+<td align="right">408096</td>
+<td align="right">424823</td>
+<td align="right">454656</td>
+<td align="right">528686</td>
+<td align="right">557699</td>
+<td align="right">567948</td>
+<td align="right">561507</td>
+<td align="right">585133</td>
+<td align="right">4088547</td>
+</tr>
+<tr class="odd">
+<td align="left">Total</td>
+<td align="right">1693941</td>
+<td align="right">1693941</td>
+<td align="right">1693941</td>
+<td align="right">1693941</td>
+<td align="right">1579098</td>
+<td align="right">1579098</td>
+<td align="right">1579098</td>
+<td align="right">1579098</td>
+<td align="right">13092153</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="descriptor" class="section level3">
+<h3>Descriptor</h3>
+<pre class="r"><code># format results
+sums &lt;- acresjso %&gt;%
+  filter(var %in% &#39;HMPU_DESCRIPTOR&#39;) %&gt;% 
+  select(-var) %&gt;% 
+  bind_rows(group_by(., name) %&gt;%
+              summarise(areaac = sum(areaac)) %&gt;%
+              mutate(val = &#39;Total&#39;)) %&gt;%
+  bind_rows(group_by(., val) %&gt;%
+              summarise(areaac = sum(areaac)) %&gt;%
+              mutate(name = &#39;Total&#39;)) %&gt;%
+  spread(name, areaac, fill = NA)
+
+alltot &lt;- sums %&gt;% 
+  filter(val != &#39;Total&#39;)
+coltot &lt;- sums %&gt;% 
+  filter(val == &#39;Total&#39;)
+totab &lt;- bind_rows(alltot, coltot) 
+
+knitr::kable(totab, digits = 0)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">val</th>
+<th align="right">1990</th>
+<th align="right">1995</th>
+<th align="right">1999</th>
+<th align="right">2004</th>
+<th align="right">2007</th>
+<th align="right">2011</th>
+<th align="right">2014</th>
+<th align="right">2017</th>
+<th align="right">Total</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Algae</td>
+<td align="right">635</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">635</td>
+</tr>
+<tr class="even">
+<td align="left">Continuous_Seagrass</td>
+<td align="right">15819</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">15819</td>
+</tr>
+<tr class="odd">
+<td align="left">Developed</td>
+<td align="right">372447</td>
+<td align="right">393343</td>
+<td align="right">422716</td>
+<td align="right">479355</td>
+<td align="right">502711</td>
+<td align="right">516656</td>
+<td align="right">530839</td>
+<td align="right">536318</td>
+<td align="right">3754386</td>
+</tr>
+<tr class="even">
+<td align="left">Dry_Prairie</td>
+<td align="right">2404</td>
+<td align="right">813</td>
+<td align="right">705</td>
+<td align="right">525</td>
+<td align="right">681</td>
+<td align="right">742</td>
+<td align="right">7815</td>
+<td align="right">630</td>
+<td align="right">14315</td>
+</tr>
+<tr class="odd">
+<td align="left">Estuary</td>
+<td align="right">198185</td>
+<td align="right">222826</td>
+<td align="right">222916</td>
+<td align="right">242783</td>
+<td align="right">127993</td>
+<td align="right">128082</td>
+<td align="right">121926</td>
+<td align="right">128149</td>
+<td align="right">1392860</td>
+</tr>
+<tr class="even">
+<td align="left">Lakes</td>
+<td align="right">13260</td>
+<td align="right">13508</td>
+<td align="right">13998</td>
+<td align="right">13514</td>
+<td align="right">13316</td>
+<td align="right">12648</td>
+<td align="right">13587</td>
+<td align="right">13220</td>
+<td align="right">107053</td>
+</tr>
+<tr class="odd">
+<td align="left">Lakes_Reservoirs</td>
+<td align="right">21371</td>
+<td align="right">27000</td>
+<td align="right">30443</td>
+<td align="right">31586</td>
+<td align="right">39287</td>
+<td align="right">40000</td>
+<td align="right">41305</td>
+<td align="right">43210</td>
+<td align="right">274201</td>
+</tr>
+<tr class="even">
+<td align="left">Mangrove_Swamps</td>
+<td align="right">13522</td>
+<td align="right">14351</td>
+<td align="right">14314</td>
+<td align="right">15637</td>
+<td align="right">15591</td>
+<td align="right">15589</td>
+<td align="right">15512</td>
+<td align="right">15533</td>
+<td align="right">120049</td>
+</tr>
+<tr class="odd">
+<td align="left">Mixed_Rangeland</td>
+<td align="right">3293</td>
+<td align="right">2857</td>
+<td align="right">2584</td>
+<td align="right">7115</td>
+<td align="right">7355</td>
+<td align="right">7248</td>
+<td align="right">9232</td>
+<td align="right">6756</td>
+<td align="right">46441</td>
+</tr>
+<tr class="even">
+<td align="left">Patchy_Seagrass</td>
+<td align="right">9122</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">9122</td>
+</tr>
+<tr class="odd">
+<td align="left">Restorable_Agriculture</td>
+<td align="right">430176</td>
+<td align="right">435582</td>
+<td align="right">414683</td>
+<td align="right">345889</td>
+<td align="right">319378</td>
+<td align="right">305734</td>
+<td align="right">285905</td>
+<td align="right">288724</td>
+<td align="right">2826069</td>
+</tr>
+<tr class="even">
+<td align="left">Restorable_Developed</td>
+<td align="right">35649</td>
+<td align="right">31480</td>
+<td align="right">31940</td>
+<td align="right">49331</td>
+<td align="right">54988</td>
+<td align="right">51293</td>
+<td align="right">30668</td>
+<td align="right">48814</td>
+<td align="right">334161</td>
+</tr>
+<tr class="odd">
+<td align="left">Restorable_Mining</td>
+<td align="right">101221</td>
+<td align="right">104189</td>
+<td align="right">113502</td>
+<td align="right">119337</td>
+<td align="right">120506</td>
+<td align="right">121637</td>
+<td align="right">127891</td>
+<td align="right">128419</td>
+<td align="right">936702</td>
+</tr>
+<tr class="even">
+<td align="left">Restorable_Pond</td>
+<td align="right">339</td>
+<td align="right">301</td>
+<td align="right">393</td>
+<td align="right">800</td>
+<td align="right">920</td>
+<td align="right">1051</td>
+<td align="right">1269</td>
+<td align="right">1000</td>
+<td align="right">6072</td>
+</tr>
+<tr class="odd">
+<td align="left">Restorable_Shoreline</td>
+<td align="right">4166</td>
+<td align="right">2240</td>
+<td align="right">4221</td>
+<td align="right">9886</td>
+<td align="right">2418</td>
+<td align="right">3469</td>
+<td align="right">9810</td>
+<td align="right">3731</td>
+<td align="right">39942</td>
+</tr>
+<tr class="even">
+<td align="left">Salt_Barrens</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">488</td>
+<td align="right">456</td>
+<td align="right">501</td>
+<td align="right">528</td>
+<td align="right">502</td>
+<td align="right">2476</td>
+</tr>
+<tr class="odd">
+<td align="left">Salt_Marshes</td>
+<td align="right">4482</td>
+<td align="right">4436</td>
+<td align="right">4442</td>
+<td align="right">4638</td>
+<td align="right">4630</td>
+<td align="right">4603</td>
+<td align="right">4792</td>
+<td align="right">4598</td>
+<td align="right">36619</td>
+</tr>
+<tr class="even">
+<td align="left">Shrub_and_Brushland</td>
+<td align="right">85660</td>
+<td align="right">83279</td>
+<td align="right">71323</td>
+<td align="right">55858</td>
+<td align="right">54633</td>
+<td align="right">52941</td>
+<td align="right">45777</td>
+<td align="right">48270</td>
+<td align="right">497742</td>
+</tr>
+<tr class="odd">
+<td align="left">Streams_and_Waterways</td>
+<td align="right">3726</td>
+<td align="right">2481</td>
+<td align="right">2509</td>
+<td align="right">2824</td>
+<td align="right">2763</td>
+<td align="right">2758</td>
+<td align="right">2793</td>
+<td align="right">2765</td>
+<td align="right">22619</td>
+</tr>
+<tr class="even">
+<td align="left">Tidal_Flats</td>
+<td align="right">20711</td>
+<td align="right">20707</td>
+<td align="right">20597</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">62015</td>
+</tr>
+<tr class="odd">
+<td align="left">Upland_Coniferous_Forest</td>
+<td align="right">70727</td>
+<td align="right">50816</td>
+<td align="right">46178</td>
+<td align="right">37400</td>
+<td align="right">33265</td>
+<td align="right">33090</td>
+<td align="right">36770</td>
+<td align="right">31689</td>
+<td align="right">339934</td>
+</tr>
+<tr class="even">
+<td align="left">Upland_Hardwood_Forest</td>
+<td align="right">72998</td>
+<td align="right">74683</td>
+<td align="right">70293</td>
+<td align="right">62580</td>
+<td align="right">59235</td>
+<td align="right">58741</td>
+<td align="right">66124</td>
+<td align="right">56792</td>
+<td align="right">521447</td>
+</tr>
+<tr class="odd">
+<td align="left">Vegetated_Non-Forested_Wetlands</td>
+<td align="right">54457</td>
+<td align="right">51476</td>
+<td align="right">51178</td>
+<td align="right">58471</td>
+<td align="right">65146</td>
+<td align="right">68928</td>
+<td align="right">68988</td>
+<td align="right">67603</td>
+<td align="right">486249</td>
+</tr>
+<tr class="even">
+<td align="left">Wetland_Coniferous_Forests</td>
+<td align="right">30048</td>
+<td align="right">29894</td>
+<td align="right">29653</td>
+<td align="right">29977</td>
+<td align="right">29786</td>
+<td align="right">29568</td>
+<td align="right">30071</td>
+<td align="right">29538</td>
+<td align="right">238536</td>
+</tr>
+<tr class="odd">
+<td align="left">Wetland_Forested_Mixed</td>
+<td align="right">27806</td>
+<td align="right">26048</td>
+<td align="right">25536</td>
+<td align="right">20809</td>
+<td align="right">20088</td>
+<td align="right">19968</td>
+<td align="right">21756</td>
+<td align="right">19715</td>
+<td align="right">181726</td>
+</tr>
+<tr class="even">
+<td align="left">Wetland_Hardwood_Forests</td>
+<td align="right">101715</td>
+<td align="right">101633</td>
+<td align="right">99816</td>
+<td align="right">105139</td>
+<td align="right">103951</td>
+<td align="right">103852</td>
+<td align="right">105740</td>
+<td align="right">103120</td>
+<td align="right">824966</td>
+</tr>
+<tr class="odd">
+<td align="left">Total</td>
+<td align="right">1693941</td>
+<td align="right">1693941</td>
+<td align="right">1693941</td>
+<td align="right">1693941</td>
+<td align="right">1579098</td>
+<td align="right">1579098</td>
+<td align="right">1579098</td>
+<td align="right">1579098</td>
+<td align="right">13092153</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="local-dbf-import" class="section level2 tabset tabset-pills">
+<h2>local DBF import</h2>
+<div id="group-1" class="section level3">
+<h3>Group</h3>
+<pre class="r"><code># format results
+sums &lt;- acresdbf %&gt;%
   filter(var %in% &#39;HMPU_GROUP&#39;) %&gt;% 
   select(-var) %&gt;% 
   bind_rows(group_by(., name) %&gt;%
@@ -538,10 +1155,10 @@ knitr::kable(totab, digits = 0)</code></pre>
 </tbody>
 </table>
 </div>
-<div id="class" class="section level2">
-<h2>Class</h2>
+<div id="class-1" class="section level3">
+<h3>Class</h3>
 <pre class="r"><code># format results
-sums &lt;- dat %&gt;%
+sums &lt;- acresdbf %&gt;%
   filter(var %in% &#39;HMPU_CLASS&#39;) %&gt;% 
   select(-var) %&gt;% 
   bind_rows(group_by(., name) %&gt;%
@@ -686,10 +1303,10 @@ knitr::kable(totab, digits = 0)</code></pre>
 </tbody>
 </table>
 </div>
-<div id="descriptor" class="section level2">
-<h2>Descriptor</h2>
+<div id="descriptor-1" class="section level3">
+<h3>Descriptor</h3>
 <pre class="r"><code># format results
-sums &lt;- dat %&gt;%
+sums &lt;- acresdbf %&gt;%
   filter(var %in% &#39;HMPU_DESCRIPTOR&#39;) %&gt;% 
   select(-var) %&gt;% 
   bind_rows(group_by(., name) %&gt;%
@@ -1049,6 +1666,7 @@ knitr::kable(totab, digits = 0)</code></pre>
 </tr>
 </tbody>
 </table>
+</div>
 </div>
 </div>
 
