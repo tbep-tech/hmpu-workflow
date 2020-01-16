@@ -3,165 +3,80 @@ output:
   html_document:
     code_folding: hide
 ---
-  
+
 # Land use changes {.tabset}
   
 ```{r setup, message = F, warning = F, results = 'hide', echo = FALSE}
 knitr::opts_chunk$set(echo = TRUE, warning = F, message = F, echo = T, fig.path = 'figs/', dev.args = list(family = 'serif'), fig.path = 'figures/')
 
 library(tidyverse)
-library(sf)
-library(patchwork)
+library(reactable)
 library(here)
 
 data(acresjso)
-data(acresdbf)
+dat <- acresjso
+
+source('R/funcs.R')
 ```
 
-## JSON downloads {.tabset .tabset-pills}
+Values in each table are acreage, unless noted otherwise. 
 
-### Group
+## Descriptor
 
 ```{r}
 # format results
-sums <- acresjso %>%
-  filter(var %in% 'HMPU_GROUP') %>% 
-  select(-var) %>% 
-  bind_rows(group_by(., name) %>%
-              summarise(areaac = sum(areaac)) %>%
-              mutate(val = 'Total')) %>%
-  bind_rows(group_by(., val) %>%
-              summarise(areaac = sum(areaac)) %>%
-              mutate(name = 'Total')) %>%
-  spread(name, areaac, fill = NA)
-
-alltot <- sums %>% 
-  filter(val != 'Total')
-coltot <- sums %>% 
-  filter(val == 'Total')
-totab <- bind_rows(alltot, coltot) 
-
-knitr::kable(totab, digits = 0)
-```
-
-### Class
-
-```{r}
-# format results
-sums <- acresjso %>%
-  filter(var %in% 'HMPU_CLASS') %>% 
-  select(-var) %>% 
-  bind_rows(group_by(., name) %>%
-              summarise(areaac = sum(areaac)) %>%
-              mutate(val = 'Total')) %>%
-  bind_rows(group_by(., val) %>%
-              summarise(areaac = sum(areaac)) %>%
-              mutate(name = 'Total')) %>%
-  spread(name, areaac, fill = NA)
-
-alltot <- sums %>% 
-  filter(val != 'Total')
-coltot <- sums %>% 
-  filter(val == 'Total')
-totab <- bind_rows(alltot, coltot) 
-
-knitr::kable(totab, digits = 0)
-```
-
-### Descriptor
-
-```{r}
-# format results
-sums <- acresjso %>%
+sums <- dat %>%
   filter(var %in% 'HMPU_DESCRIPTOR') %>% 
   select(-var) %>% 
-  bind_rows(group_by(., name) %>%
-              summarise(areaac = sum(areaac)) %>%
-              mutate(val = 'Total')) %>%
-  bind_rows(group_by(., val) %>%
-              summarise(areaac = sum(areaac)) %>%
-              mutate(name = 'Total')) %>%
-  spread(name, areaac, fill = NA)
+  spread(name, areaac, fill = NA) %>% 
+  mutate(
+    grpval = case_when(
+      val %in% c('Mangrove_Swamps', 'Salt_Marshes', 'Salt_Barrens') ~ 'Tidal Wetlands', 
+      val %in% c('Streams_and_Waterways', 'Lakes', 'Wetland_Hardwood_Forests','Wetland_Coniferous_Forests', 'Wetland_Forested_Mixed',  'Vegetated_Non-Forested_Wetlands') ~ 'Freshwater Wetlands', 
+      val %in% c('Dry_Prairie', 'Shrub_and_Brushland', 'Mixed_Rangeland', 'Upland_Coniferous_Forest', 'Upland_Hardwood_Forest') ~ 'Native Uplands',
+      val %in% c('Restorable_Agriculture', 'Restorable_Developed', 'Restorable_Mining', 'Restorable_Shoreline', 'Restorable_Pond') ~ 'Opportunity Areas', 
+      val %in% c('Lakes_Reservoirs', 'Developed') ~ 'Developed'
+    ), 
+    chg = `2017` - `1990`,
+    chgper = 100 * (`2017` - `1990`) / `1990`
+  )
 
-alltot <- sums %>% 
-  filter(val != 'Total')
-coltot <- sums %>% 
-  filter(val == 'Total')
-totab <- bind_rows(alltot, coltot) 
-
-knitr::kable(totab, digits = 0)
+rct_fun(sums, 'Habitat')
 ```
 
-## local DBF import {.tabset .tabset-pills}
-
-### Group
+## Class
 
 ```{r}
 # format results
-sums <- acresdbf %>%
-  filter(var %in% 'HMPU_GROUP') %>% 
-  select(-var) %>% 
-  bind_rows(group_by(., name) %>%
-              summarise(areaac = sum(areaac)) %>%
-              mutate(val = 'Total')) %>%
-  bind_rows(group_by(., val) %>%
-              summarise(areaac = sum(areaac)) %>%
-              mutate(name = 'Total')) %>%
-  spread(name, areaac, fill = NA)
-
-alltot <- sums %>% 
-  filter(val != 'Total')
-coltot <- sums %>% 
-  filter(val == 'Total')
-totab <- bind_rows(alltot, coltot) 
-
-knitr::kable(totab, digits = 0)
-```
-
-### Class
-
-```{r}
-# format results
-sums <- acresdbf %>%
+sums <- dat %>%
   filter(var %in% 'HMPU_CLASS') %>% 
   select(-var) %>% 
-  bind_rows(group_by(., name) %>%
-              summarise(areaac = sum(areaac)) %>%
-              mutate(val = 'Total')) %>%
-  bind_rows(group_by(., val) %>%
-              summarise(areaac = sum(areaac)) %>%
-              mutate(name = 'Total')) %>%
-  spread(name, areaac, fill = NA)
+  spread(name, areaac, fill = NA) %>% 
+  mutate(
+    grpval = case_when(
+      val %in% c('Agriculture', 'Mining', 'Urban') ~ 'Developed', 
+      val %in% c('Subtidal', 'Emergent Tidal Wetlands', 'Freshwater Wetlands', 'Native Forested Uplands', 'Native Non-Forested Uplands') ~ 'Native'
+    ), 
+    chg = `2017` - `1990`,
+    chgper = 100 * (`2017` - `1990`) / `1990`
+  )
 
-alltot <- sums %>% 
-  filter(val != 'Total')
-coltot <- sums %>% 
-  filter(val == 'Total')
-totab <- bind_rows(alltot, coltot) 
-
-knitr::kable(totab, digits = 0)
+rct_fun(sums, 'Class')
 ```
 
-### Descriptor
+## Group
 
 ```{r}
 # format results
-sums <- acresdbf %>%
-  filter(var %in% 'HMPU_DESCRIPTOR') %>% 
+sums <- dat %>%
+  filter(var %in% 'HMPU_GROUP') %>% 
   select(-var) %>% 
-  bind_rows(group_by(., name) %>%
-              summarise(areaac = sum(areaac)) %>%
-              mutate(val = 'Total')) %>%
-  bind_rows(group_by(., val) %>%
-              summarise(areaac = sum(areaac)) %>%
-              mutate(name = 'Total')) %>%
-  spread(name, areaac, fill = NA)
+  spread(name, areaac, fill = NA) %>% 
+  mutate(
+    chg = `2017` - `1990`,
+    chgper = 100 * (`2017` - `1990`) / `1990`
+  )
 
-alltot <- sums %>% 
-  filter(val != 'Total')
-coltot <- sums %>% 
-  filter(val == 'Total')
-totab <- bind_rows(alltot, coltot) 
-
-knitr::kable(totab, digits = 0)
+rct_fun(sums, 'Group', grpby = F)
 ```
+

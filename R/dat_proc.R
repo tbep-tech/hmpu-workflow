@@ -84,7 +84,20 @@ acresjso <- res %>%
   enframe %>% 
   bind_cols(acres, .) %>% 
   select(name, value1) %>% 
-  unnest(value1)
+  unnest(value1) %>% 
+  filter(!val %in% c('Algae', 'Continuous_Seagrass', 'Estuary', 'Patchy_Seagrass', 'Tidal_Flats'))
+
+# manually add salt barren ests from ESA
+sltbrn <- tibble(
+  name = c('1990', '1995', '1999'), 
+  var = 'HMPU_DESCRIPTOR', 
+  val = 'Salt_Barrens', 
+  areaac = c(468,479, 492)
+)
+
+acresjso <- acresjso %>% 
+  bind_rows(sltbrn) %>% 
+  arrange(name, var, val)
 
 save(acresjso, file = here('data', 'acresjso.RData'), compress = 'xz')
 
@@ -136,7 +149,20 @@ acresdbf <- dbfs %>%
     })
   ) %>% 
   select(-value) %>% 
-  unnest(ests)
+  unnest(ests) %>% 
+  filter(!val %in% c('Algae', 'Continuous_Seagrass', 'Estuary', 'Patchy_Seagrass', 'Tidal_Flats'))
+
+# manually add salt barren ests from ESA
+sltbrn <- tibble(
+  name = c('1990', '1995', '1999'), 
+  var = 'HMPU_DESCRIPTOR', 
+  val = 'Salt_Barrens', 
+  areaac = c(468,479, 492)
+)
+
+acresdbf <- acresdbf %>% 
+  bind_rows(sltbrn) %>% 
+  arrange(name, var, val)
 
 save(acresdbf, file = here('data', 'acresdbf.RData'), compress = 'xz')
 
