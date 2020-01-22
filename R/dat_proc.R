@@ -66,9 +66,10 @@ res <- foreach(i = 1:nrow(acres), .packages = c('tidyverse', 'sf', 'here', 'tbep
       Acres = sum(areaac)
     )
   
-  # summarise by categories
+  # summarise by categories, remove subtidal first for watershed area
   dat_out <- dat_are %>% 
     left_join(fluccs, by = 'FLUCCSCODE') %>% 
+    filter(!HMPU_DESCRIPTOR %in% c('Algae', 'Continuous_Seagrass', 'Hard_Bottom', 'Estuary', 'Oyster_Bars', 'Patchy_Seagrass', 'Subtidal', 'Tidal_Flats')) %>% 
     select(-FLUCCSCODE, -FIRST_FLUC) %>% 
     gather('var', 'val', -Acres) %>% 
     group_by(var, val) %>% 
@@ -84,8 +85,7 @@ acresjso <- res %>%
   enframe %>% 
   bind_cols(acres, .) %>% 
   select(name, value1) %>% 
-  unnest(value1) %>% 
-  filter(!val %in% c('Algae', 'Continuous_Seagrass', 'Estuary', 'Patchy_Seagrass', 'Tidal_Flats'))
+  unnest(value1)
 
 # manually add salt barren ests from ESA
 sltbrn <- tibble(
@@ -137,6 +137,7 @@ acresdbf <- dbfs %>%
         select(FLUCCSCODE, Acres) %>% 
         filter(FLUCCSCODE %in% fluccs$FLUCCSCODE) %>% 
         left_join(fluccs, by = 'FLUCCSCODE') %>% 
+        filter(!HMPU_DESCRIPTOR %in% c('Algae', 'Continuous_Seagrass', 'Hard_Bottom', 'Estuary', 'Oyster_Bars', 'Patchy_Seagrass', 'Subtidal', 'Tidal_Flats')) %>% 
         select(-FLUCCSCODE, -FIRST_FLUC) %>% 
         gather('var', 'val', -Acres) %>% 
         group_by(var, val) %>% 
@@ -149,8 +150,7 @@ acresdbf <- dbfs %>%
     })
   ) %>% 
   select(-value) %>% 
-  unnest(ests) %>% 
-  filter(!val %in% c('Algae', 'Continuous_Seagrass', 'Estuary', 'Patchy_Seagrass', 'Tidal_Flats'))
+  unnest(ests)
 
 # manually add salt barren ests from ESA
 sltbrn <- tibble(

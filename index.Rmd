@@ -55,7 +55,7 @@ sums <- dat %>%
   mutate(
     grpval = case_when(
       val %in% c('Agriculture', 'Mining', 'Urban') ~ 'Developed', 
-      val %in% c('Subtidal', 'Emergent Tidal Wetlands', 'Freshwater Wetlands', 'Native Forested Uplands', 'Native Non-Forested Uplands') ~ 'Native'
+      val %in% c('Emergent Tidal Wetlands', 'Freshwater Wetlands', 'Native Forested Uplands', 'Native Non-Forested Uplands') ~ 'Native'
     ), 
     chg = `2017` - `1990`,
     chgper = 100 * (`2017` - `1990`) / `1990`
