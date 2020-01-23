@@ -27,10 +27,10 @@ rct_fun <- function(sums, colnm, grpby = T){
         `2011` = colDef(footer = sum(sums$`2011`), aggregate = 'sum'),
         `2014` = colDef(footer = sum(sums$`2014`), aggregate = 'sum'),
         `2017` = colDef(footer = sum(sums$`2017`), aggregate = 'sum'),
-        chg = colDef(name = '1990-2017 change', minWidth = 130,
+        chg = colDef(name = '1990-2017 change', minWidth = 140,
                      style = jsfun
         ), 
-        chgper = colDef(name = '% change', minWidth = 100,
+        chgper = colDef(name = '% change', minWidth = 85,
                         style = jsfun,
                         format = colFormat(suffix = '%', digits = 0)
                         
@@ -60,10 +60,10 @@ rct_fun <- function(sums, colnm, grpby = T){
         `2011` = colDef(footer = sum(sums$`2011`), aggregate = 'sum'),
         `2014` = colDef(footer = sum(sums$`2014`), aggregate = 'sum'),
         `2017` = colDef(footer = sum(sums$`2017`), aggregate = 'sum'),
-        chg = colDef(name = '1990-2017 change', minWidth = 130,
+        chg = colDef(name = '1990-2017 change', minWidth = 140,
                      style = jsfun
         ), 
-        chgper = colDef(name = '% change', minWidth = 100,
+        chgper = colDef(name = '% change', minWidth = 85,
                         style = jsfun,
                         format = colFormat(suffix = '%', digits = 0)
                         
