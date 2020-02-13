@@ -11,8 +11,11 @@ css: styles.css
 knitr::opts_chunk$set(echo = TRUE, warning = F, message = F, echo = T, fig.path = 'figs/', dev.args = list(family = 'serif'), fig.path = 'figures/')
 
 library(tidyverse)
+library(forcats)
+library(foreign)
 library(reactable)
 library(here)
+library(networkD3)
 
 data(acresjso)
 dat <- acresjso
@@ -47,6 +50,49 @@ sums <- dat %>%
   )
 
 rct_fun(sums, 'Habitat')
+```
+
+```{r}
+chgdat <- read.dbf('T:/05_GIS/HMPU/comp1990v2017/TBEP_dbasinsg_LU9017.dbf')
+lkup <- read.csv('data-raw/FLUCCShabsclass.csv')
+
+clp <- lkup %>% 
+  select(HMPU_DESCRIPTOR, FLUCCSCODE) %>% 
+  group_by(HMPU_DESCRIPTOR) %>%
+  deframe() %>%
+  map(as.character)
+ 
+sumdat <- chgdat %>% 
+  select(FLUCCS17, FLUCCS90, Acres) %>% 
+  group_by(FLUCCS17, FLUCCS90) %>% 
+  summarise(Acres = sum(Acres)) %>% 
+  ungroup %>% 
+  mutate(
+    FLUCCS17 = factor(FLUCCS17, levels = lkup$FLUCCSCODE),
+    FLUCCS17 = fct_recode(FLUCCS17, !!!clp),
+    FLUCCS90 = factor(FLUCCS90, levels = lkup$FLUCCSCODE),
+    FLUCCS90 = fct_recode(FLUCCS90, !!!clp),
+  ) %>% 
+  na.omit() %>% 
+  group_by(FLUCCS17, FLUCCS90) %>% 
+  summarise(Acres = sum(Acres)) %>% 
+  ungroup %>% 
+  select(source = FLUCCS90, target = FLUCCS17, value = Acres) %>% 
+  data.frame(stringsAsFactors = F)
+sumdat$target <- paste(sumdat$target, " ", sep="")
+
+# From these flows we need to create a node data frame: it lists every entities involved in the flow
+nodes <- data.frame(name=c(as.character(sumdat$source), as.character(sumdat$target)) %>% unique())
+
+# With networkD3, connection must be provided using id, not using real name like in the links dataframe.. So we need to reformat it.
+sumdat$IDsource=match(sumdat$source, nodes$name)-1 
+sumdat$IDtarget=match(sumdat$target, nodes$name)-1
+
+sankeyNetwork(Links = sumdat, Nodes = nodes,
+              Source = "IDsource", Target = "IDtarget",
+              Value = "value", NodeID = "name", height = 1200, width = 800,
+              sinksRight=FALSE, units = 'acres', nodeWidth=40, fontSize=13, nodePadding=5)
+
 ```
 
 ## Class
