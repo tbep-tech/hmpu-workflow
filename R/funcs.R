@@ -83,3 +83,48 @@ rct_fun <- function(sums, colnm, grpby = T){
   return(out)
   
 }
+
+# alluvial function
+# https://www.data-to-viz.com/graph/sankey.html
+alluvout <- function(chgdat, lkup, var = 'HMPU_DESCRIPTOR', height = 1200){
+  
+  clp <- lkup %>% 
+    select(!!var, FLUCCSCODE) %>% 
+    group_by(!!var) %>%
+    deframe() %>%
+    map(as.character)
+  
+  sumdat <- chgdat %>% 
+    select(FLUCCS17, FLUCCS90, Acres) %>% 
+    group_by(FLUCCS17, FLUCCS90) %>% 
+    summarise(Acres = sum(Acres)) %>% 
+    ungroup %>% 
+    mutate(
+      FLUCCS17 = factor(FLUCCS17, levels = lkup$FLUCCSCODE),
+      FLUCCS17 = fct_recode(FLUCCS17, !!!clp),
+      FLUCCS90 = factor(FLUCCS90, levels = lkup$FLUCCSCODE),
+      FLUCCS90 = fct_recode(FLUCCS90, !!!clp),
+    ) %>% 
+    na.omit() %>% 
+    group_by(FLUCCS17, FLUCCS90) %>% 
+    summarise(Acres = sum(Acres)) %>% 
+    ungroup %>% 
+    select(source = FLUCCS90, target = FLUCCS17, value = Acres) %>% 
+    data.frame(stringsAsFactors = F)
+  sumdat$target <- paste(sumdat$target, " ", sep="")
+  
+  # From these flows we need to create a node data frame: it lists every entities involved in the flow
+  nodes <- data.frame(name=c(as.character(sumdat$source), as.character(sumdat$target)) %>% unique())
+  
+  # With networkD3, connection must be provided using id, not using real name like in the links dataframe.. So we need to reformat it.
+  sumdat$IDsource=match(sumdat$source, nodes$name)-1 
+  sumdat$IDtarget=match(sumdat$target, nodes$name)-1
+  
+  out <- sankeyNetwork(Links = sumdat, Nodes = nodes,
+                Source = "IDsource", Target = "IDtarget",
+                Value = "value", NodeID = "name", height = height, width = 800,
+                sinksRight=FALSE, units = 'acres', nodeWidth=40, fontSize=13, nodePadding=5)
+  
+  return(out)
+  
+}
