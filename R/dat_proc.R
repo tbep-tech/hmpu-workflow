@@ -6,6 +6,7 @@ library(here)
 library(doParallel)
 library(foreach)
 library(tbeptools)
+library(foreign)
 
 # https://data-swfwmd.opendata.arcgis.com/search?groupIds=880fc95697ce45c3a8b078bb752faf40
 urls <- list(
@@ -166,3 +167,7 @@ acresdbf <- acresdbf %>%
 
 save(acresdbf, file = here('data', 'acresdbf.RData'), compress = 'xz')
 
+# save change data dbf from network ---------------------------------------
+
+chgdat <- read.dbf('T:/05_GIS/HMPU/comp1990v2017/TBEP_dbasinsg_LU9017.dbf')
+save(chgdat, file = 'data/chgdat.RData', compress = 'xz')

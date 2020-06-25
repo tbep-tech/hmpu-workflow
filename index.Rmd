@@ -17,10 +17,10 @@ library(reactable)
 library(here)
 library(networkD3)
 
+data(chgdat)
 data(acresjso)
 dat <- acresjso
 
-chgdat <- read.dbf('T:/05_GIS/HMPU/comp1990v2017/TBEP_dbasinsg_LU9017.dbf')
 lkup <- read.csv('data-raw/FLUCCShabsclass.csv')
 
 source('R/funcs.R')
