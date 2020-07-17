@@ -55,10 +55,18 @@ sums <- dat %>%
 rct_fun(sums, 'Habitat')
 ```
 
-##### 1990 to 2017 change 
+##### 1990 to 2017 change  {.tabset .tabset-pills}
+
+###### Plot
 
 ```{r}
 alluvout(chgdat, lkup, var = "HMPU_DESCRIPTOR", height = 1200)
+```
+
+###### Table
+
+```{r}
+cmprctfun(chgdat, lkup, var = "HMPU_DESCRIPTOR")
 ```
 
 ## Class
@@ -81,10 +89,18 @@ sums <- dat %>%
 rct_fun(sums, 'Class')
 ```
 
-##### 1990 to 2017 change 
+##### 1990 to 2017 change {.tabset .tabset-pills} 
+
+###### Plot 
 
 ```{r}
 alluvout(chgdat, lkup, var = "HMPU_CLASS", height = 900)
+```
+
+###### Table
+
+```{r}
+cmprctfun(chgdat, lkup, var = "HMPU_CLASS")
 ```
 
 ## Group
@@ -103,8 +119,16 @@ sums <- dat %>%
 rct_fun(sums, 'Group', grpby = F)
 ```
 
-##### 1990 to 2017 change 
+##### 1990 to 2017 change {.tabset .tabset-pills} 
+
+###### Plot 
 
 ```{r}
 alluvout(chgdat, lkup, var = "HMPU_GROUP", height = 900)
+```
+
+###### Table
+
+```{r}
+cmprctfun(chgdat, lkup, var = "HMPU_GROUP")
 ```

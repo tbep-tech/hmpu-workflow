@@ -90,7 +90,6 @@ alluvout <- function(chgdat, lkup, var = 'HMPU_DESCRIPTOR', height = 1200){
   
   clp <- lkup %>% 
     select(!!var, FLUCCSCODE) %>% 
-    group_by(!!var) %>%
     deframe() %>%
     map(as.character)
   
@@ -124,6 +123,133 @@ alluvout <- function(chgdat, lkup, var = 'HMPU_DESCRIPTOR', height = 1200){
                 Source = "IDsource", Target = "IDtarget",
                 Value = "value", NodeID = "name", height = height, width = 800,
                 sinksRight=FALSE, units = 'acres', nodeWidth=40, fontSize=13, nodePadding=5)
+  
+  return(out)
+  
+}
+
+# reactable change table for 1990 to 2017 comp
+cmprctfun <- function(chgdat, lkup, var = 'HMPU_DESCRIPTOR'){
+  
+  clp <- lkup %>% 
+    select(!!var, FLUCCSCODE) %>% 
+    deframe %>%
+    map(as.character)
+
+  sumdat <- chgdat %>% 
+    select(FLUCCS17, FLUCCS90, Acres) %>% 
+    group_by(FLUCCS17, FLUCCS90) %>% 
+    summarise(Acres = sum(Acres)) %>% 
+    ungroup %>% 
+    mutate(
+      FLUCCS17 = factor(FLUCCS17, levels = lkup$FLUCCSCODE),
+      FLUCCS17 = fct_recode(FLUCCS17, !!!clp),
+      FLUCCS90 = factor(FLUCCS90, levels = lkup$FLUCCSCODE),
+      FLUCCS90 = fct_recode(FLUCCS90, !!!clp),
+    ) %>% 
+    na.omit() %>% 
+    group_by(FLUCCS17, FLUCCS90) %>% 
+    summarise(Acres = sum(Acres)) %>% 
+    ungroup %>% 
+    rename(
+      source = FLUCCS90, 
+      target = FLUCCS17, 
+      value = Acres
+    ) %>% 
+    mutate(
+      target = factor(target, levels = sort(levels(target))),
+      source = factor(source, levels = sort(levels(source)))
+    )
+  
+  totab <- sumdat %>% 
+    complete(source, target) %>% 
+    spread(target, value, fill = 0) %>% 
+    mutate(Total = select_if(., is.numeric) %>% rowSums)
+  
+  srcttl <- select(totab, source, Total)
+  trgttl <- totab %>% 
+    select(-source, -Total) %>% 
+    gather('Category', 'Total') %>% 
+    mutate(Category = factor(Category, levels = levels(totab$source))) %>% 
+    group_by(Category) %>% 
+    summarise(Total = sum(Total)) %>% 
+    ungroup
+  
+  totab <- totab %>%
+    mutate(
+      chg = trgttl$Total - Total,
+      chgper = 100 * chg / Total, 
+      chgper = ifelse(is.na(chgper), 0, chgper),
+      chg = as.character(round(chg, 0)),
+      chgper = as.character(round(chgper, 1)), 
+      Total = as.character(round(Total, 0))
+    )
+  
+  jsfun <- JS("function(rowInfo) {
+    var value = rowInfo.row.chg
+    if (value >= 0) {
+      var color = '#008000E6'
+    } else if (value < 0) {
+      var color = '#e00000E6'
+    } 
+    return { color: color, fontWeight: 'bold' }
+    }"
+  ) 
+  
+  sticky_style <- list(position = "sticky", left = 0, background = "#fff", zIndex = 1,
+                       borderRight = "1px solid #eee", fontWeight = 'bold')
+  
+  out <- reactable(
+    totab, 
+    columns = list(
+      source = colDef(
+        name = '', 
+        footer = '2017 total', 
+        minWidth = 250,
+        style = sticky_style,
+        headerStyle = sticky_style, 
+        footerStyle = sticky_style
+        ), 
+      Total = colDef(
+        name = '1990 total', 
+        style = list(fontWeight = 'bold'),
+        class = "sticky right-col-3",
+        headerClass = "sticky right-col-3",
+        footerClass = "sticky right-col-3"
+        ),
+      chg = colDef(
+        name = '1990-2017 change (acres)', 
+        style = jsfun,
+        class = "sticky right-col-2",
+        headerClass = "sticky right-col-2",
+        footerClass = "sticky right-col-2"
+        ), 
+      chgper = colDef(
+        name = '% change',
+        style = jsfun,
+        format = colFormat(suffix = '%', digits = 0),
+        class = "sticky right-col-1",
+        headerClass = "sticky right-col-1",
+        footerClass = "sticky right-col-1"
+        )
+    ),
+    defaultColDef = colDef(
+      footerStyle = list(fontWeight = "bold"),
+      footer = function(values){
+        if(!is.numeric(values))
+          return()
+        
+        round(sum(values), 0)
+        
+      },
+      format = colFormat(digits = 0, separators = TRUE),
+      resizable = TRUE
+    ),
+    height = 800,
+    highlight = T,
+    wrap = T, 
+    pagination = F
+  )
   
   return(out)
   
