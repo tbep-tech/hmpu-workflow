@@ -190,3 +190,11 @@ h5 {
   right: 225px;
   border-left: 1px solid #eee !important;
 }
+
+.right-col-2a {
+  right: 100px;}
+
+.right-col-3a {
+  right: 200px;
+  border-left: 1px solid #eee !important;
+}

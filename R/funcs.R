@@ -221,16 +221,16 @@ cmprctfun <- function(chgdat, lkup, var = 'HMPU_DESCRIPTOR'){
       Total = colDef(
         name = '1990 total', 
         style = list(fontWeight = 'bold'),
-        class = "sticky right-col-3",
-        headerClass = "sticky right-col-3",
-        footerClass = "sticky right-col-3"
+        class = "sticky right-col-3a",
+        headerClass = "sticky right-col-3a",
+        footerClass = "sticky right-col-3a"
         ),
       chg = colDef(
         name = '1990-2017 change (acres)', 
         style = jsfun,
-        class = "sticky right-col-2",
-        headerClass = "sticky right-col-2",
-        footerClass = "sticky right-col-2"
+        class = "sticky right-col-2a",
+        headerClass = "sticky right-col-2a",
+        footerClass = "sticky right-col-2a"
         ), 
       chgper = colDef(
         name = '% change',
@@ -253,7 +253,7 @@ cmprctfun <- function(chgdat, lkup, var = 'HMPU_DESCRIPTOR'){
       format = colFormat(digits = 0, separators = TRUE),
       resizable = TRUE
     ),
-    height = 800,
+    # height = 800,
     highlight = T,
     wrap = T, 
     pagination = F
