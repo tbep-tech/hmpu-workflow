@@ -1,6 +1,9 @@
 # reactable table function
 rct_fun <- function(sums, colnm, grpby = T){
   
+  sticky_style <- list(position = "sticky", left = 0, background = "#fff", zIndex = 1,
+                       borderRight = "1px solid #eee")
+  
   jsfun <- JS("function(rowInfo) {
     var value = rowInfo.row.chg
     if (value >= 0) {
@@ -17,8 +20,13 @@ rct_fun <- function(sums, colnm, grpby = T){
       sums, 
       groupBy = 'grpval',
       columns = list(
-        grpval = colDef(name = '', minWidth = 145),
-        val = colDef(name = colnm, footer = 'Total', minWidth = 120), 
+        grpval = colDef(name = '', minWidth = 170, class = 'sticky left-col-1', headerClass = 'sticky left-col-1', footerClass = 'sticky left-col-1'),
+        val = colDef(
+          name = colnm, 
+          footer = 'Total', 
+          minWidth = 200, 
+          class = 'sticky left-col-2', headerClass = 'sticky left-col-2', footerClass = 'sticky left-col-2'
+          ), 
         `1990` = colDef(footer = sum(sums$`1990`), aggregate = 'sum'),
         `1995` = colDef(footer = sum(sums$`1995`), aggregate = 'sum'),
         `1999` = colDef(footer = sum(sums$`1999`), aggregate = 'sum'),
@@ -28,30 +36,29 @@ rct_fun <- function(sums, colnm, grpby = T){
         `2014` = colDef(footer = sum(sums$`2014`), aggregate = 'sum'),
         `2017` = colDef(footer = sum(sums$`2017`), aggregate = 'sum'),
         chg = colDef(name = '1990-2017 change', minWidth = 140,
-                     style = jsfun
+                     style = jsfun, class = 'sticky right-col-2', headerClass = 'sticky right-col-2', footerClass = 'sticky right-col-2'
         ), 
         chgper = colDef(name = '% change', minWidth = 85,
                         style = jsfun,
-                        format = colFormat(suffix = '%', digits = 0)
+                        format = colFormat(suffix = '%', digits = 0), 
+                        class = 'sticky right-col-1', headerClass = 'sticky right-col-1', footerClass = 'sticky right-col-1'
                         
         )
       ),
       defaultColDef = colDef(
         footerStyle = list(fontWeight = "bold"),
         format = colFormat(digits = 0, separators = TRUE), 
-        minWidth = 75, resizable = TRUE
+        resizable = F
       ),
-      defaultPageSize = nrow(sums),
-      showPageSizeOptions = F,
       highlight = T,
-      wrap = F
+      wrap = T
     )
   
   if(!grpby)
     out <- reactable(
       sums, 
       columns = list(
-        val = colDef(name = colnm, footer = 'Total', minWidth = 120), 
+        val = colDef(name = colnm, footer = 'Total', minWidth = 120, class = 'sticky left-col-1-bord', headerClass = 'sticky left-col-1-bord', footerClass = 'sticky left-col-1-bord'), 
         `1990` = colDef(footer = sum(sums$`1990`), aggregate = 'sum'),
         `1995` = colDef(footer = sum(sums$`1995`), aggregate = 'sum'),
         `1999` = colDef(footer = sum(sums$`1999`), aggregate = 'sum'),
@@ -61,11 +68,12 @@ rct_fun <- function(sums, colnm, grpby = T){
         `2014` = colDef(footer = sum(sums$`2014`), aggregate = 'sum'),
         `2017` = colDef(footer = sum(sums$`2017`), aggregate = 'sum'),
         chg = colDef(name = '1990-2017 change', minWidth = 140,
-                     style = jsfun
+                     style = jsfun, class = 'sticky right-col-2', headerClass = 'sticky right-col-2', footerClass = 'sticky right-col-2'
         ), 
         chgper = colDef(name = '% change', minWidth = 85,
                         style = jsfun,
-                        format = colFormat(suffix = '%', digits = 0)
+                        format = colFormat(suffix = '%', digits = 0), 
+                        class = 'sticky right-col-1', headerClass = 'sticky right-col-1', footerClass = 'sticky right-col-1'
                         
         )
       ),

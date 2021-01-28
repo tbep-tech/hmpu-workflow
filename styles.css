@@ -159,29 +159,34 @@ h5 {
 }
 
 .left-col-1 {
-  left: 0;
+  left: 0px;
 }
 
 .left-col-2 {
-  left: 100px;
+  left: 170px;
+  border-right: 1px solid #eee !important;
 }
 
 .left-col-3 {
-  left: 200px;
+  left: 370px;
+  border-right: 1px solid #eee !important;
+}
+
+.left-col-1-bord {
+  left: 0px;
   border-right: 1px solid #eee !important;
 }
 
 .right-col-1 {
-  right: 0;
-  border-left: 1px solid #eee !important;
+  right: 0px;
 }
 
 .right-col-2 {
-  right: 100px;
+  right: 85px;
   border-left: 1px solid #eee !important;
 }
 
 .right-col-3 {
-  right: 200px;
+  right: 225px;
   border-left: 1px solid #eee !important;
 }
