@@ -23,7 +23,7 @@ urls <- list(
   `1999` = 'https://opendata.arcgis.com/datasets/f3352c512a904eb694d3a3e04fc275a1_3.geojson',
   `1995` = 'https://opendata.arcgis.com/datasets/ca1b5d1bff5c4459a28e93dc92d39413_2.geojson',
   `1990` = 'https://opendata.arcgis.com/datasets/5be9f0bf951f45379e43466198988673_1.geojson'
-) %>%
+  ) %>%
   enframe 
 
 # setup parallel backend
@@ -158,9 +158,56 @@ acresjso <- acresjso %>%
 
 save(acresjso, file = here('data', 'acresjso.RData'), compress = 'xz')
 
-
-
 # save change data dbf from network ---------------------------------------
 
 chgdat <- read.dbf('T:/05_GIS/HMPU/comp1990v2017/TBEP_dbasinsg_LU9017.dbf')
 save(chgdat, file = 'data/chgdat.RData', compress = 'xz')
+
+
+# opportunities map from deliverables -------------------------------------
+
+library(raster)
+library(sf)
+library(tidyverse)
+library(stars)
+
+oppdat <- raster('~/Desktop/rasters/rasters/HMPU_additivehybrid.tif')
+oppdat <- readAll(oppdat)
+
+# vals <- getValues(tmp)
+
+cls <- list(
+  `100` = 'Not-considered Native', # x
+  `101` = 'Protected Native', # 'Existing Conservation Native'
+  `104` = 'Proposed Native', # 'Proposed Consevation Native'
+  `150` = 'Reserve Not-considered Native', 
+  `154` = 'Reserve Proposed Native', # 'Reservation Native'
+  `201` = 'Protected Restorable', # 'Existing Conservation Restorable'
+  `204` = 'Proposed Restorable', # 'Proposed Conservation Restorable'
+  `254` = 'Reserve Proposed Restorable', # 'Reservation Restorable'
+  `300` = 'Developed', # x
+  `400` = 'Open Water', # x
+  `401` = 'Sub-tidal', # x
+  `999` = 'Not-considered' # x
+)
+
+oppdat[!oppdat[] %in% c(101, 104, 154, 201, 204, 254)] <- NA
+oppdat <- oppdat %>% 
+  st_as_stars %>% 
+  st_as_sf(as_points = FALSE, merge = TRUE) %>% 
+  dplyr::rename(code = HMPU_additivehybrid) %>% 
+  dplyr::mutate(
+    cat = case_when(
+      code == 101 ~ 'Existing Conservation Native', 
+      code == 104 ~ 'Proposed Conservation Native', 
+      code == 150 ~ 'Reservation Not Native', 
+      code == 154 ~ 'Reservation Native', 
+      code == 201 ~ 'Existing Conservation Restorable', 
+      code == 204 ~ 'Proposed Cosnervation Restorable', 
+      code == 254 ~ 'Reservation Restorable', 
+      T ~ NA_character_
+    )
+  )
+
+save(oppdat, file= 'data/oppdat.RData', compress = 'xz')
+

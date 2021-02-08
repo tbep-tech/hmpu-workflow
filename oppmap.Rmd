@@ -1,0 +1,37 @@
+---
+output: 
+  html_document:
+    code_folding: hide
+css: styles.css
+---
+
+# Opportunities map {.tabset}
+  
+```{r setup, message = F, warning = F, results = 'hide', echo = FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = F, message = F, echo = T, fig.path = 'figs/', dev.args = list(family = 'serif'), fig.path = 'figures/')
+
+library(tidyverse)
+library(mapview)
+
+data(oppdat)
+
+cols <- list(
+  `Existing Conservation Native` = 'yellowgreen', 
+  `Existing Conservation Restorable` = 'green4', 
+  `Proposed Conservation Native` = 'dodgerblue1', 
+  `Proposed Conservation Restorable` = 'dodgerblue4', 
+  `Restoration Native` = 'violetred1', 
+  `Restoration Restorable` = 'violetred3'
+  ) %>% 
+  unlist
+
+# # style file
+# styles <- readLines('https://raw.githubusercontent.com/tbep-tech/css-styling/master/styles.css')
+# writeLines(styles, 'styles.css')
+```
+
+```{r, out.width = '100%'}
+mapview(oppdat, zcol = 'cat', col.regions = cols, lwd = 0)
+```
+
+
