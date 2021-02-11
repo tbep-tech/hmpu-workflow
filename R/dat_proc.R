@@ -163,7 +163,6 @@ save(acresjso, file = here('data', 'acresjso.RData'), compress = 'xz')
 chgdat <- read.dbf('T:/05_GIS/HMPU/comp1990v2017/TBEP_dbasinsg_LU9017.dbf')
 save(chgdat, file = 'data/chgdat.RData', compress = 'xz')
 
-
 # opportunities map from deliverables -------------------------------------
 
 library(raster)
@@ -203,7 +202,7 @@ oppdat <- oppdat %>%
       code == 150 ~ 'Reservation Not Native', 
       code == 154 ~ 'Reservation Native', 
       code == 201 ~ 'Existing Conservation Restorable', 
-      code == 204 ~ 'Proposed Cosnervation Restorable', 
+      code == 204 ~ 'Proposed Conservation Restorable', 
       code == 254 ~ 'Reservation Restorable', 
       T ~ NA_character_
     )
