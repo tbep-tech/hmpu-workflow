@@ -210,3 +210,82 @@ oppdat <- oppdat %>%
 
 save(oppdat, file= 'data/oppdat.RData', compress = 'xz')
 
+
+# get current status of HMPU categories -----------------------------------
+
+# use current lulc
+url <- 'https://opendata.arcgis.com/datasets/bedb342c692d4be6891b899e4cf7f4a6_1.geojson'
+
+# import file
+dat_raw <- st_read(url)
+
+# crop by watershed and select fluccs
+dat_crp <- dat_raw %>%
+  st_transform(crs = prj) %>%
+  dplyr::select(FLUCCSCODE) %>%
+  filter(FLUCCSCODE %in% fluccs$FLUCCSCODE) %>%
+  st_buffer(dist = 0) %>%
+  st_intersection(tbshed)
+
+# use current subtidal/seagrass
+sub_raw <- st_read('https://opendata.arcgis.com/datasets/8d0d473468924423bf0f1682aaca790f_0.geojson')
+
+sub_crp <- sub_raw %>% 
+  dplyr::select(FLUCCSCODE) %>%
+  filter(FLUCCSCODE %in% fluccs$FLUCCSCODE) %>%
+  st_buffer(dist = 0) %>%
+  st_intersection(tbshed)
+
+sub_are <- sub_crp %>%
+  mutate(
+    aream2 = st_area(.),
+    aream2 = as.numeric(aream2),
+    areaac = aream2 / 4047
+  ) %>%
+  st_set_geometry(NULL) %>%
+  group_by(FLUCCSCODE) %>%
+  summarise(
+    Acres = sum(areaac)
+  )
+
+tmp2 <- sub_are %>%
+  left_join(fluccs, by = 'FLUCCSCODE') %>%
+  group_by(HMPU_TARGETS) %>%
+  summarise(Acres = sum(Acres))
+
+# # use existing lulc
+# 
+# lulcdat <- raster('~/Desktop/rasters/rasters/Full_LULC.tif')
+# lulcdat <- readAll(lulcdat)
+# 
+# dat_crp <- lulcdat %>% 
+#   st_as_stars %>% 
+#   st_as_sf(as_points = FALSE, merge = TRUE) %>% 
+#   st_transform(crs = prj) %>% 
+#   rename(FLUCCSCODE = 'Full_LULC')
+
+# everything above can be swapped
+
+# get area
+dat_are <- dat_crp %>%
+  mutate(
+    aream2 = st_area(.),
+    aream2 = as.numeric(aream2),
+    areaac = aream2 / 4047
+  ) %>%
+  st_set_geometry(NULL) %>%
+  group_by(FLUCCSCODE) %>%
+  summarise(
+    Acres = sum(areaac)
+  )
+
+
+tmp <- dat_are %>%
+  left_join(fluccs, by = 'FLUCCSCODE') %>%
+  group_by(HMPU_TARGETS) %>%
+  summarise(Acres = sum(Acres))
+
+
+# # doesn't work (memory issue)
+# all_crp <- st_union(dat_crp, sub_crp)
+
