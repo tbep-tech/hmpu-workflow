@@ -3,6 +3,7 @@ library(tidyverse)
 library(here)
 library(doParallel)
 library(foreach)
+library(units)
 
 prj <- 4326
 
@@ -156,7 +157,8 @@ for(i in 1:nrow(inds)){
     select(source = Category, target = Category.1, value = Acres) %>%
     data.frame(stringsAsFactors = F)
   
-  union$bay_segment <- seg
   chgdat <- bind_rows(chgdat, union)
   
 }
+
+save(chgout, file = here('data', 'chgout.RData'), compress = 'xz')
