@@ -161,4 +161,4 @@ for(i in 1:nrow(inds)){
   
 }
 
-save(chgout, file = here('data', 'chgout.RData'), compress = 'xz')
+save(chgdat, file = here('data', 'chgdat.RData'), compress = 'xz')
