@@ -75,9 +75,6 @@ save(acresjso, file = here('data', 'acresjso.RData'), compress = 'xz')
 
 # LULC change analysis ----------------------------------------------------
 
-# chgdat <- read.dbf('T:/05_GIS/HMPU/comp1990v2017/TBEP_dbasinsg_LU9017.dbf')
-# save(chgdat, file = 'data/chgdat.RData', compress = 'xz')
-
 # file and year list
 inds <- list.files('data', '^lulc') %>% 
   enframe %>% 

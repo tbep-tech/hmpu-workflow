@@ -6,6 +6,8 @@ library(foreach)
 
 prj <- 4326
 
+fluccs <- read.csv(here('data', 'FLUCCShabsclass.csv'), stringsAsFactors = F)
+
 # LULC current status -----------------------------------------------------
 
 # # from HMPU deliverables 
@@ -17,6 +19,8 @@ prj <- 4326
 #   st_as_sf(as_points = FALSE, merge = TRUE) %>% 
 #   st_transform(crs = prj) %>% 
 #   rename(FLUCCSCODE = 'Full_LULC')
+
+data(strats)
 
 lulcfl <- 'lulc2017'
 subtfl <- 'sgdat2018'
@@ -34,12 +38,41 @@ lulc <- lulcfl %>%
   ) %>%
   left_join(fluccs, by = 'FLUCCSCODE')
 
+# get coastal uplands
+coastal <- strats %>% 
+  dplyr::filter(Stratum %in% 'Coastal') %>% 
+  st_buffer(dist = 0)
+
+uplands <- lulc %>% 
+  dplyr::filter(HMPU_TARGETS %in% 'Native Uplands') %>% 
+  st_buffer(dist = 0)
+
+coastal_uplands <- st_intersection(uplands, coastal) %>% 
+  mutate(
+    aream2 = st_area(.),
+    aream2 = as.numeric(aream2),
+    areaac = aream2 / 4047, 
+    HMPU_TARGETS = 'Coastal Uplands'
+  ) %>% 
+  st_set_geometry(NULL) %>% 
+  group_by(HMPU_TARGETS) %>%
+  summarise(Acres = sum(areaac))
+csum(tmp$areaac)
+
 # lulc summarize, table categories
 lulcsum <- lulc %>%
   st_set_geometry(NULL) %>%
   group_by(HMPU_TARGETS) %>%
-  summarise(Acres = sum(areaac))
-
+  summarise(Acres = sum(areaac)) %>% 
+  bind_rows(coastal_uplands) %>% 
+  mutate(
+    Acres = case_when(
+      HMPU_TARGETS == 'Native Uplands' ~ Acres - coastal_uplands$Acres, 
+      T ~ Acres
+    )
+  ) %>% 
+  arrange(HMPU_TARGETS)
+  
 # subtidal area, all categories
 subt <- subtfl %>%
   get %>% 
@@ -55,5 +88,3 @@ subtsum <- subt %>%
   st_set_geometry(NULL) %>%
   group_by(HMPU_TARGETS) %>%
   summarise(Acres = sum(areaac))
-
-# # use existing lulc

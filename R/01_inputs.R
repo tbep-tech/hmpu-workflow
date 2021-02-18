@@ -5,7 +5,9 @@ library(here)
 library(doParallel)
 library(foreach)
 
-prj <- 4326
+# NAD83(2011) / Florida West (ftUS)
+# this is the projection used in original report
+prj <- 6443
 
 fluccs <- read.csv(here('data', 'FLUCCShabsclass.csv'), stringsAsFactors = F)
 
@@ -18,7 +20,12 @@ save(tbshed, file = here('data', 'tbshed.RData'), compress = 'xz')
 
 # coastal stratum ---------------------------------------------------------
 
-# strat <- st_read('~/Desktop/ConvertedPolygon/Model_Input/Reservation.shp')
+gdb <- '~/Desktop/TBEP/HMPU/GIS/TBEP_HMPUv3/TBEP_HMPUv3.gdb'
+# st_layers(gdb)
+strats <- st_read(gdb, layer = 'SpatialStrata') %>% 
+  st_transform(prj)
+
+save(strats, file = here('data', 'strats.RData'), compress = 'xz')
 
 # soils -------------------------------------------------------------------
 
@@ -194,6 +201,3 @@ res <- foreach(i = 1:nrow(urls), .packages = c('tidyverse', 'sf', 'here')) %dopa
 #   )
 # 
 # save(oppdat, file= 'data/oppdat.RData', compress = 'xz')
-
-
-
