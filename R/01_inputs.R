@@ -11,7 +11,7 @@ fluccs <- read.csv(here('data', 'FLUCCShabsclass.csv'), stringsAsFactors = F)
 
 # watershed ---------------------------------------------------------------
 
-tbshed <- st_read('~/Desktop/ConvertedPolygon/Model_Input/TBEP_Watershed_Correct_Projection.shp') %>% 
+tbshed <- st_read('~/Desktop/TBEP/HMPU/GIS/ConvertedPolygon/Model_Input/TBEP_Watershed_Correct_Projection.shp') %>% 
   st_transform(prj)
 
 save(tbshed, file = here('data', 'tbshed.RData'), compress = 'xz')
@@ -22,14 +22,14 @@ save(tbshed, file = here('data', 'tbshed.RData'), compress = 'xz')
 
 # soils -------------------------------------------------------------------
 
-soils <- st_read('~/Desktop/ConvertedPolygon/Model_Input/SoilsForRestoration.shp') %>% 
+soils <- st_read('~/Desktop/TBEP/HMPU/GIS/ConvertedPolygon/Model_Input/SoilsForRestoration.shp') %>% 
   st_transform(prj)
 
 save(soils, file = here('data', 'soils.RData'), compress = 'xz')
 
 # salinity ----------------------------------------------------------------
 
-salin <- st_read('~/Desktop/ConvertedPolygon/Model_Input/SalinityKrigMerge.shp') %>% 
+salin <- st_read('~/Desktop/TBEP/HMPU/GIS/ConvertedPolygon/Model_Input/SalinityKrigMerge.shp') %>% 
   st_transform(prj)
 
 save(salin, file = here('data', 'salin.RData'), compress = 'xz')
