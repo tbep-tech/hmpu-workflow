@@ -1,22 +1,22 @@
 FLUCCSCODE,FIRST_FLUC,HMPU_GROUP,HMPU_CLASS,HMPU_DESCRIPTOR,HMPU_TARGETS
-1100,RESIDENTIAL LOW DENSITY < 2 DWELLING UNITS PER ACRE,Developed,Urban,Developed,Other
-1180,RURAL RESIDENTIAL 2 TO 5 ACRES FOR EACH DWELLING,Developed,Urban,Developed,Other
-1190,LOW DENSITY UNDER CONSTRUCTION,Developed,Urban,Developed,Other
-1200,RESIDENTIAL MED DENSITY 2 TO 5 DWELLING UNITS PER ACRE,Developed,Urban,Developed,Other
-1290,MEDIUM DENSITY UNDER CONSTRUCTION,Developed,Urban,Developed,Other
-1300,RESIDENTIAL HIGH DENSITY,Developed,Urban,Developed,Other
-1390,HIGH DENSITY UNDER CONSTRUCTION,Developed,Urban,Developed,Other
-1400,COMMERCIAL AND SERVICES,Developed,Urban,Developed,Other
-1480,CEMETERIES,Developed,Urban,Developed,Other
-1490,COMMERCIAL AND SERVICES UNDER CONSTRUCTION,Developed,Urban,Developed,Other
-1500,INDUSTRIAL,Developed,Urban,Developed,Other
-1700,INSTITUTIONAL,Developed,Urban,Developed,Other
-1800,RECREATIONAL,Developed,Urban,Developed,Other
-1920,INACTIVE LAND WITH STREET PATTERNS BUT NO STRUCTURES,Developed,Urban,Developed,Other
-1930,URBAN LAND IN TRANSITION WITH UNKOWN ACTIVITY,Developed,Urban,Developed,Other
-8100,TRANSPORTATION,Developed,Urban,Developed,Other
-8200,COMMUNICATION,Developed,Urban,Developed,Other
-8300,UTILITIES,Developed,Urban,Developed,Other
+1100,RESIDENTIAL LOW DENSITY < 2 DWELLING UNITS PER ACRE,Developed,Urban,Developed,Developed
+1180,RURAL RESIDENTIAL 2 TO 5 ACRES FOR EACH DWELLING,Developed,Urban,Developed,Developed
+1190,LOW DENSITY UNDER CONSTRUCTION,Developed,Urban,Developed,Developed
+1200,RESIDENTIAL MED DENSITY 2 TO 5 DWELLING UNITS PER ACRE,Developed,Urban,Developed,Developed
+1290,MEDIUM DENSITY UNDER CONSTRUCTION,Developed,Urban,Developed,Developed
+1300,RESIDENTIAL HIGH DENSITY,Developed,Urban,Developed,Developed
+1390,HIGH DENSITY UNDER CONSTRUCTION,Developed,Urban,Developed,Developed
+1400,COMMERCIAL AND SERVICES,Developed,Urban,Developed,Developed
+1480,CEMETERIES,Developed,Urban,Developed,Developed
+1490,COMMERCIAL AND SERVICES UNDER CONSTRUCTION,Developed,Urban,Developed,Developed
+1500,INDUSTRIAL,Developed,Urban,Developed,Developed
+1700,INSTITUTIONAL,Developed,Urban,Developed,Developed
+1800,RECREATIONAL,Developed,Urban,Developed,Developed
+1920,INACTIVE LAND WITH STREET PATTERNS BUT NO STRUCTURES,Developed,Urban,Developed,Developed
+1930,URBAN LAND IN TRANSITION WITH UNKOWN ACTIVITY,Developed,Urban,Developed,Developed
+8100,TRANSPORTATION,Developed,Urban,Developed,Developed
+8200,COMMUNICATION,Developed,Urban,Developed,Developed
+8300,UTILITIES,Developed,Urban,Developed,Developed
 3000,RANGELAND,Native,Native Non-Forested Uplands,Mixed_Rangeland,Native Uplands
 3100,HERBACEOUS,Native,Native Non-Forested Uplands,Dry_Prairie,Native Uplands
 3200,SHRUB AND BRUSHLAND,Native,Native Non-Forested Uplands,Shrub_and_Brushland,Native Uplands
@@ -52,28 +52,28 @@ FLUCCSCODE,FIRST_FLUC,HMPU_GROUP,HMPU_CLASS,HMPU_DESCRIPTOR,HMPU_TARGETS
 7210,SAND OTHER THAN BEACHES SUBMERGED,Native,Subtidal,Tidal_Flats,Tidal Flats
 9113,Patchy Seagrass,Native,Subtidal,Patchy_Seagrass,Seagrasses
 9116,Continuous Seagrass,Native,Subtidal,Continuous_Seagrass,Seagrasses
-9121,Attached Algae,Native,Subtidal,Algae,Other
+9121,Attached Algae,Native,Subtidal,Algae,Open Water
 9510,SMB/AR,Native,Subtidal,Hard_Bottom,Hard Bottom
 9511,SMB/Boulder Field,Native,Subtidal,Hard_Bottom,Hard Bottom
 9512,SMB/Cobble-sized,Native,Subtidal,Hard_Bottom,Hard Bottom
 9513,SMB/Cobble-sized/Boulder Field,Native,Subtidal,Hard_Bottom,Hard Bottom
 9514,SMB/Cobble-sized/Boulder Field/AR,Native,Subtidal,Hard_Bottom,Hard Bottom
 9515,SMB/Cobble-sized/Boulder Field/Ledge,Native,Subtidal,Hard_Bottom,Hard Bottom
-5100,STREAMS AND WATERWAYS,Open Water,Freshwater Wetlands,Streams_and_Waterways,Other
-5200,LAKES,Open Water,Freshwater Wetlands,Lakes,Other
-5210,LAKES LARGER THAN 500 ACRES (202 HECTARES),Open Water,Freshwater Wetlands,Lakes,Other
-5220,LAKES > 100 ACRES (40 HECTARES) & < 500 ACRES,Open Water,Freshwater Wetlands,Lakes,Other
-5230,LAKES > 10 ACRES (4 HECTARES) < 100 ACRES,Open Water,Freshwater Wetlands,Lakes,Other
-5240,LAKES < 10 ACRES (4 HECTARES) DOMINANT FEATURES,Open Water,Freshwater Wetlands,Lakes,Other
-5250,MARSHY LAKES,Open Water,Freshwater Wetlands,Lakes,Other
-5300,RESERVOIRS,Open Water,Freshwater Wetlands,Lakes_Reservoirs,Other
-5310,RESERVOIRS > 500 ACRES (202 HECTARES),Open Water,Freshwater Wetlands,Lakes_Reservoirs,Other
-5320,RESERVOIRS > 100 ACRES (40 HECTARES) & < 500 ACRES,Open Water,Freshwater Wetlands,Lakes_Reservoirs,Other
-5330,RESERVOIRS > 10 ACRES(4 HECTARES) & < 100 ACRES,Open Water,Freshwater Wetlands,Lakes_Reservoirs,Other
-5340,RESERVOIRS < 10 ACRES(4 HECTARES) W/DOMINANT FEATURES,Open Water,Freshwater Wetlands,Lakes_Reservoirs,Other
-5400,BAYS AND ESTUARIES,Open Water,Subtidal,Estuary,Other
-5700,MAJOR BODIES OF WATER,Open Water,Subtidal,Estuary,Other
-5720,GULF OF MEXICO,Open Water,Subtidal,Estuary,Other
+5100,STREAMS AND WATERWAYS,Open Water,Freshwater Wetlands,Streams_and_Waterways,Open Water
+5200,LAKES,Open Water,Freshwater Wetlands,Lakes,Open Water
+5210,LAKES LARGER THAN 500 ACRES (202 HECTARES),Open Water,Freshwater Wetlands,Lakes,Open Water
+5220,LAKES > 100 ACRES (40 HECTARES) & < 500 ACRES,Open Water,Freshwater Wetlands,Lakes,Open Water
+5230,LAKES > 10 ACRES (4 HECTARES) < 100 ACRES,Open Water,Freshwater Wetlands,Lakes,Open Water
+5240,LAKES < 10 ACRES (4 HECTARES) DOMINANT FEATURES,Open Water,Freshwater Wetlands,Lakes,Open Water
+5250,MARSHY LAKES,Open Water,Freshwater Wetlands,Lakes,Open Water
+5300,RESERVOIRS,Open Water,Freshwater Wetlands,Lakes_Reservoirs,Open Water
+5310,RESERVOIRS > 500 ACRES (202 HECTARES),Open Water,Freshwater Wetlands,Lakes_Reservoirs,Open Water
+5320,RESERVOIRS > 100 ACRES (40 HECTARES) & < 500 ACRES,Open Water,Freshwater Wetlands,Lakes_Reservoirs,Open Water
+5330,RESERVOIRS > 10 ACRES(4 HECTARES) & < 100 ACRES,Open Water,Freshwater Wetlands,Lakes_Reservoirs,Open Water
+5340,RESERVOIRS < 10 ACRES(4 HECTARES) W/DOMINANT FEATURES,Open Water,Freshwater Wetlands,Lakes_Reservoirs,Open Water
+5400,BAYS AND ESTUARIES,Open Water,Subtidal,Estuary,Open Water
+5700,MAJOR BODIES OF WATER,Open Water,Subtidal,Estuary,Open Water
+5720,GULF OF MEXICO,Open Water,Subtidal,Estuary,Open Water
 1600,EXTRACTIVE,Restorable,Mining,Restorable_Mining,Restorable
 1650,RECLAIMED LAND,Restorable,Mining,Restorable_Mining,Restorable
 1820,GOLF COURSES,Restorable,Urban,Restorable_Developed,Restorable

@@ -22,7 +22,9 @@ save(tbshed, file = here('data', 'tbshed.RData'), compress = 'xz')
 
 gdb <- '~/Desktop/TBEP/HMPU/GIS/TBEP_HMPUv3/TBEP_HMPUv3.gdb'
 # st_layers(gdb)
+
 strats <- st_read(gdb, layer = 'SpatialStrata') %>% 
+  dplyr::select(Stratum) %>% 
   st_transform(prj)
 
 save(strats, file = here('data', 'strats.RData'), compress = 'xz')

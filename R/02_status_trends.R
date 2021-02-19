@@ -5,11 +5,23 @@ library(doParallel)
 library(foreach)
 library(units)
 
+source(here('R', 'funcs.R'))
+
 prj <- 4326
 
 fluccs <- read.csv(here('data', 'FLUCCShabsclass.csv'), stringsAsFactors = F)
 
 # LULC trends -------------------------------------------------------------
+
+# do not do this with subtidal because years don't match with lulc
+
+data(strats)
+
+# get coastal stratum
+coastal <- strats %>% 
+  dplyr::filter(Stratum %in% 'Coastal') %>% 
+  st_buffer(dist = 0) %>% 
+  st_geometry()
 
 res <- list.files('data', '^lulc') %>% 
   enframe() %>% 
@@ -24,54 +36,19 @@ res <- list.files('data', '^lulc') %>%
       load(file = here(paste0('data/', x)))
       dat <- get(gsub('\\.RData', '', x))
       
-      # get area
-      dat_are <- dat %>%
-        mutate(
-          aream2 = st_area(.),
-          aream2 = as.numeric(aream2),
-          areaac = aream2 / 4047
-        ) %>%
-        st_set_geometry(NULL) %>%
-        group_by(FLUCCSCODE) %>%
-        summarise(
-          Acres = sum(areaac)
-        )
-      
-      # summarise by categories, remove subtidal first for watershed area
-      dat_out <- dat_are %>%
-        left_join(fluccs, by = 'FLUCCSCODE') %>%
-        filter(!HMPU_DESCRIPTOR %in% c('Algae', 'Continuous_Seagrass', 'Hard_Bottom', 'Estuary', 'Oyster_Bars', 'Patchy_Seagrass', 'Subtidal', 'Tidal_Flats')) %>%
-        select(-FLUCCSCODE, -FIRST_FLUC) %>%
-        gather('var', 'val', -Acres) %>%
-        group_by(var, val) %>%
-        summarise(
-          areaac = sum(Acres),
-          .groups = 'drop'
-        )
+      dat_out <- lulc_est(dat, coastal, fluccs)
       
       return(dat_out)
       
     })
   )
 
-acresjso <- res %>% 
+acres <- res %>% 
   select(name = value, acres) %>% 
   unnest(acres) %>% 
   mutate(name = gsub('^lulc|\\.RData$', '', name))
 
-# manually add salt barren ests from ESA
-sltbrn <- tibble(
-  name = c('1990', '1995', '1999'), 
-  var = 'HMPU_DESCRIPTOR', 
-  val = 'Salt_Barrens', 
-  areaac = c(468,479, 492)
-)
-
-acresjso <- acresjso %>% 
-  bind_rows(sltbrn) %>% 
-  arrange(name, var, val)
-
-save(acresjso, file = here('data', 'acresjso.RData'), compress = 'xz')
+save(acres, file = here('data', 'acres.RData'), compress = 'xz')
 
 # LULC change analysis ----------------------------------------------------
 
