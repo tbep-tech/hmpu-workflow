@@ -4,8 +4,6 @@ library(here)
 library(doParallel)
 library(foreach)
 
-prj <- 4326
-
 fluccs <- read.csv(here('data', 'FLUCCShabsclass.csv'), stringsAsFactors = F)
 
 # LULC current status -----------------------------------------------------
@@ -17,7 +15,6 @@ fluccs <- read.csv(here('data', 'FLUCCShabsclass.csv'), stringsAsFactors = F)
 # dat_crp <- lulcdat %>% 
 #   st_as_stars %>% 
 #   st_as_sf(as_points = FALSE, merge = TRUE) %>% 
-#   st_transform(crs = prj) %>% 
 #   rename(FLUCCSCODE = 'Full_LULC')
 
 data(strats)

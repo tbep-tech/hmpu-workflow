@@ -5,6 +5,8 @@ library(here)
 library(doParallel)
 library(foreach)
 
+source(here('R', 'funcs.R'))
+
 # NAD83(2011) / Florida West (ftUS)
 # this is the projection used in original report
 prj <- 6443
@@ -42,6 +44,61 @@ salin <- st_read('~/Desktop/TBEP/HMPU/GIS/ConvertedPolygon/Model_Input/SalinityK
   st_transform(prj)
 
 save(salin, file = here('data', 'salin.RData'), compress = 'xz')
+
+# conservation lands ------------------------------------------------------
+
+data(tbshed)
+
+## from FNAI website
+
+# URL links for these layers are from here: https://www.fnai.org/gisdata.cfm
+# these links probably change quarterly
+
+# FLMA, florida conservation lands
+url <- 'https://www.fnai.org/shapefiles/flma_202101.zip'
+flma <- get_cons(url, prj, tbshed)
+
+# FFBOT, future forever board of trustees projects
+url <- 'https://www.fnai.org/shapefiles/ffbot_202101.zip'
+ffbot <- get_cons(url, prj, tbshed)
+
+# FFA, future forever acquisitions
+url <- 'https://www.fnai.org/shapefiles/ff_acquired_202101.zip'
+ffa <- get_cons(url, prj, tbshed)
+
+## aquatic preserves, from DEP
+
+# from here https://geodata.dep.state.fl.us/datasets/81841412d3984e9aac2c00c21e41d32e_0
+
+# this gets all preserves in watershed, then removes lake tarpon (not in map 3-1)
+# note that the original layer has overlapping polygons
+aqprs <- st_read('https://opendata.arcgis.com/datasets/81841412d3984e9aac2c00c21e41d32e_0.geojson') %>% 
+  st_transform(crs = prj) %>%
+  # select(name = LONG_NAME) %>%
+  st_buffer(dist = 0) %>% 
+  st_intersection(tbshed) %>% 
+  st_cast("MULTIPOLYGON") %>% 
+  st_cast("POLYGON") %>% 
+  dplyr::filter(!grepl('\\.', row.names(.))) %>% 
+  st_union()
+
+# combine all of the above, see how it differs from original layer
+# need to do something about macdill since orig had a custom polygon
+                 
+## original conservation layer
+gdb <- '~/Desktop/TBEP/HMPU/GIS/TBEP_HMPUv3/TBEP_HMPUv3.gdb'
+
+# st_layers(gdb)
+cnsorig <- st_read(dsn = gdb, layer = 'ExistingConservation') %>% 
+  st_transform(prj)
+
+
+tmpflma <- flma %>% 
+  st_buffer(dist = 0) 
+tmpcnsorig <- cnsorig %>% 
+  st_buffer(dist = 0)
+tmp <- st_difference(tmpflma, tmpcnsorig)
+
 
 # import each lulc layer, crop by tbshed, save ----------------------------
 

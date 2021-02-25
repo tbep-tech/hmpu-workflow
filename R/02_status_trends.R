@@ -7,8 +7,6 @@ library(units)
 
 source(here('R', 'funcs.R'))
 
-prj <- 4326
-
 fluccs <- read.csv(here('data', 'FLUCCShabsclass.csv'), stringsAsFactors = F)
 
 # LULC trends -------------------------------------------------------------
@@ -52,6 +50,15 @@ save(acres, file = here('data', 'acres.RData'), compress = 'xz')
 
 # LULC change analysis ----------------------------------------------------
 
+data(strats)
+
+# get coastal stratum
+coastal <- strats %>% 
+  dplyr::filter(Stratum %in% 'Coastal') %>% 
+  st_buffer(dist = 0) %>% 
+  st_geometry() %>% 
+  st_union()
+
 # file and year list
 inds <- list.files('data', '^lulc') %>% 
   enframe %>% 
@@ -63,7 +70,7 @@ inds <- list.files('data', '^lulc') %>%
 # get final year 
 maxyr <- inds$yr %>% max
 
-# format final year data
+# get final year data, add coastal uplands
 maxdat <- inds %>% 
   filter(yr == maxyr) %>% 
   pull(data)
@@ -71,11 +78,12 @@ load(file = here('data/', maxdat))
 maxdat <- maxdat %>% 
   gsub('\\.RData$', '', .) %>%
   get %>% 
-  left_join(fluccs, by = 'FLUCCSCODE') %>%
-  st_transform(crs = 26917) %>%
-  select(Category = HMPU_TARGETS) %>%
+  filter(!FLUCCSCODE %in% c(5400, 5700, 5720)) %>% # remove estuary codes, the boundaries aren't consistent year to year
+  add_coast_up(coastal, fluccs) %>% 
   st_union(by_feature = TRUE) %>%
-  mutate(Category = paste0(Category, ', ', maxyr))
+  mutate(
+    Category = paste0(Category, ', ', maxyr)
+  )
 
 # change analysis comparing each year to max
 chgdat <- NULL
@@ -89,6 +97,7 @@ for(i in 1:nrow(inds)){
   
   cat(yr, '\t')
   
+  # current year, add coastal stratum
   a <- inds %>% 
     filter(yr == !!yr) %>% 
     pull(data)
@@ -96,19 +105,35 @@ for(i in 1:nrow(inds)){
   a <- a %>% 
     gsub('\\.RData$', '', .) %>%
     get %>% 
-    left_join(fluccs, by = 'FLUCCSCODE') %>%
-    st_transform(crs = 26917) %>%
-    select(Category = HMPU_TARGETS) %>%
+    filter(!FLUCCSCODE %in% c(5400, 5700, 5720)) %>% # remove estuary codes, the boundaries aren't consistent year to year
+    add_coast_up(coastal, fluccs) %>% 
     st_union(by_feature = TRUE) %>%
     mutate(Category = paste0(Category, ', ', yr))
   b <- maxdat
   
+  # so intersect doesnt complain about attributes
   st_agr(a) = "constant"
   st_agr(b) = "constant"
   
+  # some clean up stuff for slivers
+  a <- a %>% 
+    st_set_precision(1e5) %>% 
+    st_make_valid()
+  b <- b %>% 
+    st_set_precision(1e5) %>% 
+    st_make_valid()
+  aunion <- a %>% 
+    st_union %>% 
+    st_set_precision(1e5) %>% 
+    st_make_valid()
+  bunion <- b %>% 
+    st_union %>% 
+    st_set_precision(1e5) %>% 
+    st_make_valid()
+  
   # get full union
-  op1 <- st_difference(a, st_union(b))
-  op2 <- st_difference(b, st_union(a)) %>%
+  op1 <- st_difference(a, bunion)
+  op2 <- st_difference(b, aunion) %>%
     rename(Category.1 = Category)
   op3 <- st_intersection(a, b)
   
