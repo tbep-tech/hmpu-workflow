@@ -55,16 +55,22 @@ data(tbshed)
 # these links probably change quarterly
 
 # FLMA, florida conservation lands
-url <- 'https://www.fnai.org/shapefiles/flma_202101.zip'
-flma <- get_cons(url, prj, tbshed)
+# remove Macdill (custom polygon from original layer)
+flma <- get_cons('https://www.fnai.org/shapefiles/flma_202101.zip', prj, tbshed) %>% 
+  filter(!MANAME %in% 'MacDill Air Force Base') %>% 
+  st_union %>% 
+  st_buffer(dist = 0)
 
 # FFBOT, future forever board of trustees projects
-url <- 'https://www.fnai.org/shapefiles/ffbot_202101.zip'
-ffbot <- get_cons(url, prj, tbshed)
+ffbot <- get_cons('https://www.fnai.org/shapefiles/ffbot_202101.zip', prj, tbshed) %>% 
+  st_union %>%  
+  st_buffer(dist = 0)
 
 # FFA, future forever acquisitions
 url <- 'https://www.fnai.org/shapefiles/ff_acquired_202101.zip'
-ffa <- get_cons(url, prj, tbshed)
+ffa <- get_cons(url, prj, tbshed) %>% 
+  st_union %>% 
+  st_buffer(dist = 0)
 
 ## aquatic preserves, from DEP
 
@@ -80,25 +86,30 @@ aqprs <- st_read('https://opendata.arcgis.com/datasets/81841412d3984e9aac2c00c21
   st_cast("MULTIPOLYGON") %>% 
   st_cast("POLYGON") %>% 
   dplyr::filter(!grepl('\\.', row.names(.))) %>% 
-  st_union()
+  st_union() %>% 
+  st_buffer(dist = 0)
 
-# combine all of the above, see how it differs from original layer
-# need to do something about macdill since orig had a custom polygon
-                 
+## join conservation layers from sources
+cons <- st_geometry(flma) %>% 
+  st_union(st_geometry(ffbot)) %>% 
+  st_union(st_geometry(ffa)) %>% 
+  st_union(st_geometry(aqprs)) %>% 
+  st_buffer(dist = 0)
+
 ## original conservation layer
 gdb <- '~/Desktop/TBEP/HMPU/GIS/TBEP_HMPUv3/TBEP_HMPUv3.gdb'
 
 # st_layers(gdb)
-cnsorig <- st_read(dsn = gdb, layer = 'ExistingConservation') %>% 
-  st_transform(prj)
-
-
-tmpflma <- flma %>% 
+consorig <- st_read(dsn = gdb, layer = 'ExistingConservation') %>% 
+  st_transform(prj) %>% 
+  st_union() %>% 
   st_buffer(dist = 0) 
-tmpcnsorig <- cnsorig %>% 
-  st_buffer(dist = 0)
-tmp <- st_difference(tmpflma, tmpcnsorig)
 
+# union consorig with cons, assumes consorig will have nothing that already isn't in cons
+cons <- st_union(st_geometry(cons), st_geometry(consorig)) %>% 
+  st_buffer(dist = 0) %>% 
+  st_cast('POLYGON') %>% 
+  st_sf(geometry = .)
 
 # import each lulc layer, crop by tbshed, save ----------------------------
 
