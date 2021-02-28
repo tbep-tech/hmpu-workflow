@@ -48,10 +48,9 @@ acres <- res %>%
 
 # manually add salt barren ests from ESA, these are not in first three years
 sltbrn <- tibble(
-  name = c('1990', '1995', '1999'), 
-  var = 'HMPU_TARGETS', 
-  val = 'Salt Barrens', 
-  areaac = c(468,479, 492)
+  name = c('1990', '1995', '1999'),
+  HMPU_TARGETS = 'Salt Barrens', 
+  Acres = c(468, 479, 492)
 )
 
 acres <- acres %>% 
