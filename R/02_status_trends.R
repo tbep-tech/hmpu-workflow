@@ -86,6 +86,7 @@ maxdat <- maxdat %>%
   )
 
 # change analysis comparing each year to max
+strt <- Sys.time()
 chgdat <- NULL
 for(i in 1:nrow(inds)){
   
@@ -95,7 +96,8 @@ for(i in 1:nrow(inds)){
   if(yr == '2017')
     next()
   
-  cat(yr, '\t')
+  cat(yr, 'importing\n')
+  print(Sys.time() - strt)
   
   # current year, add coastal stratum
   a <- inds %>% 
@@ -111,6 +113,8 @@ for(i in 1:nrow(inds)){
     mutate(Category = paste0(Category, ', ', yr))
   b <- maxdat
   
+  cat('\tintersecting...\n')
+  
   # so intersect doesnt complain about attributes
   st_agr(a) = "constant"
   st_agr(b) = "constant"
@@ -118,18 +122,22 @@ for(i in 1:nrow(inds)){
   # some clean up stuff for slivers
   a <- a %>% 
     st_set_precision(1e5) %>% 
-    st_make_valid()
+    st_make_valid() %>% 
+    st_buffer(dist = 0)
   b <- b %>% 
     st_set_precision(1e5) %>% 
-    st_make_valid()
+    st_make_valid() %>% 
+    st_buffer(dist = 0)
   aunion <- a %>% 
     st_union %>% 
     st_set_precision(1e5) %>% 
-    st_make_valid()
+    st_make_valid() %>% 
+    st_buffer(dist = 0)
   bunion <- b %>% 
     st_union %>% 
     st_set_precision(1e5) %>% 
-    st_make_valid()
+    st_make_valid() %>% 
+    st_buffer(dist = 0)
   
   # get full union
   op1 <- st_difference(a, bunion)
