@@ -63,6 +63,9 @@ save(acres, file = here('data', 'acres.RData'), compress = 'xz')
 
 data(strats)
 
+# codes to remove, all subtidal 
+cds <- c(5400, 5700, 5720, 6510, 6540, 7210, 9113, 9114, 9121, 9510, 9511, 9512, 9513, 9514, 9515)
+
 # get coastal stratum
 coastal <- strats %>% 
   dplyr::filter(Stratum %in% 'Coastal') %>% 
@@ -89,7 +92,7 @@ load(file = here('data/', maxdat))
 maxdat <- maxdat %>% 
   gsub('\\.RData$', '', .) %>%
   get %>% 
-  filter(!FLUCCSCODE %in% c(5400, 5700, 5720)) %>% # remove estuary codes, the boundaries aren't consistent year to year
+  filter(!FLUCCSCODE %in% cds) %>% # subtidal codes to remove
   add_coast_up(coastal, fluccs) %>% 
   st_union(by_feature = TRUE) %>%
   mutate(
@@ -118,7 +121,7 @@ for(i in 1:nrow(inds)){
   a <- a %>% 
     gsub('\\.RData$', '', .) %>%
     get %>% 
-    filter(!FLUCCSCODE %in% c(5400, 5700, 5720)) %>% # remove estuary codes, the boundaries aren't consistent year to year
+    filter(!FLUCCSCODE %in% cds) %>% # subtidal codes to remove
     add_coast_up(coastal, fluccs) %>% 
     st_union(by_feature = TRUE) %>%
     mutate(Category = paste0(Category, ', ', yr))
