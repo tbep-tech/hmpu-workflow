@@ -113,7 +113,7 @@ get_cons <- function(url, prj, tbshed){
   out <- st_read(shp) %>%
     st_transform(crs = prj) %>%
     st_buffer(dist = 0) %>%
-    st_intersection(tbshed)
+    st_intersection(tbshed) 
   
   file.remove(list.files(tmp1, full.names = T))
   file.remove(list.files(tmp2, full.names = T))
