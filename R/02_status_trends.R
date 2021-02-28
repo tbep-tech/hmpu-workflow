@@ -46,6 +46,18 @@ acres <- res %>%
   unnest(acres) %>% 
   mutate(name = gsub('^lulc|\\.RData$', '', name))
 
+# manually add salt barren ests from ESA, these are not in first three years
+sltbrn <- tibble(
+  name = c('1990', '1995', '1999'), 
+  var = 'HMPU_TARGETS', 
+  val = 'Salt Barrens', 
+  areaac = c(468,479, 492)
+)
+
+acres <- acres %>% 
+  bind_rows(sltbrn) %>% 
+  arrange(name, HMPU_TARGETS, Acres)
+
 save(acres, file = here('data', 'acres.RData'), compress = 'xz')
 
 # LULC change analysis ----------------------------------------------------

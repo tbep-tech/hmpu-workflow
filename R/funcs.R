@@ -24,11 +24,13 @@ lulc_est <- function(lulcin, coastal, fluccs){
     ) 
 
   # lulc area, all categories
+  # remove open water and subtidal habitats (open water area changes between layers and subtidal not consistently collected)
   lulc <- lulc %>%
     mutate(
       Acres = st_area(.),
       Acres = set_units(Acres, acres)
-    ) 
+    ) %>% 
+    filter(!HMPU_TARGETS %in% c('Open Water', 'Seagrasses', 'Tidal Flats', 'Oyster Bars'))
   
   # lulc summarize, table categories
   out <- lulc %>%
