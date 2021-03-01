@@ -215,6 +215,8 @@ save(chgdat, file = here('data', 'chgdat.RData'), compress = 'xz')
 
 # subtidal change analysis ------------------------------------------------
 
+# takes about a day to run
+
 # file and year list
 inds <- list.files('data', '^sgdat') %>% 
   enframe %>% 
@@ -252,7 +254,7 @@ for(i in 1:nrow(inds)){
   # year
   yr <- inds[i, ] %>% pull(yr)
   
-  if(yr == '2017')
+  if(yr == '2018')
     next()
   
   cat(yr, 'importing\n')
