@@ -51,6 +51,31 @@ lulc_est <- function(lulcin, coastal, fluccs){
   
 }
 
+# estimate subtical area in acres for available HMPU targets 
+#
+# subtin in seagrass rdata file for a given year
+# flucss is lookup table
+subt_est <- function(subtin, fluccs){
+  
+  # subtidal area, all categories
+  out <- subtin %>%
+    mutate(
+      FLUCCSCODE = as.integer(FLUCCSCODE)
+    ) %>% 
+    left_join(fluccs, by = 'FLUCCSCODE') %>% 
+    mutate(
+      Acres = st_area(.),
+      Acres = set_units(Acres, acres)
+    ) %>%
+    st_set_geometry(NULL) %>%
+    group_by(HMPU_TARGETS) %>%
+    summarise(Acres = sum(Acres), .groups = 'drop') %>% 
+    arrange(HMPU_TARGETS)
+  
+  return(out)
+  
+}
+
 # Add coastal uplands to a lulc layer 
 #
 # lulcin lulc rdata file for a given year
