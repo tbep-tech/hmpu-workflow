@@ -15,6 +15,9 @@ fluccs <- read.csv(here('data', 'FLUCCShabsclass.csv'), stringsAsFactors = F)
 
 data(strats)
 
+# remove open water estuary categories
+cds <- c(5400, 5700, 5720)
+
 # get coastal stratum
 coastal <- strats %>% 
   dplyr::filter(Stratum %in% 'Coastal') %>% 
@@ -32,7 +35,8 @@ res <- list.files('data', '^lulc') %>%
       
       # import file
       load(file = here(paste0('data/', x)))
-      dat <- get(gsub('\\.RData', '', x))
+      dat <- get(gsub('\\.RData', '', x)) %>% 
+        filter(!FLUCCSCODE %in% cds)
       
       dat_out <- lulc_est(dat, coastal, fluccs)
       

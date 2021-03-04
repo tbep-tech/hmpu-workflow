@@ -30,7 +30,7 @@ lulc_est <- function(lulcin, coastal, fluccs){
       Acres = st_area(.),
       Acres = set_units(Acres, acres)
     ) %>% 
-    filter(!HMPU_TARGETS %in% c('Open Water', 'Seagrasses', 'Tidal Flats', 'Oyster Bars'))
+    filter(!HMPU_TARGETS %in% c('Seagrasses', 'Tidal Flats', 'Oyster Bars'))
   
   # lulc summarize, table categories
   out <- lulc %>%

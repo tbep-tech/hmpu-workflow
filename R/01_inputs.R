@@ -122,6 +122,18 @@ cons <- st_union(st_geometry(cons), st_geometry(consorig)) %>%
   st_cast('POLYGON') %>% 
   st_sf(geometry = .)
 
+# proposed lands ----------------------------------------------------------
+
+# the CLIP data are a one off, so I can just use the original layer from HMPU
+
+gdb <- '~/Desktop/TBEP/HMPU/GIS/TBEP_HMPUv3/TBEP_HMPUv3.gdb'
+
+# st_layers(gdb)
+prop <- st_read(dsn = gdb, layer = 'ExistingConservation') %>% 
+  st_transform(prj) %>% 
+  st_union() %>% 
+  st_buffer(dist = 0) 
+
 # import each lulc layer, crop by tbshed, save ----------------------------
 
 data (tbshed)
