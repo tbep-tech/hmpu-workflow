@@ -93,7 +93,7 @@ save(subtacres, file = here('data', 'subtacres.RData'), compress = 'xz')
 data(strats)
 
 # codes to remove, all subtidal 
-cds <- c(5400, 5700, 5720, 6510, 6540, 7210, 9113, 9114, 9121, 9510, 9511, 9512, 9513, 9514, 9515)
+cds <- c(5400, 5700, 5720, 6510, 6540, 7210, 9113, 9116, 9121, 9510, 9511, 9512, 9513, 9514, 9515)
 
 # get coastal stratum
 coastal <- strats %>% 
