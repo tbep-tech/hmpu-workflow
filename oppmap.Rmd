@@ -31,7 +31,7 @@ cols <- list(
 ```
 
 ```{r, out.width = '100%'}
-mapview(oppdat, zcol = 'cat', col.regions = cols, lwd = 0)
+mapview(oppdat, zcol = 'cat', col.regions = cols, lwd = 0, homebutton = F, layer.name = '')
 ```
 
 
