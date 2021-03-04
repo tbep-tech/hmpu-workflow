@@ -4,6 +4,7 @@ library(tidyverse)
 library(here)
 library(doParallel)
 library(foreach)
+library(esri2sf) # yonghah/esri2sf on github
 
 source(here('R', 'funcs.R'))
 
@@ -49,28 +50,38 @@ save(salin, file = here('data', 'salin.RData'), compress = 'xz')
 
 data(tbshed)
 
+bbox <- sf::st_bbox(tbshed)
+
 ## from FNAI website
 
 # URL links for these layers are from here: https://www.fnai.org/gisdata.cfm
-# these links probably change quarterly
+# layers are so available through ESRI servers
 
 # FLMA, florida conservation lands
 # remove Macdill (custom polygon from original layer)
-flma <- get_cons('https://www.fnai.org/shapefiles/flma_202101.zip', prj, tbshed) %>% 
-  filter(!MANAME %in% 'MacDill Air Force Base') %>% 
-  st_union %>% 
-  st_buffer(dist = 0)
+flma <- esri2sf('https://services.arcgis.com/9Jk4Zl9KofTtvg3x/arcgis/rest/services/FL_Conservation_Lands/FeatureServer/0', 
+        bbox = bbox) %>% 
+  dplyr::filter(!MANAME %in% 'MacDill Air Force Base') %>% 
+  st_transform(st_crs(tbshed)) %>% 
+  st_buffer(dist = 0) %>% 
+  st_intersection(tbshed) %>% 
+  st_union 
 
 # FFBOT, future forever board of trustees projects
-ffbot <- get_cons('https://www.fnai.org/shapefiles/ffbot_202101.zip', prj, tbshed) %>% 
-  st_union %>%  
-  st_buffer(dist = 0)
+ffbot <- esri2sf('https://services.arcgis.com/9Jk4Zl9KofTtvg3x/arcgis/rest/services/Florida_Forever_BOT_Projects/FeatureServer/0', 
+                 bbox = bbox) %>% 
+  st_transform(st_crs(tbshed)) %>% 
+  st_buffer(dist = 0) %>% 
+  st_intersection(tbshed) %>% 
+  st_union 
 
 # FFA, future forever acquisitions
-url <- 'https://www.fnai.org/shapefiles/ff_acquired_202101.zip'
-ffa <- get_cons(url, prj, tbshed) %>% 
-  st_union %>% 
-  st_buffer(dist = 0)
+ffa <- esri2sf('https://services.arcgis.com/9Jk4Zl9KofTtvg3x/arcgis/rest/services/Florida_Forever_Acquisitions/FeatureServer/0', 
+               bbox = bbox) %>% 
+  st_transform(st_crs(tbshed)) %>% 
+  st_buffer(dist = 0) %>% 
+  st_intersection(tbshed) %>% 
+  st_union
 
 ## aquatic preserves, from DEP
 

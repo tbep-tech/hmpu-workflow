@@ -57,7 +57,7 @@ acres <- acres %>%
   bind_rows(sltbrn) %>% 
   arrange(name, HMPU_TARGETS, Acres)
 
-save(acres, file = here('data', 'acres.RData'), compress = 'xz')
+save(acres, file = here('data', 'acres.RData'), version = 2)
 
 # subtidal trends ---------------------------------------------------------
 
@@ -86,7 +86,7 @@ subtacres <- res %>%
   unnest(acres) %>% 
   mutate(name = gsub('^sgdat|\\.RData$', '', name))
 
-save(subtacres, file = here('data', 'subtacres.RData'), compress = 'xz')
+save(subtacres, file = here('data', 'subtacres.RData'), version = 2)
 
 # LULC change analysis ----------------------------------------------------
 
@@ -211,7 +211,7 @@ for(i in 1:nrow(inds)){
   
 }
 
-save(chgdat, file = here('data', 'chgdat.RData'), compress = 'xz')
+save(chgdat, file = here('data', 'chgdat.RData'), version = 2)
 
 # subtidal change analysis ------------------------------------------------
 
@@ -334,4 +334,4 @@ for(i in 1:nrow(inds)){
   
 }
 
-save(subtchgdat, file = here('data', 'subtchgdat.RData'), compress = 'xz')
+save(subtchgdat, file = here('data', 'subtchgdat.RData'), version = 2)
