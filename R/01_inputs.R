@@ -4,6 +4,7 @@ library(tidyverse)
 library(here)
 library(doParallel)
 library(foreach)
+library(units)
 library(esri2sf) # yonghah/esri2sf on github
 
 source(here('R', 'funcs.R'))
@@ -13,6 +14,22 @@ source(here('R', 'funcs.R'))
 prj <- 6443
 
 fluccs <- read.csv(here('data', 'FLUCCShabsclass.csv'), stringsAsFactors = F)
+
+
+# stratification lookup table ---------------------------------------------
+
+strata <- data.frame(
+  Category  = c("Intertidal", "Intertidal", "Intertidal", "Intertidal", "Intertidal", 
+    "Subtidal", "Subtidal", "Subtidal", "Subtidal", "Suptratidal", 
+    "Suptratidal", "Suptratidal", "Suptratidal"),
+  HMPU_TARGETS = c("Living Shorelines", "Mangrove Forests", "Salt Barrens", "Salt Marshes", 
+                   "Tidal Tributaries", "Artificial Reefs", "Oyster Bars", "Seagrasses", 
+                   "Tidal Flats", "Coastal Uplands", "Forested Freshwater Wetlands", 
+                   "Native Uplands", "Non-Forested Freshwater Wetlands"), 
+  stringsAsFactors = F
+)
+
+write.csv(strata, here('data/strata.csv'), row.names = F)
 
 # watershed ---------------------------------------------------------------
 
@@ -118,8 +135,9 @@ consorig <- st_read(dsn = gdb, layer = 'ExistingConservation') %>%
 
 # union consorig with cons, assumes consorig will have nothing that already isn't in cons
 cons <- st_union(st_geometry(cons), st_geometry(consorig)) %>% 
-  st_buffer(dist = 0) %>% 
-  st_cast('POLYGON') 
+  st_cast('POLYGON') %>% 
+  st_union() %>% 
+  st_buffer(dist = 0)
 
 save(cons, file = 'data/cons.RData', compress = 'xz')
 
@@ -251,6 +269,58 @@ res <- foreach(i = 1:nrow(urls), .packages = c('tidyverse', 'sf', 'here')) %dopa
   save(list = flnm, file = here('data', paste0('/', flnm, '.RData')), compress = 'xz')
   
 }
+
+# habitats not in lulc ------------------------------------------------------
+
+gdb <- '~/Desktop/TBEP/HMPU/GIS/TBEP_HMPUv3/TBEP_HMPUv3.gdb'
+
+# st_layers(gdb)
+
+# hardbottom
+hard <- st_read(dsn = gdb, layer = 'Habitats_Hardbottom') %>% 
+  st_transform(prj) %>% 
+  filter(Hardbottom %in% 'Natural') %>% 
+  mutate(
+    Acres = st_area(.),
+    Acres = set_units(Acres, 'acres'),
+    Acres = as.numeric(Acres)
+  ) %>% 
+  select(Acres)
+  
+# artificial reefs
+arti <- st_read(dsn = gdb, layer = 'ArtificialReefs') %>% 
+  st_transform(prj) %>% 
+  mutate(
+    Acres = st_area(.),
+    Acres = set_units(Acres, 'acres'),
+    Acres = as.numeric(Acres)
+  ) %>% 
+  select(Acres)
+
+# tidal tribs
+tidt <- st_read(dsn = gdb, layer = 'Tidal_Tributaries') %>% 
+  st_transform(prj) %>% 
+  mutate(
+    Miles = st_length(.),
+    Miles = set_units(Miles, 'Miles'),
+    Miles = as.numeric(Miles)
+  ) %>% 
+  select(Miles)
+
+# living shorelines
+livs <- st_read(dsn = gdb, layer = 'ESA_livingShorelines') %>% 
+  st_transform(prj) %>% 
+  mutate(
+    Miles = st_length(.),
+    Miles = set_units(Miles, 'Miles'),
+    Miles = as.numeric(Miles)
+  ) %>% 
+  select(Miles)
+
+save(hard, file = 'data/hard.RData', version = 2)
+save(arti, file = 'data/arti.RData', version = 2)
+save(tidt, file = 'data/tidt.RData', version = 2)
+save(livs, file = 'data/livs.RData', version = 2)
 
 # opportunities map from deliverables -------------------------------------
 # 
