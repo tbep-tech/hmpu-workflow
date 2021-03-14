@@ -119,8 +119,7 @@ consorig <- st_read(dsn = gdb, layer = 'ExistingConservation') %>%
 # union consorig with cons, assumes consorig will have nothing that already isn't in cons
 cons <- st_union(st_geometry(cons), st_geometry(consorig)) %>% 
   st_buffer(dist = 0) %>% 
-  st_cast('POLYGON') %>% 
-  st_sf(geometry = .)
+  st_cast('POLYGON') 
 
 save(cons, file = 'data/cons.RData', compress = 'xz')
 
