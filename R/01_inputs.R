@@ -15,7 +15,6 @@ prj <- 6443
 
 fluccs <- read.csv(here('data', 'FLUCCShabsclass.csv'), stringsAsFactors = F)
 
-
 # stratification lookup table ---------------------------------------------
 
 strata <- data.frame(
@@ -63,11 +62,13 @@ salin <- st_read('~/Desktop/TBEP/HMPU/GIS/ConvertedPolygon/Model_Input/SalinityK
 
 save(salin, file = here('data', 'salin.RData'), compress = 'xz')
 
-# conservation lands ------------------------------------------------------
+# proposed and conservation lands ------------------------------------------
 
 data(tbshed)
 
 bbox <- sf::st_bbox(tbshed)
+
+### conservation 
 
 ## from FNAI website
 
@@ -139,9 +140,7 @@ cons <- st_union(st_geometry(cons), st_geometry(consorig)) %>%
   st_union() %>% 
   st_buffer(dist = 0)
 
-save(cons, file = 'data/cons.RData', compress = 'xz')
-
-# proposed lands ----------------------------------------------------------
+### proposed
 
 # the CLIP data are a one off, so I can just use the original layer from HMPU
 # original from here https://www.fnai.org/clip.cfm, but HMPU added some by hand
@@ -154,7 +153,37 @@ prop <- st_read(dsn = gdb, layer = 'ProposedConservation') %>%
   st_union() %>% 
   st_buffer(dist = 0) 
 
-save(prop, file = 'data/prop.RData', compress = 'xz')
+# mapview(cons, col.regions = 'green') + mapview(prop, col.regions = 'red')
+
+### correct overlap between conservation and proposed
+# assumes anything that's proposed that overlaps with conservation is now conservation
+
+# this takes the overlap of proposed with conservation, puts it in conservation, removes from proposed
+# note that this works very fast on a unioned geometry set, very slow if not
+
+a <- cons %>% 
+  st_set_precision(1e5)
+b <- prop %>% 
+  st_set_precision(1e5)
+
+# conservation not in proposed
+op1 <- st_difference(a, b)
+beepr::beep('coin')
+
+# proposed not in conservation
+op2 <- st_difference(b, a)
+beepr::beep('coin')
+
+# conservation in proposed
+op3 <- st_intersection(a, b)
+beepr::beep('coin')
+
+prop <- op2
+cons <- st_union(op1, op3) %>% 
+  st_geometry()
+
+save(prop, file = here('data', 'prop.RData'), version = 2)
+save(cons, file = here('data', 'cons.RData'), version = 2)
 
 # import each lulc layer, crop by tbshed, save ----------------------------
 
