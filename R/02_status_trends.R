@@ -13,16 +13,7 @@ fluccs <- read.csv(here('data', 'FLUCCShabsclass.csv'), stringsAsFactors = F)
 
 # do not do this with subtidal because years don't match with lulc
 
-data(strats)
-
-# remove open water estuary categories
-cds <- c(5400, 5700, 5720)
-
-# get coastal stratum
-coastal <- strats %>% 
-  dplyr::filter(Stratum %in% 'Coastal') %>% 
-  st_buffer(dist = 0) %>% 
-  st_geometry()
+data(coastal)
 
 res <- list.files('data', '^lulc') %>% 
   enframe() %>% 
@@ -35,8 +26,7 @@ res <- list.files('data', '^lulc') %>%
       
       # import file
       load(file = here(paste0('data/', x)))
-      dat <- get(gsub('\\.RData', '', x)) %>% 
-        filter(!FLUCCSCODE %in% cds)
+      dat <- get(gsub('\\.RData', '', x))
       
       dat_out <- lulc_est(dat, coastal, fluccs)
       
@@ -94,17 +84,7 @@ save(subtacres, file = here('data', 'subtacres.RData'), version = 2)
 
 # LULC change analysis ----------------------------------------------------
 
-data(strats)
-
-# codes to remove, all subtidal 
-cds <- c(5400, 5700, 5720, 6510, 6540, 7210, 9113, 9116, 9121, 9510, 9511, 9512, 9513, 9514, 9515)
-
-# get coastal stratum
-coastal <- strats %>% 
-  dplyr::filter(Stratum %in% 'Coastal') %>% 
-  st_buffer(dist = 0) %>% 
-  st_geometry() %>% 
-  st_union()
+data(coastal)
 
 # file and year list
 inds <- list.files('data', '^lulc') %>% 
@@ -125,8 +105,8 @@ load(file = here('data/', maxdat))
 maxdat <- maxdat %>% 
   gsub('\\.RData$', '', .) %>%
   get %>% 
-  filter(!FLUCCSCODE %in% cds) %>% # subtidal codes to remove
-  add_coast_up(coastal, fluccs) %>% 
+  lulc_est(coastal, fluccs, sumout = F) %>% 
+  rename(Category = HMPU_TARGETS) %>% 
   st_union(by_feature = TRUE) %>%
   mutate(
     Category = paste0(Category, ', ', maxyr)
@@ -154,8 +134,8 @@ for(i in 1:nrow(inds)){
   a <- a %>% 
     gsub('\\.RData$', '', .) %>%
     get %>% 
-    filter(!FLUCCSCODE %in% cds) %>% # subtidal codes to remove
-    add_coast_up(coastal, fluccs) %>% 
+    lulc_est(coastal, fluccs, sumout = F) %>% 
+    rename(Category = HMPU_TARGETS) %>% 
     st_union(by_feature = TRUE) %>%
     mutate(Category = paste0(Category, ', ', yr))
   b <- maxdat

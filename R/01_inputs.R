@@ -42,11 +42,16 @@ save(tbshed, file = here('data', 'tbshed.RData'), compress = 'xz')
 gdb <- '~/Desktop/TBEP/HMPU/GIS/TBEP_HMPUv3/TBEP_HMPUv3.gdb'
 # st_layers(gdb)
 
-strats <- st_read(gdb, layer = 'SpatialStrata') %>% 
+coastal <- st_read(gdb, layer = 'SpatialStrata') %>% 
   dplyr::select(Stratum) %>% 
-  st_transform(prj)
+  st_transform(prj) %>% 
+  dplyr::filter(Stratum %in% 'Coastal') %>% 
+  st_buffer(dist = 0) %>% 
+  st_geometry() %>% 
+  st_union() %>% 
+  st_cast('POLYGON')
 
-save(strats, file = here('data', 'strats.RData'), compress = 'xz')
+save(coastal, file = here('data', 'coastal.RData'), compress = 'xz')
 
 # soils -------------------------------------------------------------------
 

@@ -14,7 +14,7 @@ data(hard)
 data(arti)
 data(tidt)
 data(livs)
-data(strats)
+data(coastal)
 
 lulcfl <- 'lulc2017'
 subtfl <- 'sgdat2018'
@@ -33,11 +33,6 @@ load(here('data', paste0(subtfl, '.RData')))
 #   st_as_sf(as_points = FALSE, merge = TRUE) %>% 
 #   rename(FLUCCSCODE = 'Full_LULC')
 
-# coastal stratum
-coastal <- strats %>% 
-  dplyr::filter(Stratum %in% 'Coastal') %>% 
-  st_buffer(dist = 0)
-
 # lulc area, all categories
 lulcsum <- get(lulcfl) %>% 
   add_coast_up(coastal, fluccs) %>% 
@@ -47,11 +42,11 @@ lulcsum <- get(lulcfl) %>%
     Acres = as.numeric(Acres)
   ) %>% 
   st_set_geometry(NULL) %>% 
-  group_by(Category) %>% 
+  group_by(HMPU_TARGETS) %>% 
   summarise(
     Acres = sum(Acres)
   ) %>% 
-  select(HMPU_TARGETS = Category, Acres) %>% 
+  select(HMPU_TARGETS, Acres) %>% 
   arrange(HMPU_TARGETS)
 
   
@@ -129,21 +124,17 @@ curex <- bind_rows(lulcsum, subtsum, artisum, tidtsum, livssum) %>%
 
 data(prop)
 data(cons)
+data(coastal)
 
 prop <- st_cast(prop, 'POLYGON')
 cons <- st_cast(cons, 'POLYGON')
 
-# coastal stratum
-coastal <- strats %>% 
-  dplyr::filter(Stratum %in% 'Coastal') %>% 
-  st_buffer(dist = 0)
-
 # lulc
 lulc <- get(lulcfl) %>% 
   add_coast_up(coastal, fluccs) %>% 
-  filter(!Category %in% c('Developed', 'Open Water'))
+  filter(!HMPU_TARGETS %in% c('Developed', 'Open Water'))
 
-categories <- unique(lulc$Category)
+categories <- unique(lulc$HMPU_TARGETS)
 
 propopp <- NULL
 consopp <- NULL
@@ -152,7 +143,7 @@ for(cats in categories){
   cat(cats, '\n')
   
   tmp <- lulc %>% 
-    filter(Category %in% cats) %>% 
+    filter(HMPU_TARGETS %in% cats) %>% 
     st_geometry() %>% 
     st_union() %>%
     st_cast('POLYGON')
@@ -160,33 +151,17 @@ for(cats in categories){
   propout <- st_intersection(tmp, prop) %>% 
     st_sf(geometry = .) %>% 
     mutate(
-      Category = cats
+      HMPU_TARGETS = cats
     )
   
   consout <- st_intersection(tmp, cons) %>% 
     st_sf(geometry = .) %>% 
     mutate(
-      Category = cats
+      HMPU_TARGETS = cats
     )
   
   propopp <- bind_rows(propopp, propout)
   consout <- bind_rows(consopp, consout)
   
 }
-
-# uplands <- lulc %>% 
-#   dplyr::filter(HMPU_TARGETS %in% 'Native Uplands') %>% 
-#   st_buffer(dist = 0)
-# 
-# coastal_uplands <- st_intersection(uplands, coastal) %>% 
-#   st_union() %>% 
-#   st_geometry() %>% 
-#   st_buffer(dist = 0) 
-# 
-# 
-# tmp2 <- st_cast(coastal_uplands, 'POLYGON')
-# 
-# coastal_uplands_p <- st_intersection(tmp1, tmp2)
-# 
-# mapview(prop, col.regions = 'green') + mapview(coastal_uplands, col.regions = 'red') + mapview(tmp)
 

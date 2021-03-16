@@ -3,48 +3,31 @@
 # lulcin in lulc rdata file for a given year
 # coastal is coastal stratum from strats
 # flucss is lookup table
-lulc_est <- function(lulcin, coastal, fluccs){
+# sumout logical if summary of acreage returned, otherwise
+lulc_est <- function(lulcin, coastal, fluccs, sumout = T){
 
-  # add fluccs
-  lulc <- lulcin %>%
-    left_join(fluccs, by = 'FLUCCSCODE')
-
-  # get coastal uplands
-  coastal_uplands <- lulc %>% 
-    dplyr::select(HMPU_TARGETS) %>% 
-    dplyr::filter(HMPU_TARGETS %in% 'Native Uplands') %>% 
-    st_geometry() %>% 
-    st_intersection(coastal, .) %>% 
-    st_area %>% 
-    sum %>% 
-    set_units(acres) %>% 
-    tibble(
-      HMPU_TARGETS = 'Coastal uplands', 
-      Acres = .
-    ) 
+  # FLUCCS codes to remove, these are all subtidal and irrelevant for lulc
+  # in order: bays and estuaries, major bodies of water, gulf of mexico, tidal flats, oyster bars, sand other than beaches submerged
+  # patchy seagrass, continuous seagrass, attached algae, hardbottom x 6
+  cds <- c(5400, 5700, 5720, 6510, 6540, 7210, 9113, 9116, 9121, 9510, 9511, 9512, 9513, 9514, 9515)
 
   # lulc area, all categories
   # remove open water and subtidal habitats (open water area changes between layers and subtidal not consistently collected)
-  lulc <- lulc %>%
+  out <- lulc %>%
+    filter(!FLUCCSCODE %in% cds) %>% 
+    add_coast_up(coastal, fluccs) 
+  
+  if(!sumout)
+    return(out)
+  
+  out <- out %>% 
     mutate(
       Acres = st_area(.),
       Acres = set_units(Acres, acres)
     ) %>% 
-    filter(!HMPU_TARGETS %in% c('Seagrasses', 'Tidal Flats', 'Oyster Bars'))
-  
-  # lulc summarize, table categories
-  out <- lulc %>%
     st_set_geometry(NULL) %>%
     group_by(HMPU_TARGETS) %>%
-    summarise(Acres = sum(Acres)) %>% 
-    bind_rows(coastal_uplands) %>% 
-    mutate(
-      Acres = case_when(
-        HMPU_TARGETS == 'Native Uplands' ~ Acres - coastal_uplands$Acres, 
-        T ~ Acres
-      ), 
-      Acres = as.numeric(Acres)
-    ) %>% 
+    summarise(Acres = sum(Acres), .groups = 'drop') %>% 
     arrange(HMPU_TARGETS)
   
   return(out)
@@ -85,17 +68,11 @@ add_coast_up <- function(lulcin, coastal, fluccs){
 
   lulc <- lulcin %>% 
     left_join(fluccs, by = 'FLUCCSCODE') %>%
-    select(Category = HMPU_TARGETS) 
+    select(HMPU_TARGETS) 
 
   # get uplands geometry
   uplands <- lulc %>% 
-    dplyr::filter(Category == 'Native Uplands') %>% 
-    st_geometry() %>% 
-    st_union() %>% 
-    st_cast('POLYGON')
-  
-  # get coastal geometry
-  coastal <- coastal %>% 
+    dplyr::filter(HMPU_TARGET == 'Native Uplands') %>% 
     st_geometry() %>% 
     st_union() %>% 
     st_cast('POLYGON')
@@ -107,9 +84,9 @@ add_coast_up <- function(lulcin, coastal, fluccs){
     st_cast('POLYGON') %>% 
     st_sf(geometry = .) %>%
     mutate(
-      Category = 'Coastal Uplands'
+      HMPU_TARGET = 'Coastal Uplands'
     ) %>% 
-    dplyr::select(Category) %>% 
+    dplyr::select(HMPU_TARGET) %>% 
     st_zm()
 
   # lulc not in coastal uplands
