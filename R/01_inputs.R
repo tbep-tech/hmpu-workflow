@@ -33,7 +33,8 @@ write.csv(strata, here('data/strata.csv'), row.names = F)
 # watershed ---------------------------------------------------------------
 
 tbshed <- st_read('~/Desktop/TBEP/HMPU/GIS/ConvertedPolygon/Model_Input/TBEP_Watershed_Correct_Projection.shp') %>% 
-  st_transform(prj)
+  st_transform(prj) %>% 
+  st_
 
 save(tbshed, file = here('data', 'tbshed.RData'), compress = 'xz')
 
@@ -114,7 +115,6 @@ ffa <- esri2sf('https://services.arcgis.com/9Jk4Zl9KofTtvg3x/arcgis/rest/service
 # note that the original layer has overlapping polygons
 aqprs <- st_read('https://opendata.arcgis.com/datasets/81841412d3984e9aac2c00c21e41d32e_0.geojson') %>% 
   st_transform(crs = prj) %>%
-  # select(name = LONG_NAME) %>%
   st_buffer(dist = 0) %>% 
   st_intersection(tbshed) %>% 
   st_cast("MULTIPOLYGON") %>% 
@@ -123,24 +123,24 @@ aqprs <- st_read('https://opendata.arcgis.com/datasets/81841412d3984e9aac2c00c21
   st_union() %>% 
   st_buffer(dist = 0)
 
-## join conservation layers from sources
-cons <- st_geometry(flma) %>% 
+## join existing conservation layers from sources
+exst <- st_geometry(flma) %>% 
   st_union(st_geometry(ffbot)) %>% 
   st_union(st_geometry(ffa)) %>% 
   st_union(st_geometry(aqprs)) %>% 
   st_buffer(dist = 0)
 
-## original conservation layer
+## original existing conservation layer
 gdb <- '~/Desktop/TBEP/HMPU/GIS/TBEP_HMPUv3/TBEP_HMPUv3.gdb'
 
 # st_layers(gdb)
-consorig <- st_read(dsn = gdb, layer = 'ExistingConservation') %>% 
+exstorig <- st_read(dsn = gdb, layer = 'ExistingConservation') %>% 
   st_transform(prj) %>% 
   st_union() %>% 
   st_buffer(dist = 0) 
 
-# union consorig with cons, assumes consorig will have nothing that already isn't in cons
-cons <- st_union(st_geometry(cons), st_geometry(consorig)) %>% 
+# union exstorig with exst, assumes exstorig will have nothing that already isn't in exst
+exst <- st_union(st_geometry(exst), st_geometry(exstorig)) %>% 
   st_cast('POLYGON') %>% 
   st_union() %>% 
   st_buffer(dist = 0)
@@ -155,6 +155,7 @@ gdb <- '~/Desktop/TBEP/HMPU/GIS/TBEP_HMPUv3/TBEP_HMPUv3.gdb'
 # st_layers(gdb)
 prop <- st_read(dsn = gdb, layer = 'ProposedConservation') %>% 
   st_transform(prj) %>% 
+  st_geometry() %>% 
   st_union() %>% 
   st_buffer(dist = 0) 
 
@@ -166,26 +167,28 @@ prop <- st_read(dsn = gdb, layer = 'ProposedConservation') %>%
 # this takes the overlap of proposed with conservation, puts it in conservation, removes from proposed
 # note that this works very fast on a unioned geometry set, very slow if not
 
-a <- cons %>% 
+a <- exst %>% 
   st_set_precision(1e5)
 b <- prop %>% 
   st_set_precision(1e5)
 
-# conservation not in proposed
+# existing conservation not in proposed
 op1 <- st_difference(a, b)
 
-# proposed not in conservation
+# proposed not in existing conservation
 op2 <- st_difference(b, a)
 
-# conservation in proposed
+# existing conservation in proposed
 op3 <- st_intersection(a, b)
 
-prop <- op2
-cons <- st_union(op1, op3) %>% 
-  st_geometry()
+prop <- op2 %>% 
+  st_cast('POLYGON')
+exst <- st_union(op1, op3) %>% 
+  st_geometry() %>% 
+  st_cast('POLYGON')
 
 save(prop, file = here('data', 'prop.RData'), version = 2)
-save(cons, file = here('data', 'cons.RData'), version = 2)
+save(exst, file = here('data', 'exst.RData'), version = 2)
 
 # import each lulc layer, crop by tbshed, save ----------------------------
 

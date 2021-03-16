@@ -99,11 +99,8 @@ curex <- bind_rows(lulcsum, subtsum, hardsum, artisum, tidtsum, livssum) %>%
 # existing and proposed conservation --------------------------------------
 
 data(prop)
-data(cons)
+data(exst)
 data(coastal)
-
-prop <- st_cast(prop, 'POLYGON')
-cons <- st_cast(cons, 'POLYGON')
 
 # lulc
 lulc <- get(lulcfl) %>% 
@@ -113,7 +110,7 @@ lulc <- get(lulcfl) %>%
 categories <- unique(lulc$HMPU_TARGETS)
 
 propopp <- NULL
-consopp <- NULL
+exstopp <- NULL
 for(cats in categories){
   
   cat(cats, '\n')
@@ -127,17 +124,20 @@ for(cats in categories){
   propout <- st_intersection(tmp, prop) %>% 
     st_sf(geometry = .) %>% 
     mutate(
-      HMPU_TARGETS = cats
+      HMPU_TARGETS = cats, 
+      typ = 'Proposed'
     )
   
-  consout <- st_intersection(tmp, cons) %>% 
+  exstout <- st_intersection(tmp, exst) %>% 
     st_sf(geometry = .) %>% 
     mutate(
-      HMPU_TARGETS = cats
+      HMPU_TARGETS = cats, 
+      typ = 'Existing'
     )
   
   propopp <- bind_rows(propopp, propout)
-  consout <- bind_rows(consopp, consout)
+  exstout <- bind_rows(exstopp, exstout)
   
 }
 
+natvopp <- bind_rows(propopp, exstopp)
