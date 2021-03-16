@@ -13,7 +13,7 @@ lulc_est <- function(lulcin, coastal, fluccs, sumout = T){
 
   # lulc area, all categories
   # remove open water and subtidal habitats (open water area changes between layers and subtidal not consistently collected)
-  out <- lulc %>%
+  out <- lulcin %>%
     filter(!FLUCCSCODE %in% cds) %>% 
     add_coast_up(coastal, fluccs) 
   
@@ -23,7 +23,8 @@ lulc_est <- function(lulcin, coastal, fluccs, sumout = T){
   out <- out %>% 
     mutate(
       Acres = st_area(.),
-      Acres = set_units(Acres, acres)
+      Acres = set_units(Acres, acres), 
+      Acres = as.numeric(Acres)
     ) %>% 
     st_set_geometry(NULL) %>%
     group_by(HMPU_TARGETS) %>%
@@ -48,7 +49,8 @@ subt_est <- function(subtin, fluccs){
     left_join(fluccs, by = 'FLUCCSCODE') %>% 
     mutate(
       Acres = st_area(.),
-      Acres = set_units(Acres, acres)
+      Acres = set_units(Acres, acres),
+      Acres = as.numeric(Acres)
     ) %>%
     st_set_geometry(NULL) %>%
     group_by(HMPU_TARGETS) %>%
@@ -72,7 +74,7 @@ add_coast_up <- function(lulcin, coastal, fluccs){
 
   # get uplands geometry
   uplands <- lulc %>% 
-    dplyr::filter(HMPU_TARGET == 'Native Uplands') %>% 
+    dplyr::filter(HMPU_TARGETS == 'Native Uplands') %>% 
     st_geometry() %>% 
     st_union() %>% 
     st_cast('POLYGON')
@@ -84,9 +86,9 @@ add_coast_up <- function(lulcin, coastal, fluccs){
     st_cast('POLYGON') %>% 
     st_sf(geometry = .) %>%
     mutate(
-      HMPU_TARGET = 'Coastal Uplands'
+      HMPU_TARGETS = 'Coastal Uplands'
     ) %>% 
-    dplyr::select(HMPU_TARGET) %>% 
+    dplyr::select(HMPU_TARGETS) %>% 
     st_zm()
 
   # lulc not in coastal uplands

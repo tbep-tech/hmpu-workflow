@@ -35,38 +35,14 @@ load(here('data', paste0(subtfl, '.RData')))
 
 # lulc area, all categories
 lulcsum <- get(lulcfl) %>% 
-  add_coast_up(coastal, fluccs) %>% 
-  mutate(
-    Acres = st_area(.),
-    Acres = set_units(Acres, 'Acres'),
-    Acres = as.numeric(Acres)
-  ) %>% 
-  st_set_geometry(NULL) %>% 
-  group_by(HMPU_TARGETS) %>% 
-  summarise(
-    Acres = sum(Acres)
-  ) %>% 
-  select(HMPU_TARGETS, Acres) %>% 
-  arrange(HMPU_TARGETS)
-
+  lulc_est(coastal, fluccs)
   
 # subtidal summarize ------------------------------------------------------
 
 # subtidal area, all categories
-subt <- subtfl %>%
+subtsum <- subtfl %>%
   get %>% 
-  mutate(
-    Acres = st_area(.),
-    Acres = set_units(Acres, 'acres'),
-    Acres = as.numeric(Acres)
-  ) %>%
-  left_join(fluccs, by = 'FLUCCSCODE')
-
-# subtidal summarize, table categories
-subtsum <- subt %>%
-  st_set_geometry(NULL) %>%
-  group_by(HMPU_TARGETS) %>%
-  summarise(Acres = sum(Acres))
+  subt_est(fluccs)
 
 # miscellaneous sum -------------------------------------------------------
 
@@ -104,7 +80,7 @@ livssum <- livs %>%
 
 # combined current extent --------------------------------------------------
 
-curex <- bind_rows(lulcsum, subtsum, artisum, tidtsum, livssum) %>% 
+curex <- bind_rows(lulcsum, subtsum, hardsum, artisum, tidtsum, livssum) %>% 
   mutate(
     unis = case_when(
       is.na(Acres) ~ 'mi', 
