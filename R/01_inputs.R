@@ -168,15 +168,12 @@ b <- prop %>%
 
 # conservation not in proposed
 op1 <- st_difference(a, b)
-beepr::beep('coin')
 
 # proposed not in conservation
 op2 <- st_difference(b, a)
-beepr::beep('coin')
 
 # conservation in proposed
 op3 <- st_intersection(a, b)
-beepr::beep('coin')
 
 prop <- op2
 cons <- st_union(op1, op3) %>% 

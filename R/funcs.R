@@ -51,7 +51,7 @@ lulc_est <- function(lulcin, coastal, fluccs){
   
 }
 
-# estimate subtical area in acres for available HMPU targets 
+# estimate subtidal area in acres for available HMPU targets 
 #
 # subtin in seagrass rdata file for a given year
 # flucss is lookup table

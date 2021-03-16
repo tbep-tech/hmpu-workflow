@@ -3,6 +3,9 @@ library(tidyverse)
 library(here)
 library(doParallel)
 library(foreach)
+library(units)
+
+source('R/funcs.R')
 
 fluccs <- read.csv(here('data', 'FLUCCShabsclass.csv'), stringsAsFactors = F)
 strata <- read.vs(here('data', 'strata.csv'), stringsAsFactors = F)
@@ -143,3 +146,60 @@ curex <- bind_rows(lulcsum, subtsum, artisum, tidtsum, livssum) %>%
   inner_join(strata, by = 'HMPU_TARGETS') %>% 
   select(Category, HMPU_TARGETS, unis, `Current Extent`) %>% 
   arrange(Category, HMPU_TARGETS)
+
+
+# existing and proposed conservation --------------------------------------
+
+data(prop)
+data(cons)
+
+prop <- st_cast(prop, 'POLYGON')
+
+# coastal stratum
+coastal <- strats %>% 
+  dplyr::filter(Stratum %in% 'Coastal') %>% 
+  st_buffer(dist = 0)
+
+# lulc area, all categories
+lulc <- get(lulcfl) %>% 
+  add_coast_up(coastal, fluccs) %>% 
+  filter(!Category %in% c('Developed', 'Open Water'))
+
+categories <- unique(lulc$Category)
+
+propopp <- NULL
+for(cats in categories){
+  
+  cat(cats, '\n')
+  
+  tmp <- lulc %>% 
+    filter(Category %in% cats) %>% 
+    st_geometry() %>% 
+    st_cast('POLYGON')
+  
+  out <- st_intersection(tmp, prop) %>% 
+    st_sf(geometry = .) %>% 
+    mutate(
+      Category = cats
+    )
+  
+  propopp <- bind_rows(propopp, out)
+  
+}
+
+# uplands <- lulc %>% 
+#   dplyr::filter(HMPU_TARGETS %in% 'Native Uplands') %>% 
+#   st_buffer(dist = 0)
+# 
+# coastal_uplands <- st_intersection(uplands, coastal) %>% 
+#   st_union() %>% 
+#   st_geometry() %>% 
+#   st_buffer(dist = 0) 
+# 
+# 
+# tmp2 <- st_cast(coastal_uplands, 'POLYGON')
+# 
+# coastal_uplands_p <- st_intersection(tmp1, tmp2)
+# 
+# mapview(prop, col.regions = 'green') + mapview(coastal_uplands, col.regions = 'red') + mapview(tmp)
+
