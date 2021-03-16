@@ -154,13 +154,14 @@ data(prop)
 data(cons)
 
 prop <- st_cast(prop, 'POLYGON')
+cons <- st_cast(cons, 'POLYGON')
 
 # coastal stratum
 coastal <- strats %>% 
   dplyr::filter(Stratum %in% 'Coastal') %>% 
   st_buffer(dist = 0)
 
-# lulc area, all categories
+# lulc
 lulc <- get(lulcfl) %>% 
   add_coast_up(coastal, fluccs) %>% 
   filter(!Category %in% c('Developed', 'Open Water'))
@@ -168,6 +169,7 @@ lulc <- get(lulcfl) %>%
 categories <- unique(lulc$Category)
 
 propopp <- NULL
+consopp <- NULL
 for(cats in categories){
   
   cat(cats, '\n')
@@ -175,15 +177,23 @@ for(cats in categories){
   tmp <- lulc %>% 
     filter(Category %in% cats) %>% 
     st_geometry() %>% 
+    st_union() %>%
     st_cast('POLYGON')
   
-  out <- st_intersection(tmp, prop) %>% 
+  propout <- st_intersection(tmp, prop) %>% 
     st_sf(geometry = .) %>% 
     mutate(
       Category = cats
     )
   
-  propopp <- bind_rows(propopp, out)
+  consout <- st_intersection(tmp, cons) %>% 
+    st_sf(geometry = .) %>% 
+    mutate(
+      Category = cats
+    )
+  
+  propopp <- bind_rows(propopp, propout)
+  consout <- bind_rows(consopp, consout)
   
 }
 
