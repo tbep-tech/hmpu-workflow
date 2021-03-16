@@ -87,38 +87,37 @@ add_coast_up <- function(lulcin, coastal, fluccs){
     left_join(fluccs, by = 'FLUCCSCODE') %>%
     select(Category = HMPU_TARGETS) 
 
-  # get coastal stratum
+  # get uplands geometry
   uplands <- lulc %>% 
     dplyr::filter(Category == 'Native Uplands') %>% 
-    group_by(Category) %>% 
-    summarise() 
+    st_geometry() %>% 
+    st_union() %>% 
+    st_cast('POLYGON')
+  
+  # get coastal geometry
+  coastal <- coastal %>% 
+    st_geometry() %>% 
+    st_union() %>% 
+    st_cast('POLYGON')
   
   # get coastal uplands
   coastal_uplands <- uplands %>% 
     st_intersection(coastal) %>% 
+    st_union() %>% 
+    st_cast('POLYGON') %>% 
     st_sf(geometry = .) %>%
     mutate(
       Category = 'Coastal Uplands'
     ) %>% 
     dplyr::select(Category) %>% 
-    st_cast('POLYGON') %>% 
     st_zm()
-  
-  # true union
-  op1 <- st_difference(lulc, st_union(coastal_uplands))
-  op2 <- st_difference(coastal_uplands, st_union(lulc)) %>%
-    rename(Category.1 = Category)
-  op3 <- st_intersection(uplands, coastal_uplands)
-  
-  out <- bind_rows(op1, op2, op3) %>% 
-    mutate(
-      Category = case_when(
-        Category.1 == 'Coastal Uplands' ~ 'Coastal Uplands', 
-        T ~ Category
-      )
-    ) %>% 
-    dplyr::select(Category)
 
+  # lulc not in coastal uplands
+  lulcdiff <- st_difference(lulc, st_geometry(st_union(coastal_uplands)))
+  
+  # join op1 with coastal uplands
+  out <- bind_rows(lulcdiff, coastal_uplands)
+  
   return(out)
   
 }
