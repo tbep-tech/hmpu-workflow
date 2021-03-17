@@ -14,7 +14,11 @@ data(hard)
 data(arti)
 data(tidt)
 data(livs)
+data(prop)
+data(exst)
 data(coastal)
+data(soils)
+data(salin)
 
 lulcfl <- 'lulc2017'
 subtfl <- 'sgdat2018'
@@ -96,11 +100,7 @@ curex <- bind_rows(lulcsum, subtsum, hardsum, artisum, tidtsum, livssum) %>%
   arrange(Category, HMPU_TARGETS)
 
 
-# existing and proposed conservation --------------------------------------
-
-data(prop)
-data(exst)
-data(coastal)
+# existing, proposed conservation and restoration opps --------------------
 
 # lulc
 lulc <- get(lulcfl) %>% 
@@ -109,8 +109,8 @@ lulc <- get(lulcfl) %>%
 
 categories <- unique(lulc$HMPU_TARGETS)
 
-propopp <- NULL
-exstopp <- NULL
+propall <- NULL
+exstall <- NULL
 for(cats in categories){
   
   cat(cats, '\n')
@@ -135,9 +135,114 @@ for(cats in categories){
       typ = 'Existing'
     )
   
-  propopp <- bind_rows(propopp, propout)
-  exstout <- bind_rows(exstopp, exstout)
+  propall <- bind_rows(propall, propout)
+  exstall <- bind_rows(exstall, exstout)
   
 }
 
-natvopp <- bind_rows(propopp, exstopp)
+# layer 
+nativelyr <- bind_rows(propall, exstall) %>% 
+  filter(!HMPU_TARGETS %in% 'Restorable') %>% 
+  mutate(
+    Acres = st_area(.),
+    Acres = set_units(Acres, acres), 
+    Acres = as.numeric(Acres)
+  ) 
+
+# summary
+nativesum <- nativelyr %>% 
+  st_set_geometry(NULL) %>%
+  group_by(typ, HMPU_TARGETS) %>%
+  summarise(Acres = sum(Acres), .groups = 'drop') %>% 
+  arrange(typ, HMPU_TARGETS) %>% 
+  spread(typ, Acres)
+
+## restorable
+
+restorable <- bind_rows(propall, exstall) %>% 
+  filter(HMPU_TARGETS %in% 'Restorable') 
+
+# xeric soils
+soilsforest <- soils %>% 
+  filter(gridcode == '100') %>% 
+  st_union() %>% 
+  st_geometry() %>% 
+  st_cast('POLYGON') %>% 
+  st_buffer(dist = 0)
+
+# mesic/hydric soils
+soilswetland <- soils %>% 
+  filter(!gridcode == '100') %>% 
+  st_union() %>% 
+  st_geometry() %>% 
+  st_cast('POLYGON') %>% 
+  st_buffer(dist = 0)
+
+opps <- NULL
+for(typ in c('Proposed', 'Existing')){
+
+  cat(typ, '\n')
+  
+  ##
+  # subset proposed, existing restorable habitats
+  tmp <- restorable %>% 
+    filter(typ %in% !!typ) %>% 
+    st_union() %>%
+    st_geometry() %>%
+    st_cast('POLYGON') %>% 
+    dplyr::select(typ) %>% 
+    st_buffer(dist = 0)
+  
+  ##
+  # create
+  
+  # restorable in xeric soils
+  uplands <- st_intersection(tmp, soilsforest)
+  
+  # restorable in xeric soils, in coastal stratum
+  coastal_uplands <- st_intersection(uplands, coastal)
+    
+  # remove coastal uplands from uplands
+  uplands <- st_difference(uplands, coastal_uplands)
+  
+  # wetlands
+  wetlands <- st_intersection(tmp, soilswetland)
+  
+  # tidal wetlands
+  tidal_wetlands <- st_intersection(wetlands, coastal)
+  
+  # remove tidal wetlands from wetlands
+  wetlands <- st_difference(wetlands, tidal_wetlands)
+  
+  ##
+  # add attributes
+  
+  uplands <- uplands %>% 
+    st_sf(geometry = .) %>% 
+    mutate(HMPU_TARGETS = 'Native Uplands')
+  
+  coastal_uplands <- coastal_uplands %>% 
+    st_sf(geometry = .) %>% 
+    mutate(HMPU_TARGETS = 'Coastal Uplands')
+  
+  wetlands <- wetlands %>% 
+    st_sf(geometry = .) %>% 
+    mutate(HMPU_TARGETS = 'Freshwater Wetlands')
+  
+  tidal_wetlands <- tidal_wetlands %>% 
+    st_sf(geometry = .) %>% 
+    mutate(HMPU_TARGETS = 'Salt Marshes')
+  
+  out <- bind_rows(uplands, coastal_uplands, wetlands, tidal_wetlands) %>% 
+    mutate(typ = !!typ)
+  
+  opp <- rbind(opp, out)
+  
+}
+
+
+
+# combine all -------------------------------------------------------------
+
+cursum <- curex %>% 
+  left_join(native, by = 'HMPU_TARGETS')
