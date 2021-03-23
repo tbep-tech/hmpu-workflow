@@ -168,8 +168,28 @@ for(typ in c('Proposed', 'Existing')){
 
 save(restorelyr, file = 'data/restorelyr.RData', compress = 'xz')
 
-# native reservation ------------------------------------------------------
+# reservation layers ------------------------------------------------------
 
+# layers in coastal stratum that are native or restorable and currently not in conservation (existing or proposed)
 
-# restorable reservation --------------------------------------------------
+consall <- bind_rows(propall, exstall) %>% 
+  st_union()
 
+nativersrv <- lulc %>% 
+  filter(!HMPU_TARGETS %in% 'Restorable') %>% 
+  st_intersection(., coastal) %>% 
+  fixgeo %>% 
+  st_difference(., consall) %>% 
+  fixgeo
+
+restorersrv <- lulc %>%
+  filter(HMPU_TARGETS %in% 'Restorable') %>% 
+  st_intersection(., coastal) %>% 
+  fixgeo %>% 
+  st_difference(., consall) %>% 
+  fixgeo
+
+mapview(restorersrv, col.regions = 'deeppink', alpha.regions = 1, lwd = 0) + mapview(nativersrv, col.regions = 'pink', alpha.regions = 1, lwd = 0)
+
+save(nativersrv, file = 'data/nativersrv.RData')
+save(restorersrv, file = 'data/restorersrv.RData')

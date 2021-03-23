@@ -70,7 +70,7 @@ add_coast_up <- function(lulcin, coastal, fluccs){
 
   lulc <- lulcin %>% 
     left_join(fluccs, by = 'FLUCCSCODE') %>%
-    select(HMPU_TARGETS) 
+    dplyr::select(HMPU_TARGETS) 
 
   # get uplands geometry
   uplands <- lulc %>% 
