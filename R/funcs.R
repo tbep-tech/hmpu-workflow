@@ -126,3 +126,19 @@ get_cons <- function(url, prj, tbshed){
   return(out)
   
 }
+
+# fix geometries by union, cast to polygon, buffer by zero
+#
+# dat is input sf object with no attributes
+fixgeo <- function(dat){
+    
+  out <- dat %>% 
+    st_union() %>% 
+    st_buffer(dist = 0) %>% 
+    st_geometry() %>%
+    st_cast('POLYGON') %>% 
+    st_buffer(dist = 0) 
+  
+  return(out)
+
+}
