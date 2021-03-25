@@ -31,18 +31,18 @@ write.csv(strata, here('data/strata.csv'), row.names = F)
 
 # watershed ---------------------------------------------------------------
 
-tbshed <- st_read('~/Desktop/TBEP/HMPU/GIS/ConvertedPolygon/Model_Input/TBEP_Watershed_Correct_Projection.shp') %>% 
+# tbshed <- esri2sf('https://gis.waterinstitute.usf.edu/arcgis/rest/services/Maps/TBEP_OpenData/MapServer/16') %>%
+tbshed <- st_read('https://opendata.arcgis.com/datasets/537fc3e84ccf4f54b441fc4bc03b8b00_16.geojson') %>%
   st_transform(prj) %>% 
-  st_
+  st_union() %>% 
+  st_buffer(dist = 0)
 
 save(tbshed, file = here('data', 'tbshed.RData'), compress = 'xz')
 
 # coastal stratum ---------------------------------------------------------
 
-gdb <- '~/Desktop/TBEP/HMPU/GIS/TBEP_HMPUv3/TBEP_HMPUv3.gdb'
-# st_layers(gdb)
-
-coastal <- st_read(gdb, layer = 'SpatialStrata') %>% 
+# coastal <- esri2sf('https://gis.waterinstitute.usf.edu/arcgis/rest/services/Maps/TBEP_OpenData/MapServer/14') %>% 
+coastal <- st_read('https://opendata.arcgis.com/datasets/1ff3afee627b4f6883f462f4313a3b88_14.geojson') %>%
   dplyr::select(Stratum) %>% 
   st_transform(prj) %>% 
   dplyr::filter(Stratum %in% 'Coastal') %>% 
@@ -130,10 +130,8 @@ exst <- st_geometry(flma) %>%
   st_buffer(dist = 0)
 
 ## original existing conservation layer
-gdb <- '~/Desktop/TBEP/HMPU/GIS/TBEP_HMPUv3/TBEP_HMPUv3.gdb'
-
-# st_layers(gdb)
-exstorig <- st_read(dsn = gdb, layer = 'ExistingConservation') %>% 
+# exstorig <- esri2sf('https://gis.waterinstitute.usf.edu/arcgis/rest/services/Maps/TBEP_OpenData/MapServer/3') %>% 
+exstorig <- st_read('https://opendata.arcgis.com/datasets/e977c851f6dc49c48d0729b3cd30cc92_3.geojson') %>% 
   st_transform(prj) %>% 
   st_union() %>% 
   st_buffer(dist = 0) 
@@ -321,7 +319,8 @@ hard <- st_read(dsn = gdb, layer = 'Habitats_Hardbottom') %>%
   select(Acres)
   
 # artificial reefs
-arti <- st_read(dsn = gdb, layer = 'ArtificialReefs') %>% 
+# arti <- esri2sf('https://gis.waterinstitute.usf.edu/arcgis/rest/services/Maps/TBEP_OpenData/MapServer/0') %>% 
+arti <- st_read('https://opendata.arcgis.com/datasets/dccf9329dffd4fb9a0436934c23487bb_0.geojson') %>% 
   st_transform(prj) %>% 
   mutate(
     Acres = st_area(.),
@@ -331,7 +330,8 @@ arti <- st_read(dsn = gdb, layer = 'ArtificialReefs') %>%
   select(Acres)
 
 # tidal tribs
-tidt <- st_read(dsn = gdb, layer = 'Tidal_Tributaries') %>% 
+# tidt <- esri2sf('https://gis.waterinstitute.usf.edu/arcgis/rest/services/Maps/TBEP_OpenData/MapServer/18') %>%
+tidt <- st_read('https://opendata.arcgis.com/datasets/d00e5a7955ba429498c8d096b4d7e908_18.geojson') %>%
   st_transform(prj) %>% 
   mutate(
     Miles = st_length(.),
@@ -341,7 +341,8 @@ tidt <- st_read(dsn = gdb, layer = 'Tidal_Tributaries') %>%
   select(Miles)
 
 # living shorelines
-livs <- st_read(dsn = gdb, layer = 'ESA_livingShorelines') %>% 
+# livs <- esri2sf('https://gis.waterinstitute.usf.edu/arcgis/rest/services/Maps/TBEP_OpenData/MapServer/2') %>% 
+livs <- st_read('https://opendata.arcgis.com/datasets/7099e8a81c1847bc95ee4edfc44cfec9_2.geojson') %>% 
   st_transform(prj) %>% 
   mutate(
     Miles = st_length(.),
