@@ -147,10 +147,9 @@ exst <- st_union(st_geometry(exst), st_geometry(exstorig)) %>%
 # the CLIP data are a one off, so I can just use the original layer from HMPU
 # original from here https://www.fnai.org/clip.cfm, but HMPU added some by hand
 
-gdb <- '~/Desktop/TBEP/HMPU/GIS/TBEP_HMPUv3/TBEP_HMPUv3.gdb'
-
 # st_layers(gdb)
-prop <- st_read(dsn = gdb, layer = 'ProposedConservation') %>% 
+# prop <- esri2sf('https://gis.waterinstitute.usf.edu/arcgis/rest/services/Maps/TBEP_OpenData/MapServer/10') %>% 
+prop <- st_read('https://opendata.arcgis.com/datasets/ba464bae7a1144f09522b459d297d1ef_10.geojson') %>%
   st_transform(prj) %>% 
   st_geometry() %>% 
   st_union() %>% 
@@ -303,12 +302,11 @@ res <- foreach(i = 1:nrow(urls), .packages = c('tidyverse', 'sf', 'here')) %dopa
 
 # habitats not in lulc ------------------------------------------------------
 
-gdb <- '~/Desktop/TBEP/HMPU/GIS/TBEP_HMPUv3/TBEP_HMPUv3.gdb'
-
 # st_layers(gdb)
 
 # hardbottom
-hard <- st_read(dsn = gdb, layer = 'Habitats_Hardbottom') %>% 
+# hard <- esri2sf('https://gis.waterinstitute.usf.edu/arcgis/rest/services/Maps/TBEP_OpenData/MapServer/7') %>% 
+hard <- st_read('https://opendata.arcgis.com/datasets/130c6747048647398665e195aa321438_7.geojson') %>% 
   st_transform(prj) %>% 
   filter(Hardbottom %in% 'Natural') %>% 
   mutate(
