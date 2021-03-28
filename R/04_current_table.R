@@ -4,11 +4,11 @@ library(here)
 library(doParallel)
 library(foreach)
 library(units)
+library(flextable)
 
 source(here('R', 'funcs.R'))
 
 fluccs <- read.csv(here('data', 'FLUCCShabsclass.csv'), stringsAsFactors = F)
-strata <- read.csv(here('data', 'strata.csv'), stringsAsFactors = F)
 
 data(hard)
 data(arti)
@@ -19,6 +19,7 @@ data(exst)
 data(coastal)
 data(soils)
 data(salin)
+data(strata)
 
 lulcfl <- 'lulc2017'
 subtfl <- 'sgdat2018'
@@ -111,12 +112,12 @@ cursum <- bind_rows(lulcsum, subtsum, hardsum, artisum, tidtsum, livssum) %>%
 
 # native summary ----------------------------------------------------------
 
-# native summary
 nativesum <- nativelyr %>% 
   mutate(
     Acres = st_area(.),
     Acres = set_units(Acres, acres), 
-    Acres = as.numeric(Acres)
+    Acres = as.numeric(Acres), 
+    typ = paste('native', typ)
   ) %>% 
   st_set_geometry(NULL) %>%
   group_by(typ, HMPU_TARGETS) %>%
@@ -126,21 +127,95 @@ nativesum <- nativelyr %>%
 
 # restorable summary ------------------------------------------------------
 
-# restorable summary
 restoresum <- restorelyr %>% 
   mutate(
     Acres = st_area(.),
     Acres = set_units(Acres, acres),
-    Acres = as.numeric(Acres)
+    Acres = as.numeric(Acres),
+    typ = paste('restorable', typ)
   ) %>% 
   st_set_geometry(NULL) %>%
   group_by(typ, HMPU_TARGETS) %>%
   summarise(Acres = sum(Acres), .groups = 'drop') %>% 
-  arrange(typ, HMPU_TARGETS) %>% 
-  spread(typ, Acres)
+  arrange(typ, HMPU_TARGETS)
+
+# create duplicate rows for non-specific targets
+duplab1 <- 'Mangrove Forests/Salt Barrens'
+dups1 <- restoresum %>% 
+  filter(HMPU_TARGETS %in% !!duplab1) %>% 
+  mutate(HMPU_TARGETS = 'Mangrove Forests')
+duplab2 <- 'Freshwater Wetlands'
+dups2 <- restoresum %>% 
+  filter(HMPU_TARGETS %in% !!duplab2) %>% 
+  mutate(HMPU_TARGETS = 'Non-Forested Freshwater Wetlands')
+
+restoresum <- restoresum %>% 
+  bind_rows(dups1) %>%
+  bind_rows(dups2) %>% 
+  mutate(
+    HMPU_TARGETS = case_when(
+      HMPU_TARGETS %in% !!duplab1 ~ 'Salt Barrens',
+      HMPU_TARGETS %in% !!duplab2 ~ 'Forested Freshwater Wetlands', 
+      T ~ HMPU_TARGETS
+    )
+  ) %>% 
+  spread(typ, Acres) %>% 
+  mutate(
+    `total restorable` = `restorable Existing` + `restorable Proposed`
+  )
 
 # combine all for table ---------------------------------------------------
 
 # all summary
 allsum <- cursum %>% 
-  left_join(nativesum, by = 'HMPU_TARGETS')
+  left_join(nativesum, by = 'HMPU_TARGETS') %>% 
+  left_join(restoresum, by = 'HMPU_TARGETS') %>% 
+  gather('var', 'val', -Category, -HMPU_TARGETS, -unis) %>% 
+  mutate(
+    val = case_when(
+      !is.na(val) ~ paste(prettyNum(round(val, 0), big.mark = ','), unis),
+      T ~ NA_character_
+    ), 
+    Category = factor(Category, levels = c('Subtidal', 'Intertidal', 'Supratidal')), 
+    HMPU_TARGETS = factor(HMPU_TARGETS, levels = levels(strata$HMPU_TARGETS))
+  ) %>% 
+  spread(var, val) %>% 
+  dplyr::select(-unis) %>% 
+  mutate(
+    `native Existing` = case_when(
+      Category == 'Subtidal' ~ `Current Extent`, 
+      HMPU_TARGETS == 'Living Shorelines' ~ 'LSSM',
+      T ~ `native Existing`
+    ), 
+    `total restorable` = case_when(
+      HMPU_TARGETS == 'Seagrasses' ~ '14,131 ac', 
+      HMPU_TARGETS %in% c('Tidal Flats', 'Oyster Bars') ~ 'I/D',
+      HMPU_TARGETS %in% c('Living Shorelines', 'Tidal Tributaries') ~ 'LSSM', 
+      T ~ `total restorable`
+    ),
+    `restorable Existing` = case_when(
+      HMPU_TARGETS == 'Seagrasses' ~ '14,131 ac', 
+      HMPU_TARGETS %in% c('Tidal Flats', 'Oyster Bars') ~ 'I/D',
+      T ~ `restorable Existing`
+    )
+  ) %>% 
+  select(
+    `Habitat Type` = HMPU_TARGETS, 
+    `Current Extent`, 
+    `Existing Conservation Lands` = `native Existing`, 
+    `Proposed Conservation Lands` = `native Proposed`, 
+    `Total Restoration Opportunity` = `total restorable`, 
+    `Existing Conservation Lands Restoration Opportunity` = `restorable Existing`, 
+    `Proposed Conservation Lands Restoration Opportunity` = `restorable Proposed`
+  )
+
+flextable(allsum) %>% 
+  merge_at(i = 7:8, j = 5, part = 'body') %>% 
+  merge_at(i = 7:8, j = 6, part = 'body') %>%
+  merge_at(i = 7:8, j = 7, part = 'body') %>%
+  merge_at(i = 12:13, j = 5, part = 'body') %>% 
+  merge_at(i = 12:13, j = 6, part = 'body') %>%
+  merge_at(i = 12:13, j = 7, part = 'body') %>%
+  # add_header_row(colwidths = 14)
+  border_inner_h() %>% 
+  border_inner_v()

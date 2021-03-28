@@ -17,17 +17,20 @@ fluccs <- read.csv(here('data', 'FLUCCShabsclass.csv'), stringsAsFactors = F)
 # stratification lookup table ---------------------------------------------
 
 strata <- data.frame(
-  Category  = c("Intertidal", "Intertidal", "Intertidal", "Intertidal", "Intertidal", 
-    "Subtidal", "Subtidal", "Subtidal", "Subtidal", "Suptratidal", 
-    "Suptratidal", "Suptratidal", "Suptratidal"),
-  HMPU_TARGETS = c("Living Shorelines", "Mangrove Forests", "Salt Barrens", "Salt Marshes", 
-                   "Tidal Tributaries", "Artificial Reefs", "Oyster Bars", "Seagrasses", 
-                   "Tidal Flats", "Coastal Uplands", "Forested Freshwater Wetlands", 
-                   "Native Uplands", "Non-Forested Freshwater Wetlands"), 
+  Category  = c("Subtidal", "Subtidal", "Subtidal", "Subtidal", "Subtidal",
+    "Intertidal", "Intertidal", "Intertidal", "Intertidal", "Intertidal", 
+    "Supratidal", "Supratidal", "Supratidal", "Supratidal"),
+  HMPU_TARGETS = c("Hard Bottom", "Artificial Reefs", "Tidal Flats", "Seagrasses", "Oyster Bars",
+    "Living Shorelines", "Mangrove Forests", "Salt Barrens", "Salt Marshes", "Tidal Tributaries", 
+    "Coastal Uplands", "Non-Forested Freshwater Wetlands", "Forested Freshwater Wetlands", "Native Uplands"), 
   stringsAsFactors = F
-)
+  ) %>% 
+  mutate(
+    Category = factor(Category, levels = c("Subtidal", "Intertidal", "Supratidal")), 
+    HMPU_TARGETS = factor(HMPU_TARGETS, levels = HMPU_TARGETS)
+  )
 
-write.csv(strata, here('data/strata.csv'), row.names = F)
+save(strata, file = here('data', 'strata.RData'), version = 2)
 
 # watershed ---------------------------------------------------------------
 

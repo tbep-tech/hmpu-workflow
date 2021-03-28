@@ -8,13 +8,13 @@ library(units)
 source(here('R', 'funcs.R'))
 
 fluccs <- read.csv(here('data', 'FLUCCShabsclass.csv'), stringsAsFactors = F)
-strata <- read.csv(here('data', 'strata.csv'), stringsAsFactors = F)
 
 data(prop)
 data(exst)
 data(coastal)
 data(soils)
 data(salin)
+data(strata)
 
 # current year
 lulcfl <- 'lulc2017'
