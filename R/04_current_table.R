@@ -174,8 +174,13 @@ allsum <- cursum %>%
   mutate(
     val = case_when(
       !is.na(val) ~ paste(prettyNum(round(val, 0), big.mark = ','), unis),
-      T ~ NA_character_
+      T ~ 'N/A'
     ), 
+    val = case_when(
+      (HMPU_TARGETS %in% 'Salt Marshes') & (var %in% c('total restorable', 'restorable Existing', 
+                                                     'restorable Proposed')) ~ paste(val, '(JU)'), 
+      T ~ val
+    ),
     Category = factor(Category, levels = c('Subtidal', 'Intertidal', 'Supratidal')), 
     HMPU_TARGETS = factor(HMPU_TARGETS, levels = levels(strata$HMPU_TARGETS))
   ) %>% 
@@ -210,21 +215,7 @@ allsum <- cursum %>%
     `restorable Proposed`
   )
 
-# start with an empty line
-tab <- add_footer_lines(tab, values = "")
-# add "Note: "
-tab <- compose(tab, i = 1, j = 1, value = as_paragraph(as_i("Note: ")), part = "footer")
-
-# add some footnotes
-tab <- footnote(tab, i = 2, j = 2:3, part = "body", ref_symbols = "a", sep = "", value = as_paragraph("Method x"), inline = T)
-# add other footnotes
-tab <- footnote(tab, i = 3, j = 1, part = "body", ref_symbols = "b", sep = "; ", value = as_paragraph("Method y"), inline = T)
-
-tab <- fontsize(tab, part = "all", size = 13)
-
-'N/A - Not Applicable; I/D - Insufficient Data; LSSM - Living Shoreline Suitability Model; JU - Potential Juncus Marsh Opportunity'
-
-as_grouped_data(allsum, groups = 'Category') %>% 
+tab <- as_grouped_data(allsum, groups = 'Category') %>% 
   flextable %>% 
   set_header_labels(
     Category = 'Stratum',
@@ -244,7 +235,7 @@ as_grouped_data(allsum, groups = 'Category') %>%
   merge_at(i = 15:16, j = 6, part = 'body') %>%
   merge_at(i = 15:16, j = 7, part = 'body') %>%
   merge_at(i = 15:16, j = 8, part = 'body') %>%
-  add_header_row(colwidths = c(1, 4, 3), values = c('', 'Native Habitats', 'Restorable Habitats')) %>%
+  add_header_row(colwidths = c(2, 3, 3), values = c('', 'Native Habitats', 'Restorable Habitats')) %>%
   add_footer_lines(values = "") %>% 
   footnote(i = 1, j = 1, sep = "", value = as_paragraph("N/A - Not Applicable; I/D - Insufficient Data; LSSM - Living Shoreline Suitability Model; JU - Potential"), part = 'body', inline = T, ref_symbols = "") %>% 
   footnote(i = 1, j = 2, sep = " ", value = as_paragraph(as_i("Juncus")), part = "body", inline = T, ref_symbols = "") %>% 
@@ -254,5 +245,16 @@ as_grouped_data(allsum, groups = 'Category') %>%
   fontsize(size = 8, part = 'footer') %>% 
   align(align = "center", part = "header") %>% 
   align(i = c(2:6, 8:12, 14:17), j = 3:8, align = "center", part = "body") %>% 
-  border_inner_h() %>% 
-  border_inner_v()
+  bg(i = c(1, 7, 13), bg = 'chartreuse3', part = "body") %>% 
+  bg(i = 1, bg = 'grey', part = "header") %>% 
+  bg(i = 2, j = 1:2, bg = 'grey', part = "header") %>% 
+  border_outer(part = 'body') %>% 
+  border_outer(part = 'header') %>% 
+  border_inner_h(part = 'body') %>% 
+  border_inner_v(part = 'body') %>%  
+  border_inner_h(part = 'header') %>% 
+  border_inner_v(part = 'header') %>% 
+  set_caption(caption = '<h2>Summary of the Opportunity Assessment Analysis</h2>', html_escape = F) %>% 
+  font(part = 'all', fontname = 'Roboto')
+
+save_as_html(tab, path = 'docs/current_table.html')
