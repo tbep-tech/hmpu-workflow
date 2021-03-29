@@ -240,7 +240,7 @@ tab <- as_grouped_data(allsum, groups = 'Category') %>%
   footnote(i = 1, j = 1, sep = "", value = as_paragraph("N/A - Not Applicable; I/D - Insufficient Data; LSSM - Living Shoreline Suitability Model; JU - Potential"), part = 'body', inline = T, ref_symbols = "") %>% 
   footnote(i = 1, j = 2, sep = " ", value = as_paragraph(as_i("Juncus")), part = "body", inline = T, ref_symbols = "") %>% 
   footnote(i = 1, j = 3, sep = " ", value = as_paragraph("Marsh Opportunity"), inline = T, ref_symbols = "") %>% 
-  add_footer_lines(values = "**All lands identified for acquisity by partners, does not represent a 2030 target or 2050 goal") %>%
+  add_footer_lines(values = "**All lands identified for acquisition by partners, does not represent a 2030 target or 2050 goal") %>%
   add_footer_lines(values = "*Does not account for lands neither currently protected nor currently under consideration for acquisition") %>% 
   fontsize(size = 8, part = 'footer') %>% 
   align(align = "center", part = "header") %>% 

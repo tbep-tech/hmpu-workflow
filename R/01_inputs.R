@@ -58,14 +58,16 @@ save(coastal, file = here('data', 'coastal.RData'), compress = 'xz')
 
 # soils -------------------------------------------------------------------
 
-soils <- st_read('~/Desktop/TBEP/HMPU/GIS/ConvertedPolygon/Model_Input/SoilsForRestoration.shp') %>% 
+# soils <- esri2sf('https://gis.waterinstitute.usf.edu/arcgis/rest/services/Maps/TBEP_OpenData/MapServer/20') %>% 
+soils <- st_read('https://opendata.arcgis.com/datasets/7b75ca38c1364b178f7ce41ef4195ed4_20.geojson') %>% 
   st_transform(prj)
 
 save(soils, file = here('data', 'soils.RData'), compress = 'xz')
 
 # salinity ----------------------------------------------------------------
 
-salin <- st_read('~/Desktop/TBEP/HMPU/GIS/ConvertedPolygon/Model_Input/SalinityKrigMerge.shp') %>% 
+# salin <- st_read('https://gis.waterinstitute.usf.edu/arcgis/rest/services/Maps/TBEP_OpenData/MapServer/19') %>% 
+salin <- st_read('https://opendata.arcgis.com/datasets/caed84eb6ece4c0db8dc5b5aff8ba0a6_19.geojson') %>% 
   st_transform(prj)
 
 save(salin, file = here('data', 'salin.RData'), compress = 'xz')
