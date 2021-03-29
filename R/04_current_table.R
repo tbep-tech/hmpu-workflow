@@ -200,22 +200,59 @@ allsum <- cursum %>%
     )
   ) %>% 
   select(
-    `Habitat Type` = HMPU_TARGETS, 
+    Category,
+    HMPU_TARGETS, 
     `Current Extent`, 
-    `Existing Conservation Lands` = `native Existing`, 
-    `Proposed Conservation Lands` = `native Proposed`, 
-    `Total Restoration Opportunity` = `total restorable`, 
-    `Existing Conservation Lands Restoration Opportunity` = `restorable Existing`, 
-    `Proposed Conservation Lands Restoration Opportunity` = `restorable Proposed`
+    `native Existing`, 
+    `native Proposed`, 
+    `total restorable`, 
+    `restorable Existing`, 
+    `restorable Proposed`
   )
 
-flextable(allsum) %>% 
-  merge_at(i = 7:8, j = 5, part = 'body') %>% 
-  merge_at(i = 7:8, j = 6, part = 'body') %>%
-  merge_at(i = 7:8, j = 7, part = 'body') %>%
-  merge_at(i = 12:13, j = 5, part = 'body') %>% 
-  merge_at(i = 12:13, j = 6, part = 'body') %>%
-  merge_at(i = 12:13, j = 7, part = 'body') %>%
-  # add_header_row(colwidths = 14)
+# start with an empty line
+tab <- add_footer_lines(tab, values = "")
+# add "Note: "
+tab <- compose(tab, i = 1, j = 1, value = as_paragraph(as_i("Note: ")), part = "footer")
+
+# add some footnotes
+tab <- footnote(tab, i = 2, j = 2:3, part = "body", ref_symbols = "a", sep = "", value = as_paragraph("Method x"), inline = T)
+# add other footnotes
+tab <- footnote(tab, i = 3, j = 1, part = "body", ref_symbols = "b", sep = "; ", value = as_paragraph("Method y"), inline = T)
+
+tab <- fontsize(tab, part = "all", size = 13)
+
+'N/A - Not Applicable; I/D - Insufficient Data; LSSM - Living Shoreline Suitability Model; JU - Potential Juncus Marsh Opportunity'
+
+as_grouped_data(allsum, groups = 'Category') %>% 
+  flextable %>% 
+  set_header_labels(
+    Category = 'Stratum',
+    HMPU_TARGETS = 'Habitat Type',
+    `native Existing` = 'Existing Conservation Lands', 
+    `native Proposed` = 'Proposed Conservation Lands*',
+    `total restorable` = 'Total Restoration Opportunity**', 
+    `restorable Existing` = 'Existing Conservation Lands Restoration Opportunity', 
+    `restorable Proposed` = 'Proposed Conservation Lands Restoration Opportunity*'
+    ) %>% 
+  merge_at(i = 1, part = 'body') %>% 
+  merge_at(i = 7, part = 'body') %>% 
+  merge_at(i = 13, part = 'body') %>% 
+  merge_at(i = 9:10, j = 6, part = 'body') %>%
+  merge_at(i = 9:10, j = 7, part = 'body') %>%
+  merge_at(i = 9:10, j = 8, part = 'body') %>%
+  merge_at(i = 15:16, j = 6, part = 'body') %>%
+  merge_at(i = 15:16, j = 7, part = 'body') %>%
+  merge_at(i = 15:16, j = 8, part = 'body') %>%
+  add_header_row(colwidths = c(1, 4, 3), values = c('', 'Native Habitats', 'Restorable Habitats')) %>%
+  add_footer_lines(values = "") %>% 
+  footnote(i = 1, j = 1, sep = "", value = as_paragraph("N/A - Not Applicable; I/D - Insufficient Data; LSSM - Living Shoreline Suitability Model; JU - Potential"), part = 'body', inline = T, ref_symbols = "") %>% 
+  footnote(i = 1, j = 2, sep = " ", value = as_paragraph(as_i("Juncus")), part = "body", inline = T, ref_symbols = "") %>% 
+  footnote(i = 1, j = 3, sep = " ", value = as_paragraph("Marsh Opportunity"), inline = T, ref_symbols = "") %>% 
+  add_footer_lines(values = "**All lands identified for acquisity by partners, does not represent a 2030 target or 2050 goal") %>%
+  add_footer_lines(values = "*Does not account for lands neither currently protected nor currently under consideration for acquisition") %>% 
+  fontsize(size = 8, part = 'footer') %>% 
+  align(align = "center", part = "header") %>% 
+  align(i = c(2:6, 8:12, 14:17), j = 3:8, align = "center", part = "body") %>% 
   border_inner_h() %>% 
   border_inner_v()
