@@ -14,6 +14,30 @@ prj <- 6443
 
 fluccs <- read.csv(here('data', 'FLUCCShabsclass.csv'), stringsAsFactors = F)
 
+# restoration targets lookup table ----------------------------------------
+
+trgs <- data.frame(
+  Category  = c("Subtidal", "Subtidal", "Subtidal", "Subtidal", "Subtidal",
+                "Intertidal", "Intertidal", "Intertidal", "Intertidal", "Intertidal", 
+                "Supratidal", "Supratidal", "Supratidal", "Supratidal"),
+  HMPU_TARGETS = c("Hard Bottom", "Artificial Reefs", "Tidal Flats", "Seagrasses", "Oyster Bars",
+                   "Living Shorelines", "Mangrove Forests", "Salt Barrens", "Salt Marshes", "Tidal Tributaries", 
+                   "Coastal Uplands", "Non-Forested Freshwater Wetlands", "Forested Freshwater Wetlands", "Native Uplands"),
+  `Target2030` = c(423, 166, 16220, 40000, 221,
+                   21.3, 15300, 546, 4807, 4,
+                   3769, 68937, 152282, 141050),
+  `Target2050` = c(423, 166, 16220, 40000, 471,
+                   56.3, 15300, 796, 5457, 18,
+                   4219, 71787, 152732, 142100),
+  stringsAsFactors = F
+  ) %>% 
+  mutate(
+    Category = factor(Category, levels = c("Subtidal", "Intertidal", "Supratidal")), 
+    HMPU_TARGETS = factor(HMPU_TARGETS, levels = HMPU_TARGETS)
+  )
+
+save(trgs, file = here('data', 'trgs.RData'), version = 2)
+
 # stratification lookup table ---------------------------------------------
 
 strata <- data.frame(
@@ -358,50 +382,3 @@ save(hard, file = 'data/hard.RData', version = 2)
 save(arti, file = 'data/arti.RData', version = 2)
 save(tidt, file = 'data/tidt.RData', version = 2)
 save(livs, file = 'data/livs.RData', version = 2)
-
-# opportunities map from deliverables -------------------------------------
-# 
-# library(raster)
-# library(sf)
-# library(tidyverse)
-# library(stars)
-# 
-# oppdat <- raster('~/Desktop/rasters/rasters/HMPU_additivehybrid.tif')
-# oppdat <- readAll(oppdat)
-# 
-# # vals <- getValues(tmp)
-# 
-# cls <- list(
-#   `100` = 'Not-considered Native', # x
-#   `101` = 'Protected Native', # 'Existing Conservation Native'
-#   `104` = 'Proposed Native', # 'Proposed Consevation Native'
-#   `150` = 'Reserve Not-considered Native', 
-#   `154` = 'Reserve Proposed Native', # 'Reservation Native'
-#   `201` = 'Protected Restorable', # 'Existing Conservation Restorable'
-#   `204` = 'Proposed Restorable', # 'Proposed Conservation Restorable'
-#   `254` = 'Reserve Proposed Restorable', # 'Reservation Restorable'
-#   `300` = 'Developed', # x
-#   `400` = 'Open Water', # x
-#   `401` = 'Sub-tidal', # x
-#   `999` = 'Not-considered' # x
-# )
-# 
-# oppdat[!oppdat[] %in% c(101, 104, 154, 201, 204, 254)] <- NA
-# oppdat <- oppdat %>% 
-#   st_as_stars %>% 
-#   st_as_sf(as_points = FALSE, merge = TRUE) %>% 
-#   dplyr::rename(code = HMPU_additivehybrid) %>% 
-#   dplyr::mutate(
-#     cat = case_when(
-#       code == 101 ~ 'Existing Conservation Native', 
-#       code == 104 ~ 'Proposed Conservation Native', 
-#       code == 150 ~ 'Reservation Not Native', 
-#       code == 154 ~ 'Reservation Native', 
-#       code == 201 ~ 'Existing Conservation Restorable', 
-#       code == 204 ~ 'Proposed Conservation Restorable', 
-#       code == 254 ~ 'Reservation Restorable', 
-#       T ~ NA_character_
-#     )
-#   )
-# 
-# save(oppdat, file= 'data/oppdat.RData', compress = 'xz')

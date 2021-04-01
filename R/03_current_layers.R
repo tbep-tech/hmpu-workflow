@@ -66,8 +66,6 @@ for(cats in categories){
 nativelyr <- bind_rows(propall, exstall) %>% 
   filter(!HMPU_TARGETS %in% 'Restorable')
 
-save(nativelyr, file = 'data/nativelyr.RData', compress = 'xz')
-
 # restorable existing, proposed layer -------------------------------------
 
 restorable <- bind_rows(propall, exstall) %>% 
@@ -166,30 +164,51 @@ for(typ in c('Proposed', 'Existing')){
   
 }
 
-save(restorelyr, file = 'data/restorelyr.RData', compress = 'xz')
-
 # reservation layers ------------------------------------------------------
 
-# layers in coastal stratum that are native or restorable and currently not in conservation (existing or proposed)
+# layers in coastal stratum that are native or restorable and currently not in existing conservation
+# this includes lands in proposed conservation or unprotected status
 
-consall <- bind_rows(propall, exstall) %>% 
+# existing conservation (native and restorable), unioned for difference
+uniexstall <- exstall %>% 
   st_union()
 
-nativersrv <- lulc %>% 
+# native currently proposed
+nativersrv <- nativelyr %>% 
+  filter(typ %in% 'Proposed') %>% 
+  st_intersection(., coastal) %>% 
+  fixgeo 
+
+# restorable currently proposed
+restorersrv <- restorelyr %>% 
+  filter(typ %in% 'Proposed') %>% 
+  st_intersection(., coastal) %>% 
+  fixgeo 
+
+# unprotected native in coastal
+nativeunpro <- lulc %>% 
   filter(!HMPU_TARGETS %in% 'Restorable') %>% 
   st_intersection(., coastal) %>% 
   fixgeo %>% 
-  st_difference(., consall) %>% 
+  st_difference(., uniexstall) %>% 
   fixgeo
 
-restorersrv <- lulc %>%
+# unprotected reservation in coastal
+restoreunpro <- lulc %>%
   filter(HMPU_TARGETS %in% 'Restorable') %>% 
   st_intersection(., coastal) %>% 
   fixgeo %>% 
-  st_difference(., consall) %>% 
+  st_difference(., uniexstall) %>% 
   fixgeo
 
-mapview(restorersrv, col.regions = 'deeppink', alpha.regions = 1, lwd = 0) + mapview(nativersrv, col.regions = 'pink', alpha.regions = 1, lwd = 0)
+restorersrv <- c(st_make_valid(restorersrv), restoreunpro)
+restorersrv <- fixgeo(restorersrv)
+nativersrv <- c(st_make_valid(nativersrv), nativeunpro)
+nativersrv <- fixgeo(nativersrv)
 
+# mapview(restorersrv, col.regions = 'violetred3', lwd = 0) + mapview(nativersrv, col.regions = 'violetred1', lwd = 0)
+
+save(nativelyr, file = 'data/nativelyr.RData', compress = 'xz')
+save(restorelyr, file = 'data/restorelyr.RData', compress = 'xz')
 save(nativersrv, file = 'data/nativersrv.RData')
 save(restorersrv, file = 'data/restorersrv.RData')
