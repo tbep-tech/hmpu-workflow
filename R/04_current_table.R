@@ -257,4 +257,4 @@ tab <- as_grouped_data(allsum, groups = 'Category') %>%
   set_caption(caption = '<h2>Summary of the Opportunity Assessment Analysis</h2>', html_escape = F) %>% 
   font(part = 'all', fontname = 'Roboto')
 
-save_as_html(tab, path = 'docs/current_table.html')
+save_as_html(tab, path = 'docs/current_table.html', title = 'Opportunity Assessment Analysis')
