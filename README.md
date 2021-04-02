@@ -4,7 +4,7 @@ Workflows for recreating and updating analyses for the [Habitat Master Plan Upda
 
 * Summary of the Opportunity Assessment Analysis: 
      * [Tampa Bay watershed](https://tbep-tech.github.io/hmpu-workflow/docs/current_table)
-     * [St. Pete Municipal boundar](https://tbep-tech.github.io/hmpu-workflow/docs/current_table_stpete)
+     * [St. Pete municipal boundaries](https://tbep-tech.github.io/hmpu-workflow/docs/current_table_stpete)
 * Summary of recommended 2030 targets and 2050 goals: [table](https://tbep-tech.github.io/hmpu-workflow/docs/target_table)
 
 [![DOI](https://zenodo.org/badge/226996253.svg)](https://zenodo.org/badge/latestdoi/226996253)
