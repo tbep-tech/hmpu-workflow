@@ -22,6 +22,7 @@ data(tidt)
 data(livs)
 data(coastal)
 data(strata)
+data(trgs)
 
 # from 03_current_layers
 data(nativelyr)
@@ -167,7 +168,7 @@ restoresum <- bind_rows(restoresum, intrsum)
 # all summary
 allsum <- cursum %>% 
   left_join(restoresum, by = 'HMPU_TARGETS') %>% 
-  inner_join(trgs, by = c('Category', 'HMPU_TARGETS')) %>% 
+  left_join(trgs, ., by = c('Category', 'HMPU_TARGETS')) %>% 
   gather('var', 'val', -Category, -HMPU_TARGETS, -unis, -rationale) %>% 
   mutate(
     val = case_when(
