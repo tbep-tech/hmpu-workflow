@@ -194,13 +194,13 @@ allsum <- cursum %>%
     ), 
     `total restorable` = case_when(
       HMPU_TARGETS == 'Seagrasses' ~ '14,131 ac', 
-      HMPU_TARGETS %in% c('Tidal Flats', 'Oyster Bars') ~ 'I/D',
-      HMPU_TARGETS %in% c('Living Shorelines', 'Tidal Tributaries') ~ 'LSSM', 
+      HMPU_TARGETS %in% c('Tidal Flats', 'Oyster Bars', 'Tidal Tributaries') ~ 'I/D',
+      HMPU_TARGETS %in% c('Living Shorelines') ~ 'LSSM', 
       T ~ `total restorable`
     ),
     `restorable Existing` = case_when(
       HMPU_TARGETS == 'Seagrasses' ~ '14,131 ac', 
-      HMPU_TARGETS %in% c('Tidal Flats', 'Oyster Bars') ~ 'I/D',
+      HMPU_TARGETS %in% c('Tidal Flats', 'Oyster Bars', 'Tidal Tributaries') ~ 'I/D',
       T ~ `restorable Existing`
     )
   ) %>% 
@@ -240,8 +240,8 @@ tab <- as_grouped_data(allsum, groups = 'Category') %>%
   footnote(i = 1, j = 1, sep = "", value = as_paragraph("N/A - Not Applicable; I/D - Insufficient Data; LSSM - Living Shoreline Suitability Model; JU - Potential"), part = 'body', inline = T, ref_symbols = "") %>% 
   footnote(i = 1, j = 2, sep = " ", value = as_paragraph(as_i("Juncus")), part = "body", inline = T, ref_symbols = "") %>% 
   footnote(i = 1, j = 3, sep = " ", value = as_paragraph("Marsh Opportunity"), inline = T, ref_symbols = "") %>% 
-  add_footer_lines(values = "**All lands identified for acquisition by partners, does not represent a 2030 target or 2050 goal") %>%
-  add_footer_lines(values = "*Does not account for lands neither currently protected nor currently under consideration for acquisition") %>% 
+  add_footer_lines(values = "*All lands identified for acquisition by partners, does not represent a 2030 target or 2050 goal") %>%
+  add_footer_lines(values = "**Does not account for lands neither currently protected nor currently under consideration for acquisition") %>% 
   fontsize(size = 8, part = 'footer') %>% 
   align(align = "center", part = "header") %>% 
   align(i = c(2:6, 8:12, 14:17), j = 3:8, align = "center", part = "body") %>% 
@@ -257,4 +257,4 @@ tab <- as_grouped_data(allsum, groups = 'Category') %>%
   set_caption(caption = '<h2>Summary of the Opportunity Assessment Analysis</h2>', html_escape = F) %>% 
   font(part = 'all', fontname = 'Roboto')
 
-save_as_html(tab, path = 'docs/current_table.html', title = 'Opportunity Assessment Analysis')
+save_as_html(tab, path = 'docs/current_table.html', title = 'Current Table')

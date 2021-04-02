@@ -14,7 +14,6 @@ data(exst)
 data(coastal)
 data(soils)
 data(salin)
-data(strata)
 
 # current year
 lulcfl <- 'lulc2017'

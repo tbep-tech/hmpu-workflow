@@ -18,17 +18,33 @@ fluccs <- read.csv(here('data', 'FLUCCShabsclass.csv'), stringsAsFactors = F)
 
 trgs <- data.frame(
   Category  = c("Subtidal", "Subtidal", "Subtidal", "Subtidal", "Subtidal",
-                "Intertidal", "Intertidal", "Intertidal", "Intertidal", "Intertidal", 
+                "Intertidal", "Intertidal", "Intertidal", "Intertidal", "Intertidal", "Intertidal", 
                 "Supratidal", "Supratidal", "Supratidal", "Supratidal"),
   HMPU_TARGETS = c("Hard Bottom", "Artificial Reefs", "Tidal Flats", "Seagrasses", "Oyster Bars",
-                   "Living Shorelines", "Mangrove Forests", "Salt Barrens", "Salt Marshes", "Tidal Tributaries", 
+                   "Living Shorelines", "Total Intertidal", "Mangrove Forests", "Salt Barrens", "Salt Marshes", "Tidal Tributaries", 
                    "Coastal Uplands", "Non-Forested Freshwater Wetlands", "Forested Freshwater Wetlands", "Native Uplands"),
   `Target2030` = c(423, 166, 16220, 40000, 221,
-                   21.3, 15300, 546, 4807, 4,
+                   21.3, 21353, 15300, 546, 4807, 4,
                    3769, 68937, 152282, 141050),
   `Target2050` = c(423, 166, 16220, 40000, 471,
-                   56.3, 15300, 796, 5457, 18,
+                   56.3, 23803, 15300, 796, 5457, 18,
                    4219, 71787, 152732, 142100),
+  rationale = c('Protect existing hard bottom; continue to identify new hard bottom area using proven mapping techniques',
+               'Protect existing artificial reefs; enhance habitat complexity where feasible; expand reef area to promote fish and wildlife benefits',
+               'Identify and protect existing persistent tidal flats; assess restoration potential of other non-vegetated subtidal areas',
+               'Protect existing seagrasses; establish new HMPU lower limit of 40,000 acres; assess restoration potential of non-vegetated subtidal areas',
+               '2030: Protect existing oysters + restore 50 acres; increase target by 50 acres each out-decade; consider filtration rate to refine long-term goal; an oyster habitat suitability index (HSI) will inform opportunity space',
+               '2030: Construct 1 mile of LS each year; includes privately owned seawalls; need better definition of opportunity areas; increase target to 1.5 & 2 miles per year for out decades',
+               '2030: Protect existing intertidal mosaic + restore 1,000 acres (based on hydric soils); increase target by 150 acres each out-decade; includes the mosaic of mangrove, salt barren, and salt marsh habitats',
+               'Protect existing mangrove forests; restore opportunistically within the intertidal mosaic',
+               '2030: Protect existing salt barrens + restore 50 acres; increase target by 50 acres per out decade',
+               '2030: Protect existing low salinity salt marshes + restore 250 acres; increase target by 50 acres each out-decade; significant land acquisition and/or Public Private Partnerships required to achieve this 2030 target and 2050 goal',
+               'Inventory mapped tidal tributaries and assess/rank restoration potential; restore ~4 miles (1%) of urban tidal creek habitat where feasible; increase target by 2 miles per out decade',
+               '2030: Protect existing coastal uplands + specifically restore 150 acres (upland restoration total = 600 acres); increase target by 50 acres each out decade',
+               '2030: Protect existing non-forested freshwater wetlands + restore 1,350 acres; increase target by 50 acres each out decade',
+               '2030: Protect existing forested freshwater wetlands + restore 150 acres; increase target by 50 acres each out decade',
+               '2030: Protect existing native uplands + specifically restore 450 acres (upland restoration total = 600 acres); increase target by 50 acres each out decade; focus on pine flatwoods and protect current extent (56,717 acres)'
+               ),
   stringsAsFactors = F
   ) %>% 
   mutate(
@@ -42,10 +58,10 @@ save(trgs, file = here('data', 'trgs.RData'), version = 2)
 
 strata <- data.frame(
   Category  = c("Subtidal", "Subtidal", "Subtidal", "Subtidal", "Subtidal",
-    "Intertidal", "Intertidal", "Intertidal", "Intertidal", "Intertidal", 
+    "Intertidal", "Intertidal", "Intertidal", "Intertidal", "Intertidal", "Intertidal", 
     "Supratidal", "Supratidal", "Supratidal", "Supratidal"),
   HMPU_TARGETS = c("Hard Bottom", "Artificial Reefs", "Tidal Flats", "Seagrasses", "Oyster Bars",
-    "Living Shorelines", "Mangrove Forests", "Salt Barrens", "Salt Marshes", "Tidal Tributaries", 
+    "Living Shorelines", "Total Intertidal", "Mangrove Forests", "Salt Barrens", "Salt Marshes", "Tidal Tributaries", 
     "Coastal Uplands", "Non-Forested Freshwater Wetlands", "Forested Freshwater Wetlands", "Native Uplands"), 
   stringsAsFactors = F
   ) %>% 
