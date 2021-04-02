@@ -38,3 +38,13 @@ m <- mapview(restdat, zcol = 'HMPU_TARGETS', col.regions = cols, lwd = 0, homebu
 # save as html, takes about ten minutes and maxes out memory, but it works
 mapshot(m, url = 'docs/rstmap.html', remove_controls = NULL)
 
+# areas <- restdat %>%
+#   mutate(
+#     acres = st_area(.),
+#     acres = set_units(acres, 'acres')
+#   ) %>%
+#   st_set_geometry(NULL) %>%
+#   group_by(HMPU_TARGETS) %>%
+#   summarise(
+#     acres = sum(acres, na.rm = T)
+#   )
