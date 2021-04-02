@@ -10,29 +10,17 @@ source(here('R', 'funcs.R'))
 
 fluccs <- read.csv(here('data', 'FLUCCShabsclass.csv'), stringsAsFactors = F)
 
-data(hard)
-data(arti)
-data(tidt)
-data(livs)
-data(prop)
-data(exst)
-data(coastal)
-data(soils)
-data(salin)
-data(strata)
-
 lulcfl <- 'lulc2017'
 subtfl <- 'sgdat2018'
 
+# from 01_inputs
 load(here('data', paste0(lulcfl, '.RData')))
 load(here('data', paste0(subtfl, '.RData')))
-
-# from 01_inputs
 data(hard)
 data(arti)
 data(tidt)
 data(livs)
-data(trgs)
+data(coastal)
 data(strata)
 
 # from 03_current_layers

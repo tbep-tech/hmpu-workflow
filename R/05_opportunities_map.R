@@ -19,54 +19,8 @@ data(restorersrv)
 data(nativersrv)
 data(coastal)
 
-# union coastal for differencing
-unicoastal <- st_union(coastal)
-
-nativersrv <- nativersrv %>% 
-  st_sf(geometry = .) %>% 
-  mutate(cat = 'Reservation Native')
-
-restorersrv <- restorersrv %>% 
-  st_sf(geometry = .) %>% 
-  mutate(cat = 'Reservation Restorable')
-
-nativelyrprop <- nativelyr %>% 
-  filter(typ %in% 'Proposed') %>% 
-  st_geometry() %>% 
-  st_difference(., unicoastal) %>% 
-  fixgeo %>% 
-  st_sf(geometry = .) %>% 
-  mutate(
-    cat = 'Proposed Conservation Native'
-  ) %>% 
-  st_make_valid()
-
-nativelyrexst <- nativelyr %>% 
-  filter(typ %in% 'Existing') %>%
-  select(cat = typ) %>% 
-  mutate(
-    cat = 'Existing Conservation Native'
-  )
-  
-restorelyrprop <- restorelyr %>% 
-  filter(typ %in% 'Proposed') %>% 
-  st_geometry() %>% 
-  st_difference(., unicoastal) %>% 
-  fixgeo %>% 
-  st_sf(geometry = .) %>% 
-  mutate(
-    cat = 'Proposed Conservation Restorable'
-  ) %>% 
-  st_make_valid()
-
-restorelyrexst <- restorelyr %>% 
-  filter(typ %in% 'Existing') %>% 
-  select(cat = typ) %>% 
-  mutate(
-    cat = 'Existing Conservation Restorable'
-  )
-
-oppdat <- bind_rows(nativersrv, restorersrv, nativelyrexst, nativelyrprop, restorelyrexst, restorelyrprop)
+# boundaries, form 01_current_layers
+data(stpete)
 
 cols <- list(
   `Existing Conservation Native` = 'yellowgreen', 
@@ -75,13 +29,18 @@ cols <- list(
   `Proposed Conservation Restorable` = 'dodgerblue4', 
   `Restoration Native` = 'violetred1', 
   `Restoration Restorable` = 'violetred3'
-) %>% 
+  ) %>% 
   unlist
+
+# complete watershed ------------------------------------------------------
+
+oppdat <- oppdat_fun(nativersrv, restorersrv, nativelyr, restorelyr, coastal)
 
 m <- mapview(oppdat, zcol = 'cat', col.regions = cols, lwd = 0, homebutton = F, layer.name = '')
 
 # save as html, takes about ten minutes and maxes out memory, but it works
 mapshot(m, url = 'docs/oppmap.html', remove_controls = NULL)
+
 # areas <- oppdat %>% 
 #   mutate(
 #     acres = st_area(.), 
@@ -92,6 +51,15 @@ mapshot(m, url = 'docs/oppmap.html', remove_controls = NULL)
 #   summarise(
 #     acres = sum(acres, na.rm = T)
 #   )
+
+# st pete only ------------------------------------------------------------
+
+oppdat <- oppdat_fun(nativersrv, restorersrv, nativelyr, restorelyr, coastal, stpete)
+
+m <- mapview(oppdat, zcol = 'cat', col.regions = cols, lwd = 0, homebutton = F, layer.name = '')
+
+# save as html, takes about ten minutes and maxes out memory, but it works
+mapshot(m, url = 'docs/oppmap_stpete.html', remove_controls = NULL)
 
 # # opportunities map from deliverables -------------------------------------
 # 

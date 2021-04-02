@@ -10,21 +10,12 @@ library(htmlwidgets)
 
 source(here('R', 'funcs.R'))
 
-# opportunities map -------------------------------------------------------
-
 # from 03_current_layers.R
 data(restorelyr)
 
-restdat <- restorelyr %>% 
-  filter(typ %in% 'Existing') %>% 
-  mutate(
-    HMPU_TARGETS = case_when(
-      HMPU_TARGETS %in% c('Mangrove Forests/Salt Barrens', 'Salt Marshes') ~ 'Tidal Wetlands', 
-      T ~ HMPU_TARGETS
-    )
-  ) %>% 
-  select(HMPU_TARGETS)
-    
+# boundaries, form 01_current_layers
+data(stpete)
+
 cols <- list(
   `Coastal Uplands` = 'brown4', 
   `Freshwater Wetlands` = 'orange', 
@@ -32,6 +23,10 @@ cols <- list(
   `Tidal Wetlands` = 'yellow'
   ) %>% 
   unlist
+
+# opportunities map -------------------------------------------------------
+
+restdat <- restdat_fun(restorelyr)
 
 m <- mapview(restdat, zcol = 'HMPU_TARGETS', col.regions = cols, lwd = 0, homebutton = F, layer.name = '')
 
@@ -48,3 +43,12 @@ mapshot(m, url = 'docs/rstmap.html', remove_controls = NULL)
 #   summarise(
 #     acres = sum(acres, na.rm = T)
 #   )
+
+# st pete only ------------------------------------------------------------
+
+restdat <- restdat_fun(restorelyr, stpete)
+
+m <- mapview(restdat, zcol = 'HMPU_TARGETS', col.regions = cols, lwd = 0, homebutton = F, layer.name = '')
+
+# save as html, takes about ten minutes and maxes out memory, but it works
+mapshot(m, url = 'docs/rstmap_stpete.html', remove_controls = NULL)

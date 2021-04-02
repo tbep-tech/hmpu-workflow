@@ -398,3 +398,13 @@ save(hard, file = 'data/hard.RData', version = 2)
 save(arti, file = 'data/arti.RData', version = 2)
 save(tidt, file = 'data/tidt.RData', version = 2)
 save(livs, file = 'data/livs.RData', version = 2)
+
+# municipal boundaries ----------------------------------------------------
+
+# these are one offs that don't need to be remotely accessed
+stpete <- st_read('~/Desktop/TBEP/HMPU/GIS/boundaries/MunicipalBoundary.shp') %>% 
+  st_transform(crs = prj) %>% 
+  st_geometry() %>% 
+  st_union()
+
+save(stpete, file = 'data/stpete.RData', compress = 'xz')
