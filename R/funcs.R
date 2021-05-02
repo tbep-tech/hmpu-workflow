@@ -91,6 +91,10 @@ add_coast_up <- function(lulcin, coastal, fluccs){
     dplyr::select(HMPU_TARGETS) %>% 
     st_zm()
 
+  # exit if no coastal uplands
+  if(nrow(coastal_uplands) == 0)
+    return(lulc)
+  
   # lulc not in coastal uplands
   lulcdiff <- st_difference(lulc, st_geometry(st_union(coastal_uplands)))
   
@@ -171,9 +175,9 @@ curex_fun <- function(lulc, subt, hard, arti, tidt, livs, coastal, fluccs, strat
     restorelyr <- st_intersection(restorelyr, crplyr)
     
   }
-  
+
   # current lulc summary ----------------------------------------------------
-  
+
   # # from HMPU deliverables 
   # lulcdat <- raster('~/Desktop/rasters/rasters/Full_LULC.tif')
   # lulcdat <- readAll(lulcdat)
@@ -226,7 +230,7 @@ curex_fun <- function(lulc, subt, hard, arti, tidt, livs, coastal, fluccs, strat
     st_set_geometry(NULL) %>%
     group_by(HMPU_TARGETS) %>%
     summarise(Miles = sum(Miles))
-  
+
   # current summary
   cursum <- bind_rows(lulcsum, subtsum, hardsum, artisum, tidtsum, livssum) %>% 
     mutate(
@@ -239,10 +243,20 @@ curex_fun <- function(lulc, subt, hard, arti, tidt, livs, coastal, fluccs, strat
         is.na(Miles) ~ Acres
       )
     ) %>%
-    inner_join(strata, by = 'HMPU_TARGETS') %>% 
+    left_join(strata, ., by = 'HMPU_TARGETS') %>% 
+    mutate(
+      unis = case_when(
+        is.na(unis) & HMPU_TARGETS %in% c('Living Shorelines', 'Tidal Tributaries') ~ 'mi', 
+        is.na(unis) & !HMPU_TARGETS %in% c('Living Shorelines', 'Tidal Tributaries') ~ 'ac', 
+        T ~ unis
+      ), 
+      `Current Extent` = case_when(
+        is.na(`Current Extent`) ~ 0, 
+        T ~ `Current Extent`
+      )
+    ) %>% 
     select(Category, HMPU_TARGETS, unis, `Current Extent`) %>% 
     arrange(Category, HMPU_TARGETS)
-  
   
   # native summary ----------------------------------------------------------
   
@@ -270,7 +284,7 @@ curex_fun <- function(lulc, subt, hard, arti, tidt, livs, coastal, fluccs, strat
     ) %>% 
     st_set_geometry(NULL) %>%
     group_by(typ, HMPU_TARGETS) %>%
-    summarise(Acres = sum(Acres), .groups = 'drop') %>% 
+    summarise(Acres = sum(Acres, na.rm = T), .groups = 'drop') %>% 
     arrange(typ, HMPU_TARGETS)
   
   # create duplicate rows for non-specific targets
@@ -293,7 +307,7 @@ curex_fun <- function(lulc, subt, hard, arti, tidt, livs, coastal, fluccs, strat
         T ~ HMPU_TARGETS
       )
     ) %>% 
-    spread(typ, Acres) %>% 
+    spread(typ, Acres, fill = 0) %>% 
     mutate(
       `total restorable` = `restorable Existing` + `restorable Proposed`
     )

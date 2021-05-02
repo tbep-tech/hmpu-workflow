@@ -4,7 +4,12 @@ Workflows for recreating and updating analyses for the [Habitat Master Plan Upda
 
 * Summary of the Opportunity Assessment Analysis: 
      * [Tampa Bay watershed](https://tbep-tech.github.io/hmpu-workflow/docs/current_table)
-     * [St. Pete municipal boundaries](https://tbep-tech.github.io/hmpu-workflow/docs/current_table_stpete)
+     * [Tampa municipal boundaries](https://tbep-tech.github.io/hmpu-workflow/docs/current_table_tampa)
+     * [St. Pete municipal boundaries](https://tbep-tech.github.io/hmpu-workflow/docs/current_table_stpet)
+     * [Hillsborough Co. boundaries](https://tbep-tech.github.io/hmpu-workflow/docs/current_table_hilco)
+     * [Pinellas Co. boundaries](https://tbep-tech.github.io/hmpu-workflow/docs/current_table_pinco)
+     * [Manatee Co. boundaries](https://tbep-tech.github.io/hmpu-workflow/docs/current_table_manco)
+     * [Pasco Co. boundaries](https://tbep-tech.github.io/hmpu-workflow/docs/current_table_pasco)
 * Summary of recommended 2030 targets and 2050 goals: [table](https://tbep-tech.github.io/hmpu-workflow/docs/target_table)
 
 [![DOI](https://zenodo.org/badge/226996253.svg)](https://zenodo.org/badge/latestdoi/226996253)

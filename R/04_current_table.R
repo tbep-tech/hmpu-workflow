@@ -29,8 +29,13 @@ data(strata)
 data(nativelyr)
 data(restorelyr)
 
-# boundaries, form 01_current_layers
-data(stpete)
+# boundaries, from 01_current_layers
+data(stpet)
+data(tampa)
+data(hilco)
+data(pinco)
+data(manco)
+data(pasco)
 
 # complete watershed ------------------------------------------------------
 
@@ -39,10 +44,50 @@ tab <- curex_fun(lulc, subt, hard, arti, tidt, livs, coastal, fluccs, strata, na
 
 save_as_html(tab, path = 'docs/current_table.html', title = 'Current Table')
 
+# tampa -------------------------------------------------------------------
+
+cap <- cap <- 'Summary of the Opportunity Assessment Analysis: Tampa'
+
+tab <- curex_fun(lulc, subt, hard, arti, tidt, livs, coastal, fluccs, strata, nativelyr, restorelyr, cap, tampa)
+
+save_as_html(tab, path = 'docs/current_table_tampa.html', title = 'Current Table Tampa')
+
 # st pete -----------------------------------------------------------------
 
 cap <- cap <- 'Summary of the Opportunity Assessment Analysis: St. Pete'
 
-tab <- curex_fun(lulc, subt, hard, arti, tidt, livs, coastal, fluccs, strata, nativelyr, restorelyr, cap, stpete)
+tab <- curex_fun(lulc, subt, hard, arti, tidt, livs, coastal, fluccs, strata, nativelyr, restorelyr, cap, stpet)
 
-save_as_html(tab, path = 'docs/current_table_stpete.html', title = 'Current Table St. Pete')
+save_as_html(tab, path = 'docs/current_table_stpet.html', title = 'Current Table St. Pete')
+
+# hillsborough co ---------------------------------------------------------
+
+cap <- cap <- 'Summary of the Opportunity Assessment Analysis: Hillsborough Co.'
+
+tab <- curex_fun(lulc, subt, hard, arti, tidt, livs, coastal, fluccs, strata, nativelyr, restorelyr, cap, hilco)
+
+save_as_html(tab, path = 'docs/current_table_hilco.html', title = 'Current Table Hillsborough Co.')
+
+# pinellas co -------------------------------------------------------------
+
+cap <- cap <- 'Summary of the Opportunity Assessment Analysis: Pinellas Co.'
+
+tab <- curex_fun(lulc, subt, hard, arti, tidt, livs, coastal, fluccs, strata, nativelyr, restorelyr, cap, pinco)
+
+save_as_html(tab, path = 'docs/current_table_pinco.html', title = 'Current Table Pinellas Co.')
+
+# manatee co --------------------------------------------------------------
+
+cap <- cap <- 'Summary of the Opportunity Assessment Analysis: Manatee Co.'
+
+tab <- curex_fun(lulc, subt, hard, arti, tidt, livs, coastal, fluccs, strata, nativelyr, restorelyr, cap, manco)
+
+save_as_html(tab, path = 'docs/current_table_manco.html', title = 'Current Table Manatee Co.')
+
+# pasco co ----------------------------------------------------------------
+
+cap <- cap <- 'Summary of the Opportunity Assessment Analysis: Pasco Co.'
+
+tab <- curex_fun(lulc, subt, hard, arti, tidt, livs, coastal, fluccs, strata, nativelyr, restorelyr, cap, pasco)
+
+save_as_html(tab, path = 'docs/current_table_pasco.html', title = 'Current Table Pasco Co.')

@@ -58,10 +58,10 @@ save(trgs, file = here('data', 'trgs.RData'), version = 2)
 
 strata <- data.frame(
   Category  = c("Subtidal", "Subtidal", "Subtidal", "Subtidal", "Subtidal",
-    "Intertidal", "Intertidal", "Intertidal", "Intertidal", "Intertidal", "Intertidal", 
+    "Intertidal", "Intertidal", "Intertidal", "Intertidal", "Intertidal", 
     "Supratidal", "Supratidal", "Supratidal", "Supratidal"),
   HMPU_TARGETS = c("Hard Bottom", "Artificial Reefs", "Tidal Flats", "Seagrasses", "Oyster Bars",
-    "Living Shorelines", "Total Intertidal", "Mangrove Forests", "Salt Barrens", "Salt Marshes", "Tidal Tributaries", 
+    "Living Shorelines", "Mangrove Forests", "Salt Barrens", "Salt Marshes", "Tidal Tributaries", 
     "Coastal Uplands", "Non-Forested Freshwater Wetlands", "Forested Freshwater Wetlands", "Native Uplands"), 
   stringsAsFactors = F
   ) %>% 
@@ -402,9 +402,47 @@ save(livs, file = 'data/livs.RData', version = 2)
 # municipal boundaries ----------------------------------------------------
 
 # these are one offs that don't need to be remotely accessed
-stpete <- st_read('~/Desktop/TBEP/HMPU/GIS/boundaries/MunicipalBoundary.shp') %>% 
+
+# city of tampa
+tampa <- st_read('~/Desktop/TBEP/HMPU/GIS/boundaries/Tampa_Boundary.shp') %>% 
   st_transform(crs = prj) %>% 
   st_geometry() %>% 
   st_union()
 
-save(stpete, file = 'data/stpete.RData', compress = 'xz')
+# city of st pete
+stpet <- st_read('~/Desktop/TBEP/HMPU/GIS/boundaries/City_Limits_St._Petersburg.shp') %>% 
+  st_transform(crs = prj) %>% 
+  st_geometry() %>% 
+  st_union()
+
+# hillsborough county
+hilco <- st_read('~/Desktop/TBEP/HMPU/GIS/boundaries/HillsFromFDEP.shp') %>% 
+  st_transform(crs = prj) %>% 
+  st_geometry() %>% 
+  st_union()
+
+# pinellas country
+pinco <- st_read('~/Desktop/TBEP/HMPU/GIS/boundaries/PinellasGRfromFDEP.shp') %>% 
+  st_transform(crs = prj) %>% 
+  st_geometry() %>% 
+  st_union()
+
+# manatee country
+manco <- st_read('~/Desktop/TBEP/HMPU/GIS/boundaries/ManateeFromFDEP.shp') %>% 
+  st_transform(crs = prj) %>% 
+  st_geometry() %>% 
+  st_union()
+
+# pasco country
+pasco <- st_read('~/Desktop/TBEP/HMPU/GIS/boundaries/PascoCountyFDEP.shp') %>% 
+  st_transform(crs = prj) %>% 
+  st_geometry() %>% 
+  st_union()
+
+save(tampa, file = 'data/tampa.RData', version = 2)
+save(stpet, file = 'data/stpet.RData', version = 2)
+save(hilco, file = 'data/hilco.RData', version = 2)
+save(pinco, file = 'data/pinco.RData', version = 2)
+save(manco, file = 'data/manco.RData', version = 2)
+save(pasco, file = 'data/pasco.RData', version = 2)
+
