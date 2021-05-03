@@ -96,7 +96,7 @@ add_coast_up <- function(lulcin, coastal, fluccs){
     return(lulc)
   
   # lulc not in coastal uplands
-  lulcdiff <- st_difference(lulc, st_geometry(st_union(coastal_uplands)))
+  lulcdiff <- st_difference(lulc, st_geometry(st_union(st_combine(coastal_uplands))))
   
   # join op1 with coastal uplands
   out <- bind_rows(lulcdiff, coastal_uplands)
@@ -436,7 +436,7 @@ oppdat_fun <- function(nativersrv, restorersrv, nativelyr, restorelyr, coastal, 
   }
   
   # union coastal for differencing
-  unicoastal <- st_union(coastal)
+  unicoastal <- st_union(st_combine(coastal))
   
   nativersrv <- nativersrv %>% 
     st_sf(geometry = .) %>% 
