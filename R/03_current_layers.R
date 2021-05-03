@@ -107,6 +107,7 @@ for(typ in c('Proposed', 'Existing')){
     
   # remove coastal uplands from uplands
   uplands <- coastal_uplands %>% 
+    st_combine() %>% 
     st_union() %>% 
     st_difference(uplands, .)
   
@@ -118,6 +119,7 @@ for(typ in c('Proposed', 'Existing')){
   
   # remove tidal wetlands from wetlands
   wetlands <- tidal_wetlands %>% 
+    st_combine() %>% 
     st_union() %>% 
     st_difference(wetlands, .)
   
@@ -125,7 +127,7 @@ for(typ in c('Proposed', 'Existing')){
   salt_marshes <- st_intersection(tidal_wetlands, salinlo)
   
   # remove salt marshes from tidal wetlands
-  tidal_wetlands <- st_difference(tidal_wetlands, salt_marshes)
+  tidal_wetlands <- st_difference(tidal_wetlands, st_union(st_combine(salt_marshes)))
   
   ##
   # add attributes, fix geometries
@@ -170,6 +172,7 @@ for(typ in c('Proposed', 'Existing')){
 
 # existing conservation (native and restorable), unioned for difference
 uniexstall <- exstall %>% 
+  st_combine() %>% 
   st_union()
 
 # native currently proposed
