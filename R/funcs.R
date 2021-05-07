@@ -244,6 +244,7 @@ curex_fun <- function(lulc, subt, hard, arti, tidt, livs, coastal, fluccs, strat
       )
     ) %>%
     left_join(strata, ., by = 'HMPU_TARGETS') %>% 
+    filter(!HMPU_TARGETS %in% 'Total Intertidal') %>% 
     mutate(
       unis = case_when(
         is.na(unis) & HMPU_TARGETS %in% c('Living Shorelines', 'Tidal Tributaries') ~ 'mi', 
@@ -363,7 +364,6 @@ curex_fun <- function(lulc, subt, hard, arti, tidt, livs, coastal, fluccs, strat
       `restorable Proposed`
     )
   
-
   # make table --------------------------------------------------------------
 
   # caption
