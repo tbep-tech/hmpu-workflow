@@ -58,11 +58,11 @@ save(trgs, file = here('data', 'trgs.RData'), version = 2)
 
 strata <- data.frame(
   Category  = c("Subtidal", "Subtidal", "Subtidal", "Subtidal", "Subtidal",
-    "Intertidal", "Intertidal", "Intertidal", "Intertidal", "Intertidal", 
-    "Supratidal", "Supratidal", "Supratidal", "Supratidal"),
+                "Intertidal", "Intertidal", "Intertidal", "Intertidal", "Intertidal", "Intertidal", 
+                "Supratidal", "Supratidal", "Supratidal", "Supratidal"),
   HMPU_TARGETS = c("Hard Bottom", "Artificial Reefs", "Tidal Flats", "Seagrasses", "Oyster Bars",
-    "Living Shorelines", "Mangrove Forests", "Salt Barrens", "Salt Marshes", "Tidal Tributaries", 
-    "Coastal Uplands", "Non-Forested Freshwater Wetlands", "Forested Freshwater Wetlands", "Native Uplands"), 
+                   "Living Shorelines", "Total Intertidal", "Mangrove Forests", "Salt Barrens", "Salt Marshes", "Tidal Tributaries", 
+                   "Coastal Uplands", "Non-Forested Freshwater Wetlands", "Forested Freshwater Wetlands", "Native Uplands"), 
   stringsAsFactors = F
   ) %>% 
   mutate(

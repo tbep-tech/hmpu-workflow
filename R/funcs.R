@@ -94,7 +94,7 @@ add_coast_up <- function(lulcin, coastal, fluccs){
   # exit if no coastal uplands
   if(nrow(coastal_uplands) == 0)
     return(lulc)
-  
+
   # lulc not in coastal uplands
   lulcdiff <- st_difference(lulc, st_geometry(st_union(st_combine(coastal_uplands))))
   
@@ -190,7 +190,7 @@ curex_fun <- function(lulc, subt, hard, arti, tidt, livs, coastal, fluccs, strat
   # lulc area, all categories
   lulcsum <- lulc %>% 
     lulc_est(coastal, fluccs)
-  
+
   # subtidal area, all categories
   subtsum <- subt %>% 
     subt_est(fluccs)
