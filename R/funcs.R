@@ -423,7 +423,7 @@ curex_fun <- function(lulc, subt, hard, arti, tidt, livs, coastal, fluccs, strat
 # restorelyr is current existing/proposed restoration layer
 # coastal is coastal stratum sf object
 # crplyr is optional cropping layer
-oppdat_fun <- function(nativersrv, restorersrv, nativelyr, restorelyr, coastal, crplyr){
+oppdat_fun <- function(nativersrv, restorersrv, nativelyr, restorelyr, coastal, crplyr = NULL){
 
   if(!is.null(crplyr)){
     
@@ -436,19 +436,21 @@ oppdat_fun <- function(nativersrv, restorersrv, nativelyr, restorelyr, coastal, 
   }
   
   # union coastal for differencing
-  unicoastal <- st_union(st_combine(coastal))
+  unicoastal <- st_union(st_combine(coastal)) %>% st_make_valid()
   
   nativersrv <- nativersrv %>% 
+    fixgeo %>% 
     st_sf(geometry = .) %>% 
     mutate(cat = 'Reservation Native')
   
   restorersrv <- restorersrv %>% 
+    fixgeo %>% 
     st_sf(geometry = .) %>% 
     mutate(cat = 'Reservation Restorable')
   
   nativelyrprop <- nativelyr %>% 
     filter(typ %in% 'Proposed') %>% 
-    st_geometry() %>% 
+    fixgeo %>% 
     st_difference(., unicoastal) %>% 
     fixgeo %>% 
     st_sf(geometry = .) %>% 
@@ -459,14 +461,15 @@ oppdat_fun <- function(nativersrv, restorersrv, nativelyr, restorelyr, coastal, 
   
   nativelyrexst <- nativelyr %>% 
     filter(typ %in% 'Existing') %>%
-    select(cat = typ) %>% 
+    fixgeo %>% 
+    st_sf(geometry = .) %>%  
     mutate(
       cat = 'Existing Conservation Native'
     )
   
   restorelyrprop <- restorelyr %>% 
     filter(typ %in% 'Proposed') %>% 
-    st_geometry() %>% 
+    fixgeo %>% 
     st_difference(., unicoastal) %>% 
     fixgeo %>% 
     st_sf(geometry = .) %>% 
@@ -477,7 +480,8 @@ oppdat_fun <- function(nativersrv, restorersrv, nativelyr, restorelyr, coastal, 
   
   restorelyrexst <- restorelyr %>% 
     filter(typ %in% 'Existing') %>% 
-    select(cat = typ) %>% 
+    fixgeo %>% 
+    st_sf(geometry = .) %>% 
     mutate(
       cat = 'Existing Conservation Restorable'
     )
