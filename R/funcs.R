@@ -496,14 +496,17 @@ oppdat_fun <- function(nativersrv, restorersrv, nativelyr, restorelyr, coastal, 
 #
 # restorelyr is current existing/proposed restoration layer
 # crplyr is optional cropping layer
-restdat_fun <- function(restorelyr, crplyr){
+restdat_fun <- function(restorelyr, crplyr = NULL){
   
   if(!is.null(crplyr)){
     
-    restorelyr <- st_intersection(restorelyr, crplyr)
+    restorelyr <- crplyr %>% 
+      fixgeo %>% 
+      st_geometry %>% 
+      st_intersection(restorelyr, .)
     
   }
-  
+
   out <- restorelyr %>% 
     filter(typ %in% 'Existing') %>% 
     mutate(
@@ -512,7 +515,16 @@ restdat_fun <- function(restorelyr, crplyr){
         T ~ HMPU_TARGETS
       )
     ) %>% 
-    select(HMPU_TARGETS)
+    select(HMPU_TARGETS) %>% 
+    group_by(HMPU_TARGETS) %>% 
+    nest %>% 
+    mutate(
+      geometry = purrr::map(data, fixgeo)
+    ) %>% 
+    select(-data) %>% 
+    unnest('geometry') %>% 
+    ungroup %>% 
+    st_as_sf()
   
   return(out)
   

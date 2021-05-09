@@ -20,8 +20,8 @@ data(nativersrv)
 data(coastal)
 
 # boundaries, form 01_current_layers
-data(stpet)
 data(tampa)
+data(stpet)
 data(hilco)
 data(pinco)
 data(manco)
@@ -46,7 +46,7 @@ m <- mapview(oppdat, zcol = 'cat', col.regions = cols, lwd = 0, homebutton = F, 
 # save as html, takes about ten minutes and maxes out memory, but it works
 mapshot(m, url = 'docs/oppmap.html', remove_controls = NULL)
 
-st_write(oppdat, 'data/shapefiles/oppmap.shp')
+st_write(oppdat, 'data/shapefiles/oppmap.shp', delete_layer = TRUE)
 
 # areas <- oppdat %>% 
 #   mutate(

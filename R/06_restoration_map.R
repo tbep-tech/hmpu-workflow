@@ -14,7 +14,12 @@ source(here('R', 'funcs.R'))
 data(restorelyr)
 
 # boundaries, form 01_current_layers
-data(stpete)
+data(tampa)
+data(stpet)
+data(hilco)
+data(pinco)
+data(manco)
+data(pasco)
 
 cols <- list(
   `Coastal Uplands` = 'brown4', 
@@ -33,22 +38,40 @@ m <- mapview(restdat, zcol = 'HMPU_TARGETS', col.regions = cols, lwd = 0, homebu
 # save as html, takes about ten minutes and maxes out memory, but it works
 mapshot(m, url = 'docs/rstmap.html', remove_controls = NULL)
 
-# areas <- restdat %>%
-#   mutate(
-#     acres = st_area(.),
-#     acres = set_units(acres, 'acres')
-#   ) %>%
-#   st_set_geometry(NULL) %>%
-#   group_by(HMPU_TARGETS) %>%
-#   summarise(
-#     acres = sum(acres, na.rm = T)
-#   )
+st_write(restdat, 'data/shapefiles/restmap.shp', delete_layer = TRUE)
+
+# tampa only --------------------------------------------------------------
+
+restdat_tampa <- restdat_fun(restorelyr, tampa)
+
+st_write(restdat_tampa, 'data/shapefiles/restmap_tampa.shp', delete_layer = TRUE)
 
 # st pete only ------------------------------------------------------------
 
-restdat <- restdat_fun(restorelyr, stpete)
+restdat_stpet <- restdat_fun(restorelyr, stpet)
 
-m <- mapview(restdat, zcol = 'HMPU_TARGETS', col.regions = cols, lwd = 0, homebutton = F, layer.name = '')
+st_write(restdat_stpet, 'data/shapefiles/restmap_stpet.shp', delete_layer = TRUE)
 
-# save as html, takes about ten minutes and maxes out memory, but it works
-mapshot(m, url = 'docs/rstmap_stpete.html', remove_controls = NULL)
+# hilco only --------------------------------------------------------------
+
+restdat_hilco <- restdat_fun(restorelyr, hilco)
+
+st_write(restdat_hilco, 'data/shapefiles/restmap_hilco.shp', delete_layer = TRUE)
+
+# pinco only --------------------------------------------------------------
+
+restdat_pinco <- restdat_fun(restorelyr, pinco)
+
+st_write(restdat_pinco, 'data/shapefiles/restmap_pinco.shp', delete_layer = TRUE)
+
+# manco only --------------------------------------------------------------
+
+restdat_manco <- restdat_fun(restorelyr, manco)
+
+st_write(restdat_manco, 'data/shapefiles/restmap_manco.shp', delete_layer = TRUE)
+
+# pasco only --------------------------------------------------------------
+
+restdat_pasco <- restdat_fun(restorelyr, pasco)
+
+st_write(restdat_pasco, 'data/shapefiles/restmap_pasco.shp', delete_layer = TRUE)
