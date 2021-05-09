@@ -75,3 +75,12 @@ st_write(restdat_manco, 'data/shapefiles/restmap_manco.shp', delete_layer = TRUE
 restdat_pasco <- restdat_fun(restorelyr, pasco)
 
 st_write(restdat_pasco, 'data/shapefiles/restmap_pasco.shp', delete_layer = TRUE)
+
+# zip all shapefiles and upload to google drive ---------------------------
+
+fls <- list.files('data/shapefiles/', pattern = '^restmap', full.names = T)
+zip('data/shapefiles/restoration-layers', fls)
+
+drive_upload('data/shapefiles/restoration-layers.zip', 
+             path = 'https://drive.google.com/drive/folders/1CsuYXCpFzSJAPdHHfdKDZgYkXFeHes6y?usp=sharing/', overwrite = T)
+

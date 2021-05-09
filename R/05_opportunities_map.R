@@ -7,6 +7,7 @@ library(units)
 library(mapview)
 library(grid)
 library(htmlwidgets)
+library(googledrive)
 
 source(here('R', 'funcs.R'))
 
@@ -95,3 +96,10 @@ oppdat_pasco <- oppdat_fun(nativersrv, restorersrv, nativelyr, restorelyr, coast
 
 st_write(oppdat_pasco, 'data/shapefiles/oppmap_pasco.shp', delete_layer = TRUE)
 
+# zip all shapefiles and upload to google drive ---------------------------
+
+fls <- list.files('data/shapefiles/', pattern = '^oppmap', full.names = T)
+zip('data/shapefiles/opportunity-layers', fls)
+
+drive_upload('data/shapefiles/opportunity-layers.zip', 
+             path = 'https://drive.google.com/drive/folders/1CsuYXCpFzSJAPdHHfdKDZgYkXFeHes6y?usp=sharing/', overwrite = T)
