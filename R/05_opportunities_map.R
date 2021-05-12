@@ -23,6 +23,7 @@ data(coastal)
 # boundaries, form 01_current_layers
 data(tampa)
 data(stpet)
+data(clrwt)
 data(hilco)
 data(pinco)
 data(manco)
@@ -71,6 +72,12 @@ st_write(oppdat_tampa, 'data/shapefiles/oppmap_tampa.shp', delete_layer = TRUE)
 oppdat_stpet <- oppdat_fun(nativersrv, restorersrv, nativelyr, restorelyr, coastal, stpet)
 
 st_write(oppdat_stpet, 'data/shapefiles/oppmap_stpet.shp', delete_layer = TRUE)
+
+# clearwater only ---------------------------------------------------------
+
+oppdat_clrwt <- oppdat_fun(nativersrv, restorersrv, nativelyr, restorelyr, coastal, clrwt)
+
+st_write(oppdat_clrwt, 'data/shapefiles/oppmap_clrwt.shp', delete_layer = TRUE)
 
 # hillsborough co only ----------------------------------------------------
 

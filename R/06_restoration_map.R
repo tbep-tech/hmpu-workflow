@@ -7,6 +7,7 @@ library(units)
 library(mapview)
 library(grid)
 library(htmlwidgets)
+library(googledrive)
 
 source(here('R', 'funcs.R'))
 
@@ -16,6 +17,7 @@ data(restorelyr)
 # boundaries, form 01_current_layers
 data(tampa)
 data(stpet)
+data(clrwt)
 data(hilco)
 data(pinco)
 data(manco)
@@ -51,6 +53,12 @@ st_write(restdat_tampa, 'data/shapefiles/restmap_tampa.shp', delete_layer = TRUE
 restdat_stpet <- restdat_fun(restorelyr, stpet)
 
 st_write(restdat_stpet, 'data/shapefiles/restmap_stpet.shp', delete_layer = TRUE)
+
+# clearwater only ---------------------------------------------------------
+
+restdat_clrwt <- restdat_fun(restorelyr, clrwt)
+
+st_write(restdat_clrwt, 'data/shapefiles/restmap_clrwt.shp', delete_layer = TRUE)
 
 # hilco only --------------------------------------------------------------
 

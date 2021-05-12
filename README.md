@@ -8,6 +8,7 @@ Workflows for recreating and updating analyses for the [Habitat Master Plan Upda
      * [Tampa Bay watershed](https://tbep-tech.github.io/hmpu-workflow/current_table.html)
      * [Tampa municipal boundaries](https://tbep-tech.github.io/hmpu-workflow/current_table_tampa.html)
      * [St. Pete municipal boundaries](https://tbep-tech.github.io/hmpu-workflow/current_table_stpet.html)
+     * [Clearwater municipal boundaries](https://tbep-tech.github.io/hmpu-workflow/current_table_clrwt.html)
      * [Hillsborough Co. boundaries](https://tbep-tech.github.io/hmpu-workflow/current_table_hilco.html)
      * [Pinellas Co. boundaries](https://tbep-tech.github.io/hmpu-workflow/current_table_pinco.html)
      * [Manatee Co. boundaries](https://tbep-tech.github.io/hmpu-workflow/current_table_manco.html)

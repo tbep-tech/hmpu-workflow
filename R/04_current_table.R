@@ -32,6 +32,7 @@ data(restorelyr)
 # boundaries, from 01_current_layers
 data(stpet)
 data(tampa)
+data(clrwt)
 data(hilco)
 data(pinco)
 data(manco)
@@ -59,6 +60,14 @@ cap <- cap <- 'Summary of the Opportunity Assessment Analysis: St. Pete'
 tab_stpet <- curex_fun(lulc, subt, hard, arti, tidt, livs, coastal, fluccs, strata, nativelyr, restorelyr, cap, stpet)
 
 save_as_html(tab_stpet, path = 'docs/current_table_stpet.html', title = 'Current Table St. Pete')
+
+# clearwater --------------------------------------------------------------
+
+cap <- cap <- 'Summary of the Opportunity Assessment Analysis: Clearwater'
+
+tab_clrwt <- curex_fun(lulc, subt, hard, arti, tidt, livs, coastal, fluccs, strata, nativelyr, restorelyr, cap, clrwt)
+
+save_as_html(tab_clrwt, path = 'docs/current_table_clrwt.html', title = 'Current Table Clearwater')
 
 # hillsborough co ---------------------------------------------------------
 

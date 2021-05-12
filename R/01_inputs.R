@@ -415,6 +415,12 @@ stpet <- st_read('~/Desktop/TBEP/HMPU/GIS/boundaries/City_Limits_St._Petersburg.
   st_geometry() %>% 
   st_union()
 
+# city of clearwater
+clrwt <- st_read('~/Desktop/TBEP/HMPU/GIS/boundaries/clearwater_bnds.shp') %>% 
+  st_transform(crs = prj) %>% 
+  st_geometry() %>% 
+  st_union()
+
 # hillsborough county
 hilco <- st_read('~/Desktop/TBEP/HMPU/GIS/boundaries/HillsFromFDEP.shp') %>% 
   st_transform(crs = prj) %>% 
@@ -441,6 +447,7 @@ pasco <- st_read('~/Desktop/TBEP/HMPU/GIS/boundaries/PascoCountyFDEP.shp') %>%
 
 save(tampa, file = 'data/tampa.RData', version = 2)
 save(stpet, file = 'data/stpet.RData', version = 2)
+save(clrwt, file = 'data/clrwt.RData', version = 2)
 save(hilco, file = 'data/hilco.RData', version = 2)
 save(pinco, file = 'data/pinco.RData', version = 2)
 save(manco, file = 'data/manco.RData', version = 2)
