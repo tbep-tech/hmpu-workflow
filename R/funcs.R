@@ -492,6 +492,96 @@ oppdat_fun <- function(nativersrv, restorersrv, nativelyr, restorelyr, coastal, 
   
 }
 
+# create a ggplot of an opportunity map
+#
+# oppmap is shapefile input created in 05_opportunities_map.R
+# bndry is input boundary layer created in 01_inputs.R
+# ttle is chr string of plot title
+# northloc location of north arrow
+# scaleloc location of scale bar
+# stsz size of text on scale bar
+# buffdist is buffer for boundary layer
+# scldst is division unit for scale bar
+# stht is scalebar height
+
+# requires ggsn, ggmap, ggplot, sf
+oppmap_fun <- function(oppmap, bndry, ttl, northloc = 'topright', scaleloc = 'topleft', stsz = 3, buffdist = 0.01, scldst = 3, stht = 0.02){
+  
+  # colors 
+  cols <- list(
+    `Existing Conservation Native` = 'yellowgreen', 
+    `Existing Conservation Restorable` = 'green4', 
+    `Proposed Conservation Native` = 'dodgerblue1', 
+    `Proposed Conservation Restorable` = 'dodgerblue4', 
+    `Reservation Native` = 'violetred1', 
+    `Reservation Restorable` = 'violetred3'
+    ) %>% 
+    unlist
+  
+  # transform to wgs to work with ggmap
+  tomap <- oppmap %>%
+    st_transform(crs = 4326)
+  
+  # trasnfrom to wgs to work with ggmap
+  bndry <- bndry %>% 
+    st_transform(crs = 4326)
+  
+  # layer extent as bbox plus buffer
+  dat_ext <- bndry %>% 
+    st_bbox %>% 
+    st_as_sfc %>% 
+    st_buffer(dist = buffdist) %>%
+    st_bbox %>% 
+    unname
+
+  # reference data for ggsn, MUST have geometry named column
+  ggsnref <- bndry %>% 
+    st_bbox %>% 
+    st_as_sfc %>%
+    st_buffer(dist = buffdist / 2) %>% 
+    st_as_sf %>%
+    st_cast('POINT') %>% 
+    rename(geometry = x)
+  
+  # stamen base map
+  bsmap1 <- get_stamenmap(bbox = dat_ext, maptype = 'toner-background', zoom = 12)
+  
+  # change opacity of basemap
+  mapatt <- attributes(bsmap1)
+  bsmap1_transparent <- matrix(adjustcolor(bsmap1, 
+                                           alpha.f = 0.2), 
+                               nrow = nrow(bsmap1))
+  attributes(bsmap1_transparent) <- mapatt
+
+  # plot
+  p <- ggmap(bsmap1_transparent) +
+    geom_sf(data = tomap, aes(fill = cat), color = NA, inherit.aes = F, alpha = 0.8) +
+    geom_sf(data = bndry, fill = NA, color = 'black', inherit.aes = F, size = 0.3) +
+    scale_fill_manual(values = cols, drop = F) +
+    theme(
+      legend.title = element_blank(), 
+      panel.grid = element_blank(), 
+      axis.title = element_blank(), 
+      legend.position  = 'right', 
+      legend.justification = 'top',
+      axis.text.y = element_text(size = 7), 
+      axis.text.x = element_text(size = 7, angle = 30, hjust = 1),
+      panel.background = element_rect(fill = 'white'),
+      axis.ticks = element_line(colour = 'grey'),
+      panel.border = element_rect(colour = 'grey', fill = NA)
+    ) + 
+    labs(
+      title = ttl, 
+      caption = 'More info: https://tbep.org/habitat-master-plan-update/'
+      ) +
+    ggsn::scalebar(ggsnref, dist = scldst, dist_unit = 'km', transform = T, location = scaleloc,
+                   st.color = 'black', border.size = 0.5, st.dist = 0.015, st.size = stsz, height = stht) + 
+    north(ggsnref, location = northloc, symbol = 10, scale = 0.1)
+  
+  return(p)
+  
+}
+
 # restoration data function for restoration map, assumes salt marshes are included in tidal wetlands
 #
 # restorelyr is current existing/proposed restoration layer
