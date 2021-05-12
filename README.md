@@ -14,4 +14,12 @@ Workflows for recreating and updating analyses for the [Habitat Master Plan Upda
      * Manatee Co. boundaries: [table](https://tbep-tech.github.io/hmpu-workflow/current_table_manco.html), [map](https://tbep-tech.github.io/hmpu-workflow/oppmap_manco.png)
      * Pasco Co. boundaries: [table](https://tbep-tech.github.io/hmpu-workflow/current_table_pasco.html), [map](https://tbep-tech.github.io/hmpu-workflow/oppmap_pasco.png)
 * Summary of recommended 2030 targets and 2050 goals (Table 6-1 HMPU doc): [table](https://tbep-tech.github.io/hmpu-workflow/target_table)
-
+* Summary of Restoration Potential (Map 5-3 HMPU doc)
+     * Tampa Bay watershed: [map](https://tbep-tech.github.io/hmpu-workflow/restmap.png)
+     * Tampa municipal boundaries: [map](https://tbep-tech.github.io/hmpu-workflow/restmap_tampa.png) 
+     * St. Pete municipal boundaries: [map](https://tbep-tech.github.io/hmpu-workflow/restmap_stpet.png)
+     * Clearwater municipal boundaries: [map](https://tbep-tech.github.io/hmpu-workflow/restmap_clrwt.png)
+     * Hillsborough Co. boundaries: [map](https://tbep-tech.github.io/hmpu-workflow/restmap_hilco.png)
+     * Pinellas Co. boundaries: [map](https://tbep-tech.github.io/hmpu-workflow/restmap_pinco.png)
+     * Manatee Co. boundaries: [map](https://tbep-tech.github.io/hmpu-workflow/restmap_manco.png)
+     * Pasco Co. boundaries: [map](https://tbep-tech.github.io/hmpu-workflow/restmap_pasco.png)
