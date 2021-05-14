@@ -499,13 +499,10 @@ oppdat_fun <- function(nativersrv, restorersrv, nativelyr, restorelyr, coastal, 
 # ttle is chr string of plot title
 # northloc location of north arrow
 # scaleloc location of scale bar
-# stsz size of text on scale bar
 # buffdist is buffer for boundary layer
-# scldst is division unit for scale bar
-# stht is scalebar height
 #
 # requires ggsn, ggmap, ggplot, sf
-oppmap_fun <- function(oppmap, bndry, ttl, northloc = 'topright', scaleloc = 'topleft', stsz = 3, buffdist = 0.01, scldst = 3, stht = 0.02){
+oppmap_fun <- function(oppmap, bndry, ttl, northloc = 'tr', scaleloc = 'tl', buffdist = 0.01){
   
   # colors 
   cols <- list(
@@ -574,9 +571,9 @@ oppmap_fun <- function(oppmap, bndry, ttl, northloc = 'topright', scaleloc = 'to
       title = ttl, 
       caption = 'More info: https://tbep.org/habitat-master-plan-update/'
       ) +
-    ggsn::scalebar(ggsnref, dist = scldst, dist_unit = 'km', transform = T, location = scaleloc,
-                   st.color = 'black', border.size = 0.5, st.dist = 0.015, st.size = stsz, height = stht) + 
-    north(ggsnref, location = northloc, symbol = 10, scale = 0.1)
+    annotation_scale(location = scaleloc) +
+    annotation_north_arrow(location = northloc, which_north = "true", height = grid::unit(0.75, "cm"), 
+                           width = grid::unit(0.75, "cm"))
   
   return(p)
   
@@ -662,9 +659,9 @@ restmap_fun <- function(restmap, bndry, ttl, northloc = 'topright', scaleloc = '
       title = ttl, 
       caption = 'More info: https://tbep.org/habitat-master-plan-update/'
     ) +
-    ggsn::scalebar(ggsnref, dist = scldst, dist_unit = 'km', transform = T, location = scaleloc,
-                   st.color = 'black', border.size = 0.5, st.dist = 0.015, st.size = stsz, height = stht) + 
-    north(ggsnref, location = northloc, symbol = 10, scale = 0.1)
+    annotation_scale(location = scaleloc) +
+    annotation_north_arrow(location = northloc, which_north = "true", height = grid::unit(0.75, "cm"), 
+                           width = grid::unit(0.75, "cm"))
   
   return(p)
   

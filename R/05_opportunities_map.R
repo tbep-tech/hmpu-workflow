@@ -9,7 +9,7 @@ library(grid)
 library(htmlwidgets)
 library(googledrive)
 library(ggmap)
-library(ggsn)
+library(ggspatial)
 library(tbeptools)
 
 source(here('R', 'funcs.R'))
@@ -55,8 +55,8 @@ st_write(oppdat, 'data/shapefiles/oppmap.shp', delete_layer = TRUE)
 
 oppdat <- st_read('data/shapefiles/oppmap.shp')
 
-p <- oppmap_fun(oppdat, tbshed, ttl = 'Tampa Bay Watershed Combined Opportunities', northloc = 'topright', scaleloc = 'topleft', 
-                 stsz = 2, buffdist = 0.04, scldst = 6, stht = 0.01)
+p <- oppmap_fun(oppdat, tbshed, ttl = 'Tampa Bay Watershed Combined Opportunities', northloc = 'tr', scaleloc = 'tl', 
+                 buffdist = 0.04)
 
 png('docs/oppmap.png', height = 5, width = 8, res = 300, units = 'in')
 p
@@ -70,8 +70,8 @@ st_write(oppdat_tampa, 'data/shapefiles/oppmap_tampa.shp', delete_layer = TRUE)
 
 oppdat_tampa <- st_read('data/shapefiles/oppmap_tampa.shp')
 
-p <- oppmap_fun(oppdat_tampa, tampa, ttl = 'Tampa Combined Opportunities', northloc = 'topleft', scaleloc = 'bottomright', 
-                stsz = 2, buffdist = 0.025, scldst = 3, stht = 0.02)
+p <- oppmap_fun(oppdat_tampa, tampa, ttl = 'Tampa Combined Opportunities', northloc = 'tl', scaleloc = 'br', 
+                buffdist = 0.02)
 
 png('docs/oppmap_tampa.png', height = 5, width = 8, res = 300, units = 'in')
 p
@@ -85,8 +85,8 @@ st_write(oppdat_stpet, 'data/shapefiles/oppmap_stpet.shp', delete_layer = TRUE)
 
 oppdat_stpet <- st_read('data/shapefiles/oppmap_stpet.shp')
 
-p <- oppmap_fun(oppdat_stpet, stpet, 'St. Petersburg Combined Opportunities', northloc = 'topleft', scaleloc = 'bottomright',
-                stsz = 2, buffdist = 0.02, scldst = 3, stht = 0.02)
+p <- oppmap_fun(oppdat_stpet, stpet, 'St. Petersburg Combined Opportunities', northloc = 'tl', scaleloc = 'br',
+                buffdist = 0.02)
 
 png('docs/oppmap_stpet.png', height = 5, width = 8, res = 300, units = 'in')
 p
@@ -100,8 +100,8 @@ st_write(oppdat_clrwt, 'data/shapefiles/oppmap_clrwt.shp', delete_layer = TRUE)
 
 oppdat_clrwt <- st_read('data/shapefiles/oppmap_clrwt.shp')
 
-p <- oppmap_fun(oppdat_clrwt, clrwt, 'Clearwater Combined Opportunities', northloc = 'topleft', scaleloc = 'bottomright', 
-                stsz = 2.5, buffdist = 0.01, scldst = 3, stht = 0.02)
+p <- oppmap_fun(oppdat_clrwt, clrwt, 'Clearwater Combined Opportunities', northloc = 'tl', scaleloc = 'br', 
+                buffdist = 0.01)
 
 png('docs/oppmap_clrwt.png', height = 5, width = 8, res = 300, units = 'in')
 p
@@ -115,8 +115,8 @@ st_write(oppdat_hilco, 'data/shapefiles/oppmap_hilco.shp', delete_layer = TRUE)
 
 oppdat_hilco <- st_read('data/shapefiles/oppmap_hilco.shp')
 
-p <- oppmap_fun(oppdat_hilco, hilco, ttl = 'Hillsborough Co. Combined Opportunities', northloc = 'bottomright', scaleloc = 'topleft', 
-                stsz = 2, buffdist = 0.025, scldst = 5, stht = 0.01)
+p <- oppmap_fun(oppdat_hilco, hilco, ttl = 'Hillsborough Co. Combined Opportunities', northloc = 'tl', scaleloc = 'br', 
+                buffdist = 0.02)
 
 png('docs/oppmap_hilco.png', height = 5, width = 8, res = 300, units = 'in')
 p
@@ -130,8 +130,8 @@ st_write(oppdat_pinco, 'data/shapefiles/oppmap_pinco.shp', delete_layer = TRUE)
 
 oppdat_pinco <- st_read('data/shapefiles/oppmap_pinco.shp')
 
-p <- oppmap_fun(oppdat_pinco, pinco, ttl = 'Pinellas Co. Combined Opportunities', northloc = 'bottomleft', scaleloc = 'topright', 
-                stsz = 1.8, buffdist = 0.02, scldst = 3, stht = 0.01)
+p <- oppmap_fun(oppdat_pinco, pinco, ttl = 'Pinellas Co. Combined Opportunities', northloc = 'bl', scaleloc = 'br', 
+                buffdist = 0.02)
 
 png('docs/oppmap_pinco.png', height = 5, width = 8, res = 300, units = 'in')
 p
@@ -145,8 +145,8 @@ st_write(oppdat_manco, 'data/shapefiles/oppmap_manco.shp', delete_layer = TRUE)
 
 oppdat_manco <- st_read('data/shapefiles/oppmap_manco.shp')
 
-p <- oppmap_fun(oppdat_manco, manco, ttl = 'Manatee Co. Combined Opportunities', northloc = 'bottomleft', scaleloc = 'topleft', 
-                stsz = 2.5, buffdist = 0.025, scldst = 3, stht = 0.015)
+p <- oppmap_fun(oppdat_manco, manco, ttl = 'Manatee Co. Combined Opportunities', northloc = 'bl', scaleloc = 'tl', 
+               buffdist = 0.025)
 
 png('docs/oppmap_manco.png', height = 5, width = 8, res = 300, units = 'in')
 p
@@ -160,8 +160,8 @@ st_write(oppdat_pasco, 'data/shapefiles/oppmap_pasco.shp', delete_layer = TRUE)
 
 oppdat_pasco <- st_read('data/shapefiles/oppmap_pasco.shp')
 
-p <- oppmap_fun(oppdat_pasco, pasco, ttl = 'Pasco Co. Combined Opportunities', northloc = 'topleft', scaleloc = 'topright', 
-                stsz = 1.8, buffdist = 0.04, scldst = 5, stht = 0.02)
+p <- oppmap_fun(oppdat_pasco, pasco, ttl = 'Pasco Co. Combined Opportunities', northloc = 'tl', scaleloc = 'tr', 
+                buffdist = 0.04)
 
 png('docs/oppmap_pasco.png', height = 5, width = 8, res = 300, units = 'in')
 p
