@@ -175,7 +175,7 @@ curex_fun <- function(lulc, subt, hard, arti, tidt, livs, coastal, fluccs, strat
     restorelyr <- st_intersection(restorelyr, crplyr)
     
   }
-
+  
   # current lulc summary ----------------------------------------------------
 
   # # from HMPU deliverables 
@@ -186,7 +186,7 @@ curex_fun <- function(lulc, subt, hard, arti, tidt, livs, coastal, fluccs, strat
   #   st_as_stars %>% 
   #   st_as_sf(as_points = FALSE, merge = TRUE) %>% 
   #   rename(FLUCCSCODE = 'Full_LULC')
-  
+    
   # lulc area, all categories
   lulcsum <- lulc %>% 
     lulc_est(coastal, fluccs)
@@ -258,7 +258,7 @@ curex_fun <- function(lulc, subt, hard, arti, tidt, livs, coastal, fluccs, strat
     ) %>% 
     select(Category, HMPU_TARGETS, unis, `Current Extent`) %>% 
     arrange(Category, HMPU_TARGETS)
-  
+    
   # native summary ----------------------------------------------------------
   
   nativesum <- nativelyr %>% 
@@ -313,6 +313,61 @@ curex_fun <- function(lulc, subt, hard, arti, tidt, livs, coastal, fluccs, strat
       `total restorable` = `restorable Existing` + `restorable Proposed`
     )
   
+  # final table -------------------------------------------------------------
+  
+  tab <- curexcmp_fun(cursum, nativesum, restoresum, cap)
+  
+  return(tab)
+  
+}
+
+# get current extent table with legacy values from HMPU
+#
+# cap is chr string for caption
+curexleg_fun <- function(cap){
+  
+  # cursum
+  cursum <- structure(list(
+    Category = structure(c(1L, 1L, 1L, 1L, 1L, 2L, 2L, 2L, 2L, 2L, 3L, 3L, 3L, 3L), .Label = c("Subtidal", "Intertidal", "Supratidal"), class = "factor"), 
+    HMPU_TARGETS = c("Artificial Reefs",  "Hard Bottom", "Oyster Bars", "Seagrasses", "Tidal Flats", "Living Shorelines", 
+                     "Mangrove Forests", "Salt Barrens", "Salt Marshes", "Tidal Tributaries", 
+                     "Coastal Uplands", "Forested Freshwater Wetlands", "Native Uplands", 
+                     "Non-Forested Freshwater Wetlands"), 
+    unis = c("ac", "ac", "ac", "ac", "ac", "mi", "ac", "ac", "ac", "mi", "ac", "ac", "ac", "ac"), 
+    `Current Extent` = c(166, 423, 171, 40653, 16220, 11.3, 15300, 496, 4557, 387, 3619, 152132, 140600, 67587)), 
+    class = "data.frame", row.names = c(NA, -14L))
+  
+  # nativesum
+  nativesum <- structure(list(
+    HMPU_TARGETS = c("Coastal Uplands", "Forested Freshwater Wetlands", 
+                     "Mangrove Forests", "Native Uplands", "Non-Forested Freshwater Wetlands", 
+                     "Salt Barrens", "Salt Marshes"), 
+    `native Existing` = c(1725, 58222, 10864, 64374, 11482, 430, 2104), 
+    `native Proposed` = c(1706, 56505, 4078, 52834, 25971, 62, 2316)), 
+    row.names = c(NA, -7L), class = c("tbl_df", "tbl", "data.frame"))
+  
+  # restoresum
+  restoresum <- structure(list(
+    HMPU_TARGETS = c("Coastal Uplands", "Forested Freshwater Wetlands", 
+                     "Mangrove Forests", "Native Uplands", "Non-Forested Freshwater Wetlands", 
+                     "Salt Barrens", "Salt Marshes"), 
+    `restorable Existing` = c(311, 27447, 1309, 13265, 27447, 1309, 241), 
+    `restorable Proposed` = c(961, 132389, 1448, 30663, 132389, 1448,  851), 
+    `total restorable` = c(1272, 159836, 2757, 43928, 159836, 2757, 1092)), 
+    row.names = c(NA, -7L), class = c("tbl_df", "tbl", "data.frame"))
+  
+
+  # final table -------------------------------------------------------------
+
+  tab <- curexcmp_fun(cursum, nativesum, restoresum, cap)
+
+  return(tab)
+  
+}
+
+# final table compilation function for curex_fun, curexleg_fun
+curexcmp_fun <- function(cursum, nativesum, restoresum, cap){
+  
   # combine all for table ---------------------------------------------------
   
   # all summary
@@ -338,18 +393,18 @@ curex_fun <- function(lulc, subt, hard, arti, tidt, livs, coastal, fluccs, strat
     mutate(
       `native Existing` = case_when(
         Category == 'Subtidal' ~ `Current Extent`, 
-        HMPU_TARGETS == 'Living Shorelines' ~ 'LSSM',
+        HMPU_TARGETS == c('Living Shorelines') ~ 'LSSM',
         T ~ `native Existing`
       ), 
       `total restorable` = case_when(
         HMPU_TARGETS == 'Seagrasses' ~ '14,131 ac', 
-        HMPU_TARGETS %in% c('Tidal Flats', 'Oyster Bars', 'Tidal Tributaries') ~ 'I/D',
-        HMPU_TARGETS %in% c('Living Shorelines') ~ 'LSSM', 
+        HMPU_TARGETS %in% c('Tidal Flats', 'Oyster Bars') ~ 'I/D',
+        HMPU_TARGETS %in% c('Living Shorelines', 'Tidal Tributaries') ~ 'LSSM', 
         T ~ `total restorable`
       ),
       `restorable Existing` = case_when(
         HMPU_TARGETS == 'Seagrasses' ~ '14,131 ac', 
-        HMPU_TARGETS %in% c('Tidal Flats', 'Oyster Bars', 'Tidal Tributaries') ~ 'I/D',
+        HMPU_TARGETS %in% c('Tidal Flats', 'Oyster Bars') ~ 'I/D',
         T ~ `restorable Existing`
       )
     ) %>% 
@@ -365,7 +420,7 @@ curex_fun <- function(lulc, subt, hard, arti, tidt, livs, coastal, fluccs, strat
     )
   
   # make table --------------------------------------------------------------
-
+  
   # caption
   cap <- paste0('<h2>', cap, '</h2>')
   

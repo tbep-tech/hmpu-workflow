@@ -41,7 +41,8 @@ data(pasco)
 # complete watershed ------------------------------------------------------
 
 cap <- 'Summary of the Opportunity Assessment Analysis'
-tab <- curex_fun(lulc, subt, hard, arti, tidt, livs, coastal, fluccs, strata, nativelyr, restorelyr, cap)
+# tab <- curex_fun(lulc, subt, hard, arti, tidt, livs, coastal, fluccs, strata, nativelyr, restorelyr, cap)
+tab <- curexleg_fun(cap)
 
 save_as_html(tab, path = 'docs/current_table.html', title = 'Current Table')
 
