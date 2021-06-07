@@ -3,7 +3,6 @@ library(tidyverse)
 library(here)
 library(doParallel)
 library(foreach)
-library(units)
 library(esri2sf) # yonghah/esri2sf on github
 
 source(here('R', 'funcs.R'))
@@ -288,6 +287,7 @@ data(tbshed)
 
 # https://data-swfwmd.opendata.arcgis.com/search?groupIds=d9a4213eb9ea4713bb710e03bdcc6648
 urls <- list(
+  `2020` = 'https://opendata.arcgis.com/datasets/2b5e369edd244969bc05baa8e713cffc_1.geojson',
   `2018` = 'https://opendata.arcgis.com/datasets/8d0d473468924423bf0f1682aaca790f_0.geojson',
   `2016` = 'https://opendata.arcgis.com/datasets/f0ecff0cf0de491685f8fb074adb278b_20.geojson',
   `2014` = 'https://opendata.arcgis.com/datasets/f530f972ded749adb1c6b20c2651e7f9_18.geojson',
