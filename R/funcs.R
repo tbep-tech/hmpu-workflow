@@ -184,7 +184,7 @@ curex_fun <- function(lulc, subt, hard, arti, tidt, livs, coastal, fluccs, strat
     
   }
   
-  # current lulc summary ----------------------------------------------------
+  # current lulc summary
 
   # # from HMPU deliverables 
   # lulcdat <- raster('~/Desktop/rasters/rasters/Full_LULC.tif')
@@ -267,7 +267,7 @@ curex_fun <- function(lulc, subt, hard, arti, tidt, livs, coastal, fluccs, strat
     select(Category, HMPU_TARGETS, unis, `Current Extent`) %>% 
     arrange(Category, HMPU_TARGETS)
     
-  # native summary ----------------------------------------------------------
+  # native summary
   
   nativesum <- nativelyr %>% 
     mutate(
@@ -282,7 +282,7 @@ curex_fun <- function(lulc, subt, hard, arti, tidt, livs, coastal, fluccs, strat
     arrange(typ, HMPU_TARGETS) %>% 
     spread(typ, Acres)
   
-  # restorable summary ------------------------------------------------------
+  # restorable summary
   
   restoresum <- restorelyr %>% 
     mutate(
@@ -321,7 +321,7 @@ curex_fun <- function(lulc, subt, hard, arti, tidt, livs, coastal, fluccs, strat
       `total restorable` = `restorable Existing` + `restorable Proposed`
     )
   
-  # final table -------------------------------------------------------------
+  # final table
   
   tab <- curexcmp_fun(cursum, nativesum, restoresum, cap)
   
@@ -365,8 +365,8 @@ curexleg_fun <- function(cap){
     row.names = c(NA, -7L), class = c("tbl_df", "tbl", "data.frame"))
   
 
-  # final table -------------------------------------------------------------
-
+  # final table
+  
   tab <- curexcmp_fun(cursum, nativesum, restoresum, cap)
 
   return(tab)
@@ -376,7 +376,7 @@ curexleg_fun <- function(cap){
 # final table compilation function for curex_fun, curexleg_fun
 curexcmp_fun <- function(cursum, nativesum, restoresum, cap){
   
-  # combine all for table ---------------------------------------------------
+  # combine all for table
   
   # all summary
   allsum <- cursum %>% 
@@ -427,7 +427,7 @@ curexcmp_fun <- function(cursum, nativesum, restoresum, cap){
       `restorable Proposed`
     )
   
-  # make table --------------------------------------------------------------
+  # make table
   
   # caption
   cap <- paste0('<h2>', cap, '</h2>')
@@ -765,5 +765,263 @@ restdat_fun <- function(restorelyr, crplyr = NULL){
     st_as_sf()
   
   return(out)
+  
+}
+
+# get target table
+#
+# lulc is current lulc sf object
+# subt is current subtidal sf object
+# hard is current hard bottom sf object
+# tidt is current tidal creeks sf object
+# coastal is coastal stratum sf object
+# fluccs is fluccs data frame
+# restorelyr is current existing/proposed restoration layer
+# trgs is input targets table
+# cap is chr string for caption
+target_fun <- function(lulc, subt, hard, arti, tidt, livs, coastal, fluccs, strata, restorelyr, trgs, cap){
+  
+  # lulc area, all categories
+  lulcsum <- lulc_est(lulc, coastal, fluccs)
+  
+  # add total intertidal, this is unique to this table
+  intrsum <- lulcsum %>% 
+    filter(HMPU_TARGETS %in% c('Mangrove Forests', 'Salt Barrens', 'Salt Marshes')) %>% 
+    pull(Acres) %>% 
+    sum %>% 
+    tibble(
+      HMPU_TARGETS = 'Total Intertidal', 
+      Acres = .
+    )
+  
+  # subtidal area, all categories
+  subtsum <- subt_est(subt, fluccs)
+  
+  # hard bottom
+  hardsum <- hard %>% 
+    mutate(
+      HMPU_TARGETS = 'Hard Bottom'
+    ) %>% 
+    st_set_geometry(NULL) %>%
+    group_by(HMPU_TARGETS) %>%
+    summarise(Acres = sum(Acres))
+  
+  # artificial reefs
+  artisum <- arti %>% 
+    mutate(
+      HMPU_TARGETS = 'Artificial Reefs'
+    ) %>% 
+    st_set_geometry(NULL) %>%
+    group_by(HMPU_TARGETS) %>%
+    summarise(Acres = sum(Acres))
+  
+  # tidal tributaries
+  tidtsum <- tidt %>% 
+    mutate(
+      HMPU_TARGETS = 'Tidal Tributaries'
+    ) %>% 
+    st_set_geometry(NULL) %>%
+    group_by(HMPU_TARGETS) %>%
+    summarise(Miles = sum(Miles))
+  
+  # living shorelines
+  livssum <- livs %>% 
+    mutate(
+      HMPU_TARGETS = 'Living Shorelines'
+    ) %>% 
+    st_set_geometry(NULL) %>%
+    group_by(HMPU_TARGETS) %>%
+    summarise(Miles = sum(Miles))
+  
+  # current summary
+  cursum <- bind_rows(lulcsum, intrsum, subtsum, hardsum, artisum, tidtsum, livssum) %>% 
+    mutate(
+      unis = case_when(
+        is.na(Acres) ~ 'mi', 
+        is.na(Miles) ~ 'ac'
+      ), 
+      `Current Extent` = case_when(
+        is.na(Acres) ~ Miles, 
+        is.na(Miles) ~ Acres
+      )
+    ) %>%
+    inner_join(strata, by = 'HMPU_TARGETS') %>% 
+    select(Category, HMPU_TARGETS, unis, `Current Extent`) %>% 
+    arrange(Category, HMPU_TARGETS)
+  
+  # restorable summary
+  
+  restoresum <- restorelyr %>% 
+    mutate(
+      Acres = st_area(.),
+      Acres = set_units(Acres, acres),
+      Acres = as.numeric(Acres),
+      typ = paste('restorable', typ)
+    ) %>% 
+    st_set_geometry(NULL) %>%
+    group_by(typ, HMPU_TARGETS) %>%
+    summarise(Acres = sum(Acres), .groups = 'drop') %>% 
+    arrange(typ, HMPU_TARGETS)
+  
+  # create duplicate rows for non-specific targets
+  duplab1 <- 'Mangrove Forests/Salt Barrens'
+  dups1 <- restoresum %>% 
+    filter(HMPU_TARGETS %in% !!duplab1) %>% 
+    mutate(HMPU_TARGETS = 'Mangrove Forests')
+  duplab2 <- 'Freshwater Wetlands'
+  dups2 <- restoresum %>% 
+    filter(HMPU_TARGETS %in% !!duplab2) %>% 
+    mutate(HMPU_TARGETS = 'Non-Forested Freshwater Wetlands')
+  
+  restoresum <- restoresum %>% 
+    bind_rows(dups1) %>%
+    bind_rows(dups2) %>% 
+    mutate(
+      HMPU_TARGETS = case_when(
+        HMPU_TARGETS %in% !!duplab1 ~ 'Salt Barrens',
+        HMPU_TARGETS %in% !!duplab2 ~ 'Forested Freshwater Wetlands', 
+        T ~ HMPU_TARGETS
+      )
+    ) %>% 
+    spread(typ, Acres) %>% 
+    mutate(
+      `total restorable` = `restorable Existing` + `restorable Proposed`
+    ) %>% 
+    dplyr::select(HMPU_TARGETS, `total restorable`)
+  
+  # add total intertidal, this is unique to this table
+  intrsum <- restoresum %>% 
+    filter(HMPU_TARGETS %in% c('Mangrove Forests', 'Salt Marshes')) %>% # salt barrens is duplicated with mangrove, only pull on
+    pull(`total restorable`) %>% 
+    sum %>% 
+    tibble(
+      HMPU_TARGETS = 'Total Intertidal', 
+      `total restorable` = .
+    )
+  
+  # add intrsum to restoresum
+  restoresum <- bind_rows(restoresum, intrsum)
+  
+  # final table
+  out <- targetcmp_fun(cursum, restoresum, cap)
+    
+  return(out)
+  
+}
+
+# get target table with legacy values from HMPU doc
+#
+# trgs is input targets table
+# cap is chr string for caption
+targetleg_fun <- function(trgs, cap){
+  
+  # cursum
+  cursum <- structure(list(
+    Category = structure(c(1L, 1L, 1L, 1L, 1L, 2L, 2L, 2L, 2L, 2L, 3L, 3L, 3L, 3L), .Label = c("Subtidal", "Intertidal", "Supratidal"), class = "factor"), 
+    HMPU_TARGETS = c("Artificial Reefs",  "Hard Bottom", "Oyster Bars", "Seagrasses", "Tidal Flats", "Living Shorelines", 
+                     "Mangrove Forests", "Salt Barrens", "Salt Marshes", "Tidal Tributaries", 
+                     "Coastal Uplands", "Forested Freshwater Wetlands", "Native Uplands", 
+                     "Non-Forested Freshwater Wetlands"), 
+    unis = c("ac", "ac", "ac", "ac", "ac", "mi", "ac", "ac", "ac", "mi", "ac", "ac", "ac", "ac"), 
+    `Current Extent` = c(166, 423, 171, 40653, 16220, 11.3, 15300, 496, 4557, 387, 3619, 152132, 140600, 67587)), 
+    class = "data.frame", row.names = c(NA, -14L))
+  
+  # restoresum
+  restoresum <- structure(list(
+    HMPU_TARGETS = c("Coastal Uplands", "Forested Freshwater Wetlands", 
+                     "Mangrove Forests", "Native Uplands", "Non-Forested Freshwater Wetlands", 
+                     "Salt Barrens", "Salt Marshes"), 
+    `restorable Existing` = c(311, 27447, 1309, 13265, 27447, 1309, 241), 
+    `restorable Proposed` = c(961, 132389, 1448, 30663, 132389, 1448,  851), 
+    `total restorable` = c(1272, 159836, 2757, 43928, 159836, 2757, 1092)), 
+    row.names = c(NA, -7L), class = c("tbl_df", "tbl", "data.frame"))
+  
+  # final table
+  out <- targetcmp_fun(cursum, restoresum, cap)
+  
+  return(out)
+  
+}
+
+# final table compilation function for target_fun, targetleg_fun
+targetcmp_fun <- function(cursum, restoresum, cap){
+  
+  # all summary
+  allsum <- cursum %>% 
+    left_join(restoresum, by = 'HMPU_TARGETS') %>% 
+    left_join(trgs, ., by = c('Category', 'HMPU_TARGETS')) %>% 
+    gather('var', 'val', -Category, -HMPU_TARGETS, -unis, -rationale) %>% 
+    mutate(
+      val = case_when(
+        !is.na(val) ~ paste(prettyNum(round(val, 0), big.mark = ','), unis),
+        T ~ 'N/A'
+      ), 
+      val = case_when(
+        var %in% c('Target2030', 'Target2050') & HMPU_TARGETS %in% c('Hard Bottom', 'Artificial Reefs', 'Seagrasses', 'Mangrove Forests') ~ paste0('>', val), 
+        T ~ val
+      ),
+      Category = factor(Category, levels = c('Subtidal', 'Intertidal', 'Supratidal')), 
+      HMPU_TARGETS = factor(HMPU_TARGETS, levels = levels(strata$HMPU_TARGETS))
+    ) %>% 
+    spread(var, val) %>% 
+    dplyr::select(-unis) %>% 
+    mutate(
+      `total restorable` = case_when(
+        HMPU_TARGETS == 'Seagrasses' ~ '14,131 ac', 
+        HMPU_TARGETS %in% c('Tidal Flats', 'Oyster Bars', 'Tidal Tributaries') ~ 'I/D',
+        HMPU_TARGETS %in% c('Living Shorelines') ~ 'LSSM', 
+        T ~ `total restorable`
+      )
+    ) %>% 
+    select(
+      Category,
+      HMPU_TARGETS, 
+      `Current Extent`, 
+      `total restorable`, 
+      Target2030,
+      Target2050, 
+      rationale
+    )
+  
+  cap <- paste0('<h2>', cap, '</h2>')
+  
+  tab <- as_grouped_data(allsum, groups = 'Category') %>% 
+    flextable %>% 
+    set_header_labels(
+      Category = 'Stratum',
+      HMPU_TARGETS = 'Habitat Type',
+      `total restorable` = 'Total Restoration Opportunity*', 
+      `Target2030` = '2030 Target', 
+      `Target2050` = '2050 Goal', 
+      rationale = 'Target Narrative and Restoration and Protection Rationale'
+    ) %>% 
+    merge_at(i = 1, part = 'body') %>% 
+    merge_at(i = 7, part = 'body') %>% 
+    merge_at(i = 14, part = 'body') %>% 
+    merge_at(i = 10:11, j = 4, part = 'body') %>%
+    merge_at(i = 16:17, j = 4, part = 'body') %>%
+    add_footer_lines(values = "") %>%
+    footnote(i = 1, j = 1, sep = "", value = as_paragraph("N/A - Not Applicable; I/D - Insufficient Data; LSSM - Living Shoreline Suitability Model; JU - Potential"), part = 'body', inline = T, ref_symbols = "") %>%
+    footnote(i = 1, j = 2, sep = " ", value = as_paragraph(as_i("Juncus")), part = "body", inline = T, ref_symbols = "") %>%
+    footnote(i = 1, j = 3, sep = " ", value = as_paragraph("Marsh Opportunity"), inline = T, ref_symbols = "") %>%
+    add_footer_lines(values = "*Does not account for lands neither currently protected nor currently under consideration for acquisition") %>%
+    fontsize(size = 8, part = 'footer') %>%
+    fontsize(i = c(2:6, 8:13, 15:18), j = 7, size = 8, part = 'body') %>%
+    bold(i = 9) %>% 
+    width(j = 7, width = 4.5) %>% 
+    align(j = c(2:6), align = "center", part = "header") %>%
+    align(i = c(2:6, 8:13, 15:18), j = 3:6, align = "center", part = "body") %>%
+    bg(i = c(1, 7, 14), bg = 'chartreuse3', part = "body") %>% 
+    bg(i = 1, bg = 'grey', part = "header") %>% 
+    border_outer(part = 'body') %>% 
+    border_outer(part = 'header') %>% 
+    border_inner_h(part = 'body') %>% 
+    border_inner_v(part = 'body') %>%  
+    border_inner_h(part = 'header') %>% 
+    border_inner_v(part = 'header') %>% 
+    set_caption(caption = cap, html_escape = F) %>% 
+    font(part = 'all', fontname = 'Roboto')
+  
+  return(tab)
   
 }
