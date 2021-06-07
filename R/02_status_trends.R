@@ -238,7 +238,7 @@ for(i in 1:nrow(inds)){
   # year
   yr <- inds[i, ] %>% pull(yr)
   
-  if(yr == '2018')
+  if(yr == '2020')
     next()
   
   cat(yr, 'importing\n')
