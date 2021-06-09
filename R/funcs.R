@@ -917,25 +917,23 @@ targetleg_fun <- function(trgs, cap){
   
   # cursum
   cursum <- structure(list(
-    Category = structure(c(1L, 1L, 1L, 1L, 1L, 2L, 2L, 2L, 2L, 2L, 3L, 3L, 3L, 3L), .Label = c("Subtidal", "Intertidal", "Supratidal"), class = "factor"), 
+    Category = structure(c(1L, 1L, 1L, 1L, 1L, 2L, 2L, 2L, 2L, 2L, 2L, 3L, 3L, 3L, 3L), .Label = c("Subtidal", "Intertidal", "Supratidal"), class = "factor"), 
     HMPU_TARGETS = c("Artificial Reefs",  "Hard Bottom", "Oyster Bars", "Seagrasses", "Tidal Flats", "Living Shorelines", 
-                     "Mangrove Forests", "Salt Barrens", "Salt Marshes", "Tidal Tributaries", 
+                     "Total Intertidal", "Mangrove Forests", "Salt Barrens", "Salt Marshes", "Tidal Tributaries", 
                      "Coastal Uplands", "Forested Freshwater Wetlands", "Native Uplands", 
                      "Non-Forested Freshwater Wetlands"), 
-    unis = c("ac", "ac", "ac", "ac", "ac", "mi", "ac", "ac", "ac", "mi", "ac", "ac", "ac", "ac"), 
-    `Current Extent` = c(166, 423, 171, 40653, 16220, 11.3, 15300, 496, 4557, 387, 3619, 152132, 140600, 67587)), 
-    class = "data.frame", row.names = c(NA, -14L))
+    unis = c("ac", "ac", "ac", "ac", "ac", "mi", "ac", "ac", "ac", "ac", "mi", "ac", "ac", "ac", "ac"), 
+    `Current Extent` = c(166, 423, 171, 40653, 16220, 11.3, 20353, 15300, 496, 4557, 387, 3619, 152132, 140600, 67587)), 
+    class = "data.frame", row.names = c(NA, -15L))
   
   # restoresum
   restoresum <- structure(list(
     HMPU_TARGETS = c("Coastal Uplands", "Forested Freshwater Wetlands", 
                      "Mangrove Forests", "Native Uplands", "Non-Forested Freshwater Wetlands", 
-                     "Salt Barrens", "Salt Marshes"), 
-    `restorable Existing` = c(311, 27447, 1309, 13265, 27447, 1309, 241), 
-    `restorable Proposed` = c(961, 132389, 1448, 30663, 132389, 1448,  851), 
-    `total restorable` = c(1272, 159836, 2757, 43928, 159836, 2757, 1092)), 
-    row.names = c(NA, -7L), class = c("tbl_df", "tbl", "data.frame"))
-  
+                     "Salt Barrens", "Salt Marshes", "Total Intertidal"), 
+    `total restorable` = c(1272, 159836, 2757, 43928, 159836, 2757, 1092, 3849)), 
+    row.names = c(NA, -8L), class = c("tbl_df", "tbl", "data.frame"))
+
   # final table
   out <- targetcmp_fun(cursum, restoresum, cap)
   
