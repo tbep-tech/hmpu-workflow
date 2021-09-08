@@ -2,7 +2,9 @@
 
 [![DOI](https://zenodo.org/badge/226996253.svg)](https://zenodo.org/badge/latestdoi/226996253)
 
-Workflows for recreating and updating analyses for the [Habitat Master Plan Update](https://drive.google.com/file/d/1Hp0l_qtbxp1JxKJoGatdyuANSzQrpL0I/view?usp=drivesdk).  Note that the acreages reported in this repository are not verified.  Acreages reported in the HMPU document are the accepted values.  This repository is an attempt to reproduce values in the HMPU using a completely transparent and reproducible workflow. 
+Workflows for recreating and updating analyses for the [Habitat Master Plan Update](https://drive.google.com/file/d/1Hp0l_qtbxp1JxKJoGatdyuANSzQrpL0I/view?usp=drivesdk).  Note that the acreages reported in this repository are not verified.  Acreages reported in the HMPU document are the accepted values.  This repository reproduces values in the HMPU using a completely transparent and reproducible workflow. 
+
+For an assessment of land use changes using Shiny, see the separate repository here: https://github.com/tbep-tech/landuse-change
 
 * Summary of the Opportunity Assessment Analysis (Table 5-3 HMPU doc): 
      * Tampa Bay watershed: [table](https://tbep-tech.github.io/hmpu-workflow/current_table.html), [map](https://tbep-tech.github.io/hmpu-workflow/oppmap.png)
