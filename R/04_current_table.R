@@ -10,8 +10,8 @@ source(here('R', 'funcs.R'))
 
 fluccs <- read.csv(here('data', 'FLUCCShabsclass.csv'), stringsAsFactors = F)
 
-lulcfl <- 'lulc2017'
-subtfl <- 'sgdat2018'
+lulcfl <- 'lulc2020'
+subtfl <- 'sgdat2020'
 
 # from 01_inputs
 load(here('data', paste0(lulcfl, '.RData')))
@@ -41,8 +41,8 @@ data(pasco)
 # complete watershed ------------------------------------------------------
 
 cap <- 'Summary of the Opportunity Assessment Analysis'
-# tab <- curex_fun(lulc, subt, hard, arti, tidt, livs, coastal, fluccs, strata, nativelyr, restorelyr, cap)
-tab <- curexleg_fun(cap)
+tab <- curex_fun(lulc, subt, hard, arti, tidt, livs, coastal, fluccs, strata, nativelyr, restorelyr, cap)
+# tab <- curexleg_fun(cap)
 
 save_as_html(tab, path = 'docs/current_table.html', title = 'Current Table')
 

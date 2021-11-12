@@ -10,8 +10,8 @@ source(here('R', 'funcs.R'))
 
 fluccs <- read.csv(here('data', 'FLUCCShabsclass.csv'), stringsAsFactors = F)
 
-lulcfl <- 'lulc2017'
-subtfl <- 'sgdat2018'
+lulcfl <- 'lulc2020'
+subtfl <- 'sgdat2020'
 
 # from 01_inputs
 load(here('data', paste0(lulcfl, '.RData')))
@@ -33,8 +33,8 @@ data(restorelyr)
 
 cap <- 'Summary of the Recommended 2030 Targets and 2050 Goals'
 
-# tab <- target_fun(lulc, subt, hard, arti, tidt, livs, coastal, fluccs, strata, restorelyr, trgs, cap)
-tab <- targetleg_fun(trgs, cap)
+tab <- target_fun(lulc, subt, hard, arti, tidt, livs, coastal, fluccs, strata, restorelyr, trgs, cap)
+# tab <- targetleg_fun(trgs, cap)
 
 save_as_html(tab, path = 'docs/target_table.html', title = 'Target Table')
 

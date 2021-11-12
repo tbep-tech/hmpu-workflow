@@ -16,7 +16,7 @@ data(soils)
 data(salin)
 
 # current year
-lulcfl <- 'lulc2017'
+lulcfl <- 'lulc2020'
 load(here('data', paste0(lulcfl, '.RData')))
 
 # existing, proposed conservation and restoration opps --------------------
