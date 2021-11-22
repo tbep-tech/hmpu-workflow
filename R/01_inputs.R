@@ -122,11 +122,11 @@ bbox <- sf::st_bbox(tbshed)
 ## from FNAI website
 
 # URL links for these layers are from here: https://www.fnai.org/gisdata.cfm
-# layers are so available through ESRI servers
+# layers are also available through ESRI servers: https://geodata.fnai.org/
 
 # FLMA, florida conservation lands
 # remove Macdill (custom polygon from original layer)
-flma <- esri2sf('https://services.arcgis.com/9Jk4Zl9KofTtvg3x/arcgis/rest/services/FL_Conservation_Lands/FeatureServer/0', 
+flma <- esri2sf('https://services.arcgis.com/9Jk4Zl9KofTtvg3x/arcgis/rest/services/FL_Conservation_Lands_web/FeatureServer/0',
         bbox = bbox) %>% 
   dplyr::filter(!MANAME %in% 'MacDill Air Force Base') %>% 
   st_transform(st_crs(tbshed)) %>% 
