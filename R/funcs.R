@@ -47,7 +47,7 @@ lulc_est <- function(lulcin, coastal, fluccs, sumout = T){
 #
 # subtin in seagrass rdata file for a given year
 # flucss is lookup table
-subt_est <- function(subtin, fluccs){
+subt_est <- function(subtin, fluccs, sumout = TRUE){
   
   # subtidal area, all categories
   out <- subtin %>%
@@ -55,6 +55,12 @@ subt_est <- function(subtin, fluccs){
       FLUCCSCODE = as.integer(FLUCCSCODE)
     ) %>% 
     left_join(fluccs, by = 'FLUCCSCODE') %>% 
+    select(HMPU_TARGETS)
+  
+  if(!sumout)
+    return(out)
+    
+  out <- out %>% 
     mutate(
       Acres = st_area(.),
       Acres = set_units(Acres, acres),
