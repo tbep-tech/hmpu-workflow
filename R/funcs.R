@@ -1029,3 +1029,76 @@ targetcmp_fun <- function(cursum, restoresum, cap){
   return(tab)
   
 }
+
+# alluvial plot function, for HMPU targets
+# https://www.data-to-viz.com/graph/sankey.html
+alluvout2 <- function(datin, fluccs, mrg){
+  
+  clp <- fluccs %>%
+    pull(HMPU_TARGETS) %>% 
+    unique %>% 
+    c('Coastal Uplands', .) %>% 
+    sort
+  
+  sumdat <- datin %>% 
+    rename(Acres = value) %>% 
+    mutate(
+      target = gsub(',\\s[0-9]+$', '', target),
+      source = gsub(',\\s[0-9]+$', '', source)
+    ) %>% 
+    group_by(target, source) %>% 
+    summarise(Acres = sum(Acres), .groups = 'drop') %>% 
+    na.omit() %>% 
+    group_by(target, source) %>% 
+    summarise(Acres = sum(Acres), .groups = 'drop') %>% 
+    select(source = source, target = target, value = Acres) %>% 
+    data.frame(stringsAsFactors = F)
+  sumdat$source <- paste(sumdat$source, " ", sep="")
+  
+  # From these flows we need to create a node data frame: it lists every entities involved in the flow
+  nodes <- data.frame(name=c(as.character(sumdat$source), as.character(sumdat$target)) %>% unique())
+  
+  # With networkD3, connection must be provided using id, not using real name like in the links dataframe.. So we need to reformat it.
+  sumdat$IDsource=match(sumdat$source, nodes$name)-1 
+  sumdat$IDtarget=match(sumdat$target, nodes$name)-1
+  
+  # custom color scale
+  cols <- c('#004F7E', '#00806E', '#427355', '#958984', '#5C4A42', 'grey') %>% 
+    colorRampPalette
+  ncol <- sumdat[, c('source', 'target')] %>% 
+    unlist() %>% 
+    unique %>% 
+    gsub('\\s$', '', .) %>% 
+    unique %>% 
+    length()
+  colin <- cols(ncol) %>% 
+    paste(collapse = '", "') %>% 
+    paste('d3.scaleOrdinal(["', ., '"])')
+  
+  # margins for long text labels
+  mrgs <- list(0, mrg, 0, 0)
+  names(mrgs) <- c('top', 'right', 'bottom', 'left')
+  
+  out <- sankeyNetwork(Links = sumdat, Nodes = nodes,
+                       Source = "IDsource", Target = "IDtarget", colourScale = colin,
+                       Value = "value", NodeID = "name", height = 1000, width = 800,
+                       sinksRight=FALSE, units = 'acres', nodeWidth=50, fontSize=13, nodePadding=10, 
+                       margin = mrgs)
+  
+  out <- htmlwidgets::onRender(
+    out,
+    '
+    function(out,x){
+    // select all our node text
+    d3.select(out)
+    .selectAll(".node text")
+    .filter(function(d) { return d.name.endsWith(" "); })
+    .attr("x", x.options.nodeWidth - 55)
+    .attr("text-anchor", "end");
+    }
+    '
+  )
+  
+  return(out)
+  
+}
