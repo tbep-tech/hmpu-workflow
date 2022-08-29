@@ -1,6 +1,6 @@
 # README 
 
-[![DOI](https://zenodo.org/badge/226996253.svg)](https://zenodo.org/badge/latestdoi/226996253)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7032909.svg)](https://doi.org/10.5281/zenodo.7032909)
 
 Workflows for recreating and updating analyses for the [Habitat Master Plan Update](https://drive.google.com/file/d/1Hp0l_qtbxp1JxKJoGatdyuANSzQrpL0I/view?usp=drivesdk).  Note that the acreages reported in this repository are not verified.  Acreages reported in the HMPU document are the accepted values.  This repository reproduces values in the HMPU using a completely transparent and reproducible workflow. 
 
