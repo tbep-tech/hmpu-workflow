@@ -4,6 +4,10 @@
 
 Workflows for recreating and updating analyses for the [Habitat Master Plan Update](https://drive.google.com/file/d/1Hp0l_qtbxp1JxKJoGatdyuANSzQrpL0I/view?usp=drivesdk).  Note that the acreages reported in this repository are not verified.  Acreages reported in the HMPU document are the accepted values.  This repository reproduces values in the HMPU using a completely transparent and reproducible workflow. 
 
+A peer-reviewed [paper](https://www.frontiersin.org/articles/10.3389/fevo.2023.1070266/full) is also available that described the methods: 
+
+*Beck MW, Robison DE, Raulerson GE, Burke MC, Saarinen J, Sciarrino C, Sherwood ET and Tomasko DA (2023) Addressing climate change and development pressures in an urban estuary through habitat restoration planning. Front. Ecol. Evol. 11:1070266. doi: 10.3389/fevo.2023.1070266*
+
 For an assessment of land use changes using Shiny, see the separate repository here: https://github.com/tbep-tech/landuse-change
 
 * Summary of the Opportunity Assessment Analysis (Table 5-3 HMPU doc): 
