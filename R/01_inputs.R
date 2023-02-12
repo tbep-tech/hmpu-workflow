@@ -346,6 +346,23 @@ res <- foreach(i = 1:nrow(urls), .packages = c('tidyverse', 'sf', 'here')) %dopa
   
 }
 
+# 2022 provisional 
+st_layers('T:/05_GIS/SWFWMD/Seagrass/2022_Seagrass/provisional/DraftMaps2022_1130.gdb/DraftMaps2022_1130.gdb')
+
+dat_raw <- st_read('T:/05_GIS/SWFWMD/Seagrass/2022_Seagrass/provisional/DraftMaps2022_1130.gdb/DraftMaps2022_1130.gdb', 
+                     layer = 'Seagrass_in_2022_Suncoast') 
+
+dat_crp <- dat_raw %>% 
+  st_transform(crs = prj) %>%
+  dplyr::select(FLUCCSCODE = FLUCCS_Code) %>% 
+  filter(FLUCCSCODE %in% fluccs$FLUCCSCODE) %>%
+  st_cast('MULTIPOLYGON') %>% 
+  st_buffer(dist = 0) %>% 
+  st_intersection(tbshed)
+
+sgdat2022 <- dat_crp
+save(sgdat2022, file = here('data/sgdat2022.RData'), compress = 'xz')
+
 # habitats not in lulc ------------------------------------------------------
 
 # st_layers(gdb)
