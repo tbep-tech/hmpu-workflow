@@ -306,7 +306,7 @@ toint <- segswfwmd %>%
 
 # all zipped files on amazon s3
 # downloaded from here https://data-swfwmd.opendata.arcgis.com/
-fls <- c('88', '90', '92', '94', '96', '99', '01', '04', '06', '08', '10', '12', '14', '16', '18', '20') %>% 
+fls <- c('88', '90', '92', '94', '96', '99', '01', '04', '06', '08', '10', '12', '14', '16', '18', '20', '22') %>% 
   paste0('https://swfwmd-seagrass.s3.amazonaws.com/sg', ., '.zip')
 
 # setup parallel backend
