@@ -81,6 +81,21 @@ tbshed <- st_read('https://opendata.arcgis.com/datasets/537fc3e84ccf4f54b441fc4b
 
 save(tbshed, file = here('data', 'tbshed.RData'), compress = 'xz')
 
+# swfwmd seagrass boundaries ------------------------------------------------------------------
+
+levs <- c('oldTampaBay', 'hillsboroughBay', 'middleTampaBay', 'lowerTampaBay', 'bocaCiegaBay', 'terraCieaBay', 'manateeRiver')
+labs <- c('Old Tampa Bay', 'Hillsborough Bay', 'Middle Tampa Bay', 'Lower Tampa Bay', 'Boca Ciega Bay', 'Terra Ceia Bay', 'Manatee River')
+
+segswfwmd <- st_read(here('data/swfwmd_tbbnds/suncoastSeagrassSegments.shp')) %>% 
+  filter(wtrbdyN %in% levs) %>% 
+  mutate(
+    wtrbdyN = factor(wtrbdyN, levels = levs, labels = labs)
+  ) %>% 
+  select(segment = wtrbdyN) %>% 
+  st_transform(crs = prj)
+
+save(segswfwmd, file = here('data/segswfwmd.RData'))
+
 # coastal stratum ---------------------------------------------------------
 
 # coastal <- esri2sf('https://gis.waterinstitute.usf.edu/arcgis/rest/services/Maps/TBEP_OpenData/MapServer/14') %>% 
@@ -284,29 +299,10 @@ foreach(i = 1:nrow(urls), .packages = c('tidyverse', 'sf', 'here', 'tbeptools'))
 
 # import each subtidal layer, crop by tbshed, save ------------------------
 
-data(tbshed)
+data(segswfwmd)
 
-# https://data-swfwmd.opendata.arcgis.com/search?groupIds=d9a4213eb9ea4713bb710e03bdcc6648
-urls <- list(
-  `2022` = 'https://www45.swfwmd.state.fl.us/arcgis12/rest/services/OpenData/Environmental_Seagrass2018_sql/MapServer/2/query?outFields=*&where=1%3D1&f=geojson', 
-  `2020` = 'https://opendata.arcgis.com/datasets/2b5e369edd244969bc05baa8e713cffc_1.geojson',
-  `2018` = 'https://opendata.arcgis.com/datasets/8d0d473468924423bf0f1682aaca790f_0.geojson',
-  `2016` = 'https://opendata.arcgis.com/datasets/f0ecff0cf0de491685f8fb074adb278b_20.geojson',
-  `2014` = 'https://opendata.arcgis.com/datasets/f530f972ded749adb1c6b20c2651e7f9_18.geojson',
-  `2012` = 'https://opendata.arcgis.com/datasets/619bd267e4c54e70968abd86eb92318e_17.geojson',
-  `2010` = 'https://opendata.arcgis.com/datasets/82153be25a3340a0abdb3ec713425f29_16.geojson',
-  `2008` = 'https://opendata.arcgis.com/datasets/4ddc60a8c9f845a2912c4e7cb14a3b7b_15.geojson',
-  `2006` = 'https://opendata.arcgis.com/datasets/5a72bbd64bc9486696fa0bc47ca4e30c_13.geojson',
-  `2004` = 'https://opendata.arcgis.com/datasets/bb6b117c8eab40209d8125c3c95f6150_12.geojson',
-  `2001` = 'https://opendata.arcgis.com/datasets/e2ce063712f34654a4f371240f541479_11.geojson', 
-  `1999` = 'https://opendata.arcgis.com/datasets/e27b6e5148514f29a1f1483813297fd7_10.geojson', 
-  `1996` = 'https://opendata.arcgis.com/datasets/38f62dd9b6e5482888b2c0bb51716b6e_9.geojson',
-  `1994` = 'https://opendata.arcgis.com/datasets/a2fb9d100cfd441cbdd24b16a3b0ce53_8.geojson',
-  `1992` = 'https://opendata.arcgis.com/datasets/ea9fab53f2f74236b0cba8980dffe363_7.geojson',
-  `1990` = 'https://opendata.arcgis.com/datasets/bcc955216c62468c9a6dafffc0545a40_6.geojson',
-  `1988` = 'https://opendata.arcgis.com/datasets/092df867ece945b787557c9a7cf811d8_5.geojson'
-  ) %>% 
-  enframe 
+toint <- segswfwmd %>% 
+  st_union()
 
 # all zipped files on amazon s3
 # downloaded from here https://data-swfwmd.opendata.arcgis.com/
@@ -314,28 +310,30 @@ fls <- c('88', '90', '92', '94', '96', '99', '01', '04', '06', '08', '10', '12',
   paste0('https://swfwmd-seagrass.s3.amazonaws.com/sg', ., '.zip')
 
 # setup parallel backend
-ncores <- detectCores() - 1 
-cl <- makeCluster(ncores)
-registerDoParallel(cl)
 strt <- Sys.time()
 
-res <- foreach(i = 1:nrow(urls), .packages = c('tidyverse', 'sf', 'here')) %dopar% {
+for(i in 1:length(fls)){
   
-  sink('log.txt')
-  cat(i, 'of', nrow(urls), '\n')
+  cat(i, 'of', length(fls), '\n')
   print(Sys.time()-strt)
-  sink()
   
-  # import file
-  dat_raw <- urls[i, ] %>% 
-    pull(value) %>% 
-    .[[1]] %>% 
-    st_read
+  # download from s3, unzip
+  tmpdir <- here('data/tmp')
+  tmpzip <- here('data/tmp/tmp.zip')
+  dir.create(tmpdir)
+  download.file(fls[i], destfile = tmpzip)
+  unzip(tmpzip, exdir = tmpdir)
   
-  if('FLUCCS_CODE' %in% names(dat_raw))
-    dat_raw <- dat_raw %>% 
-      rename(FLUCCSCODE = FLUCCS_CODE)
+  # import shapefile
+  toimp <- list.files(tmpdir, pattern = '\\.shp$', full.names = T)
+  dat_raw <- st_read(toimp, quiet = T)
   
+  # delete files
+  unlink(tmpdir, recursive = T)
+  
+  if(any(c('FLUCCS_CODE', 'FLUCCS_COD') %in% names(dat_raw)))
+    names(dat_raw) <- gsub('^FLUCCS\\_COD$|^FLUCCS\\_CODE$', 'FLUCCSCODE', names(dat_raw))
+
   # crop by watershed and select fluccs
   # 9113 is patchy, 9116 is continuous
   dat_crp <- dat_raw %>%
@@ -343,31 +341,21 @@ res <- foreach(i = 1:nrow(urls), .packages = c('tidyverse', 'sf', 'here')) %dopa
     dplyr::select(FLUCCSCODE) %>% 
     filter(FLUCCSCODE %in% fluccs$FLUCCSCODE) %>%
     st_buffer(dist = 0) %>% 
-    st_intersection(tbshed)
+    st_intersection(toint)
   
   # name assignment and save
-  flnm <- paste0('sgdat', urls$name[i])
+  flnm <- gsub('^sg|\\.zip$', '', basename(fls[i])) %>% 
+    as.numeric
+  if(flnm > 80){
+    flnm <- paste0('19', flnm)
+  } else {
+    flnm <- paste0('20', sprintf("%02d", flnm))
+  }
+  flnm <- paste0('sgdat', flnm)
   assign(flnm, dat_crp)
   save(list = flnm, file = here('data', paste0('/', flnm, '.RData')), compress = 'xz')
   
 }
-
-# 2022 provisional 
-st_layers('T:/05_GIS/SWFWMD/Seagrass/2022_Seagrass/provisional/DraftMaps2022_1130.gdb/DraftMaps2022_1130.gdb')
-
-dat_raw <- st_read('T:/05_GIS/SWFWMD/Seagrass/2022_Seagrass/provisional/DraftMaps2022_1130.gdb/DraftMaps2022_1130.gdb', 
-                     layer = 'Seagrass_in_2022_Suncoast') 
-
-dat_crp <- dat_raw %>% 
-  st_transform(crs = prj) %>%
-  dplyr::select(FLUCCSCODE = FLUCCS_Code) %>% 
-  filter(FLUCCSCODE %in% fluccs$FLUCCSCODE) %>%
-  st_cast('MULTIPOLYGON') %>% 
-  st_buffer(dist = 0) %>% 
-  st_intersection(tbshed)
-
-sgdat2022 <- dat_crp
-save(sgdat2022, file = here('data/sgdat2022.RData'), compress = 'xz')
 
 # habitats not in lulc ------------------------------------------------------
 
