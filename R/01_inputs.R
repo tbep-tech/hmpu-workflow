@@ -288,6 +288,7 @@ data(tbshed)
 
 # https://data-swfwmd.opendata.arcgis.com/search?groupIds=d9a4213eb9ea4713bb710e03bdcc6648
 urls <- list(
+  `2022` = 'https://www45.swfwmd.state.fl.us/arcgis12/rest/services/OpenData/Environmental_Seagrass2018_sql/MapServer/2/query?outFields=*&where=1%3D1&f=geojson', 
   `2020` = 'https://opendata.arcgis.com/datasets/2b5e369edd244969bc05baa8e713cffc_1.geojson',
   `2018` = 'https://opendata.arcgis.com/datasets/8d0d473468924423bf0f1682aaca790f_0.geojson',
   `2016` = 'https://opendata.arcgis.com/datasets/f0ecff0cf0de491685f8fb074adb278b_20.geojson',
