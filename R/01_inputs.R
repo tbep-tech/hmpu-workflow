@@ -4,6 +4,7 @@ library(here)
 library(doParallel)
 library(foreach)
 library(esri2sf) # yonghah/esri2sf on github
+library(tbeptools)
 
 source(here('R', 'funcs.R'))
 
@@ -80,21 +81,6 @@ tbshed <- st_read('https://opendata.arcgis.com/datasets/537fc3e84ccf4f54b441fc4b
   st_buffer(dist = 0)
 
 save(tbshed, file = here('data', 'tbshed.RData'), compress = 'xz')
-
-# swfwmd seagrass boundaries ------------------------------------------------------------------
-
-levs <- c('oldTampaBay', 'hillsboroughBay', 'middleTampaBay', 'lowerTampaBay', 'bocaCiegaBay', 'terraCieaBay', 'manateeRiver')
-labs <- c('Old Tampa Bay', 'Hillsborough Bay', 'Middle Tampa Bay', 'Lower Tampa Bay', 'Boca Ciega Bay', 'Terra Ceia Bay', 'Manatee River')
-
-segswfwmd <- st_read(here('data/swfwmd_tbbnds/suncoastSeagrassSegments.shp')) %>% 
-  filter(wtrbdyN %in% levs) %>% 
-  mutate(
-    wtrbdyN = factor(wtrbdyN, levels = levs, labels = labs)
-  ) %>% 
-  select(segment = wtrbdyN) %>% 
-  st_transform(crs = prj)
-
-save(segswfwmd, file = here('data/segswfwmd.RData'))
 
 # coastal stratum ---------------------------------------------------------
 
@@ -299,9 +285,10 @@ foreach(i = 1:nrow(urls), .packages = c('tidyverse', 'sf', 'here', 'tbeptools'))
 
 # import each subtidal layer, crop by tbshed, save ------------------------
 
-data(segswfwmd)
+data(swfwmdtbseg)
 
-toint <- segswfwmd %>% 
+toint <- swfwmdtbseg %>% 
+  st_transform(crs = prj) %>% 
   st_union()
 
 # all zipped files on amazon s3
