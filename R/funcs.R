@@ -437,7 +437,7 @@ curexcmp_fun <- function(cursum, nativesum, restoresum, cap){
   
   # caption
   cap <- paste0('<h2>', cap, '</h2>')
-  
+  browser()
   tab <- as_grouped_data(allsum, groups = 'Category') %>% 
     flextable %>% 
     set_header_labels(
@@ -460,9 +460,7 @@ curexcmp_fun <- function(cursum, nativesum, restoresum, cap){
     merge_at(i = 15:16, j = 8, part = 'body') %>%
     add_header_row(colwidths = c(2, 3, 3), values = c('', 'Native Habitats', 'Restorable Habitats')) %>%
     add_footer_lines(values = "") %>% 
-    footnote(i = 1, j = 1, sep = "", value = as_paragraph("N/A - Not Applicable; I/D - Insufficient Data; LSSM - Living Shoreline Suitability Model; JU - Potential"), part = 'body', inline = T, ref_symbols = "") %>% 
-    footnote(i = 1, j = 2, sep = " ", value = as_paragraph(as_i("Juncus")), part = "body", inline = T, ref_symbols = "") %>% 
-    footnote(i = 1, j = 3, sep = " ", value = as_paragraph("Marsh Opportunity"), inline = T, ref_symbols = "") %>% 
+    add_footer_lines(values = as_paragraph("N/A - Not Applicable; I/D - Insufficient Data; LSSM - Living Shoreline Suitability Model; JU - Potential ", as_i("Juncus"), " Marsh Opportunity")) %>% 
     add_footer_lines(values = "*All lands identified for acquisition by partners, does not represent a 2030 target or 2050 goal") %>%
     add_footer_lines(values = "**Does not account for lands neither currently protected nor currently under consideration for acquisition") %>% 
     fontsize(size = 8, part = 'footer') %>% 
