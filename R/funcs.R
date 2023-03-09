@@ -436,8 +436,8 @@ curexcmp_fun <- function(cursum, nativesum, restoresum, cap){
   # make table
   
   # caption
-  cap <- paste0('<h2>', cap, '</h2>')
-  browser()
+  cap <- as_paragraph(as_chunk(cap, props = fp_text_default(font.size = 14, bold = T)))
+
   tab <- as_grouped_data(allsum, groups = 'Category') %>% 
     flextable %>% 
     set_header_labels(
@@ -475,7 +475,7 @@ curexcmp_fun <- function(cursum, nativesum, restoresum, cap){
     border_inner_v(part = 'body') %>%  
     border_inner_h(part = 'header') %>% 
     border_inner_v(part = 'header') %>% 
-    set_caption(caption = cap, html_escape = F) %>% 
+    set_caption(caption = cap) %>% 
     font(part = 'all', fontname = 'Roboto')
   
   return(tab)
@@ -952,7 +952,12 @@ targetcmp_fun <- function(cursum, restoresum, cap){
   allsum <- cursum %>% 
     left_join(restoresum, by = 'HMPU_TARGETS') %>% 
     left_join(trgs, ., by = c('Category', 'HMPU_TARGETS')) %>% 
-    gather('var', 'val', -Category, -HMPU_TARGETS, -unis, -rationale) %>% 
+    select(-rationale) %>%
+    mutate(
+      Target2030togo = Target2030 - `Current Extent`,
+      Target2050togo = Target2050 - `Current Extent`
+    ) %>% 
+    gather('var', 'val', -Category, -HMPU_TARGETS, -unis) %>% 
     mutate(
       val = case_when(
         !is.na(val) ~ paste(prettyNum(round(val, 0), big.mark = ','), unis),
@@ -981,12 +986,13 @@ targetcmp_fun <- function(cursum, restoresum, cap){
       `Current Extent`, 
       `total restorable`, 
       Target2030,
+      Target2030togo, 
       Target2050, 
-      rationale
+      Target2050togo
     )
-  
-  cap <- paste0('<h2>', cap, '</h2>')
-  
+
+  cap <- as_paragraph(as_chunk(cap, props = fp_text_default(font.size = 14, bold = T)))
+
   tab <- as_grouped_data(allsum, groups = 'Category') %>% 
     flextable %>% 
     set_header_labels(
@@ -994,8 +1000,9 @@ targetcmp_fun <- function(cursum, restoresum, cap){
       HMPU_TARGETS = 'Habitat Type',
       `total restorable` = 'Total Restoration Opportunity*', 
       `Target2030` = '2030 Target', 
+      `Target2030togo` = '2030 Target to go',
       `Target2050` = '2050 Goal', 
-      rationale = 'Target Narrative and Restoration and Protection Rationale'
+      `Target2050togo` = '2050 Goal to go'
     ) %>% 
     merge_at(i = 1, part = 'body') %>% 
     merge_at(i = 7, part = 'body') %>% 
@@ -1003,16 +1010,12 @@ targetcmp_fun <- function(cursum, restoresum, cap){
     merge_at(i = 10:11, j = 4, part = 'body') %>%
     merge_at(i = 16:17, j = 4, part = 'body') %>%
     add_footer_lines(values = "") %>%
-    footnote(i = 1, j = 1, sep = "", value = as_paragraph("N/A - Not Applicable; I/D - Insufficient Data; LSSM - Living Shoreline Suitability Model; JU - Potential"), part = 'body', inline = T, ref_symbols = "") %>%
-    footnote(i = 1, j = 2, sep = " ", value = as_paragraph(as_i("Juncus")), part = "body", inline = T, ref_symbols = "") %>%
-    footnote(i = 1, j = 3, sep = " ", value = as_paragraph("Marsh Opportunity"), inline = T, ref_symbols = "") %>%
+    add_footer_lines(value = as_paragraph("N/A - Not Applicable; I/D - Insufficient Data; LSSM - Living Shoreline Suitability Model; JU - Potential ", as_i("Juncus"), " Marsh Opportunity")) %>%
     add_footer_lines(values = "*Does not account for lands neither currently protected nor currently under consideration for acquisition") %>%
     fontsize(size = 8, part = 'footer') %>%
-    fontsize(i = c(2:6, 8:13, 15:18), j = 7, size = 8, part = 'body') %>%
     bold(i = 9) %>% 
-    width(j = 7, width = 4.5) %>% 
     align(j = c(2:6), align = "center", part = "header") %>%
-    align(i = c(2:6, 8:13, 15:18), j = 3:6, align = "center", part = "body") %>%
+    align(i = c(2:6, 8:13, 15:18), j = 3:8, align = "center", part = "body") %>%
     bg(i = c(1, 7, 14), bg = 'chartreuse3', part = "body") %>% 
     bg(i = 1, bg = 'grey', part = "header") %>% 
     border_outer(part = 'body') %>% 
@@ -1021,7 +1024,7 @@ targetcmp_fun <- function(cursum, restoresum, cap){
     border_inner_v(part = 'body') %>%  
     border_inner_h(part = 'header') %>% 
     border_inner_v(part = 'header') %>% 
-    set_caption(caption = cap, html_escape = F) %>% 
+    set_caption(caption = cap) %>% 
     font(part = 'all', fontname = 'Roboto')
   
   return(tab)
