@@ -1014,7 +1014,7 @@ targetcmp_fun <- function(cursum, restoresum, cap){
     add_footer_lines(values = "*Does not account for lands neither currently protected nor currently under consideration for acquisition") %>%
     fontsize(size = 8, part = 'footer') %>%
     bold(i = 9) %>% 
-    align(j = c(2:6), align = "center", part = "header") %>%
+    align(j = c(2:8), align = "center", part = "header") %>%
     align(i = c(2:6, 8:13, 15:18), j = 3:8, align = "center", part = "body") %>%
     bg(i = c(1, 7, 14), bg = 'chartreuse3', part = "body") %>% 
     bg(i = 1, bg = 'grey', part = "header") %>% 
