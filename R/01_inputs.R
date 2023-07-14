@@ -344,6 +344,18 @@ for(i in 1:length(fls)){
   
 }
 
+# # oyster beds in florida ----------------------------------------------------------------------
+# 
+# load(file = here('data/tbshed.RData'))
+# 
+# # most up to date layer for FL, updated 1-2 times a year by FWC 
+# # for merge with SWFWMD subtidal oyster estimates
+# fwcoysterraw <- st_read('https://atoll.floridamarine.org/arcgis/rest/services/FWC_GIS/OpenData_MarineEco/MapServer/5/query?outFields=*&where=1%3D1&f=geojson')
+# 
+# fwcoyster <- fwcoysterraw %>% 
+#   st_transform(crs = st_crs(tbshed)) %>% 
+#   st_intersection(tbshed)
+  
 # habitats not in lulc ------------------------------------------------------
 
 # st_layers(gdb)
