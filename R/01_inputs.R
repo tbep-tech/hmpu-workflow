@@ -60,8 +60,8 @@ strata <- data.frame(
   Category  = c("Subtidal", "Subtidal", "Subtidal", "Subtidal", "Subtidal",
                 "Intertidal", "Intertidal", "Intertidal", "Intertidal", "Intertidal", "Intertidal", 
                 "Supratidal", "Supratidal", "Supratidal", "Supratidal"),
-  HMPU_TARGETS = c("Hard Bottom", "Artificial Reefs", "Tidal Flats", "Seagrasses", "Oyster Bars",
-                   "Living Shorelines", "Total Intertidal", "Mangrove Forests", "Salt Barrens", "Salt Marshes", "Tidal Tributaries", 
+  HMPU_TARGETS = c("Hard Bottom", "Artificial Reefs", "Tidal Flats", "Seagrasses", "Oyster Bars", 
+                   "Total Intertidal", "Mangrove Forests", "Salt Barrens", "Salt Marshes", "Living Shorelines", "Tidal Tributaries", 
                    "Coastal Uplands", "Non-Forested Freshwater Wetlands", "Forested Freshwater Wetlands", "Native Uplands"), 
   stringsAsFactors = F
   ) %>% 

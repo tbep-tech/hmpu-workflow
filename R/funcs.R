@@ -329,7 +329,7 @@ curex_fun <- function(lulc, subt, hard, arti, tidt, livs, coastal, fluccs, strat
   
   # final table
   
-  tab <- curexcmp_fun(cursum, nativesum, restoresum, cap)
+  tab <- curexcmp_fun(cursum, nativesum, restoresum, strata, cap)
   
   return(tab)
   
@@ -338,17 +338,17 @@ curex_fun <- function(lulc, subt, hard, arti, tidt, livs, coastal, fluccs, strat
 # get current extent table with legacy values from HMPU
 #
 # cap is chr string for caption
-curexleg_fun <- function(cap){
+curexleg_fun <- function(strata, cap){
   
   # cursum
   cursum <- structure(list(
     Category = structure(c(1L, 1L, 1L, 1L, 1L, 2L, 2L, 2L, 2L, 2L, 3L, 3L, 3L, 3L), .Label = c("Subtidal", "Intertidal", "Supratidal"), class = "factor"), 
-    HMPU_TARGETS = c("Artificial Reefs",  "Hard Bottom", "Oyster Bars", "Seagrasses", "Tidal Flats", "Living Shorelines", 
-                     "Mangrove Forests", "Salt Barrens", "Salt Marshes", "Tidal Tributaries", 
+    HMPU_TARGETS = c("Artificial Reefs",  "Hard Bottom", "Oyster Bars", "Seagrasses", "Tidal Flats", 
+                     "Mangrove Forests", "Salt Barrens", "Salt Marshes", "Living Shorelines", "Tidal Tributaries", 
                      "Coastal Uplands", "Forested Freshwater Wetlands", "Native Uplands", 
                      "Non-Forested Freshwater Wetlands"), 
-    unis = c("ac", "ac", "ac", "ac", "ac", "mi", "ac", "ac", "ac", "mi", "ac", "ac", "ac", "ac"), 
-    `Current Extent` = c(166, 423, 171, 40653, 16220, 11.3, 15300, 496, 4557, 387, 3619, 152132, 140600, 67587)), 
+    unis = c("ac", "ac", "ac", "ac", "ac", "ac", "ac", "ac", "mi", "mi", "ac", "ac", "ac", "ac"), 
+    `Current Extent` = c(166, 423, 171, 40653, 16220, 15300, 496, 4557, 11.3, 387, 3619, 152132, 140600, 67587)), 
     class = "data.frame", row.names = c(NA, -14L))
   
   # nativesum
@@ -373,14 +373,14 @@ curexleg_fun <- function(cap){
 
   # final table
   
-  tab <- curexcmp_fun(cursum, nativesum, restoresum, cap)
+  tab <- curexcmp_fun(cursum, nativesum, restoresum, strata, cap)
 
   return(tab)
   
 }
 
 # final table compilation function for curex_fun, curexleg_fun
-curexcmp_fun <- function(cursum, nativesum, restoresum, cap){
+curexcmp_fun <- function(cursum, nativesum, restoresum, strata, cap){
   
   # combine all for table
   
@@ -452,9 +452,9 @@ curexcmp_fun <- function(cursum, nativesum, restoresum, cap){
     merge_at(i = 1, part = 'body') %>% 
     merge_at(i = 7, part = 'body') %>% 
     merge_at(i = 13, part = 'body') %>% 
-    merge_at(i = 9:10, j = 6, part = 'body') %>%
-    merge_at(i = 9:10, j = 7, part = 'body') %>%
-    merge_at(i = 9:10, j = 8, part = 'body') %>%
+    merge_at(i = 8:9, j = 6, part = 'body') %>%
+    merge_at(i = 8:9, j = 7, part = 'body') %>%
+    merge_at(i = 8:9, j = 8, part = 'body') %>%
     merge_at(i = 15:16, j = 6, part = 'body') %>%
     merge_at(i = 15:16, j = 7, part = 'body') %>%
     merge_at(i = 15:16, j = 8, part = 'body') %>%
@@ -907,7 +907,7 @@ target_fun <- function(lulc, subt, hard, arti, tidt, livs, coastal, fluccs, stra
   restoresum <- bind_rows(restoresum, intrsum)
   
   # final table
-  out <- targetcmp_fun(cursum, restoresum, cap)
+  out <- targetcmp_fun(cursum, restoresum, trgs, strata, cap)
     
   return(out)
   
@@ -917,17 +917,17 @@ target_fun <- function(lulc, subt, hard, arti, tidt, livs, coastal, fluccs, stra
 #
 # trgs is input targets table
 # cap is chr string for caption
-targetleg_fun <- function(trgs, cap){
+targetleg_fun <- function(trgs, strata, cap){
   
   # cursum
   cursum <- structure(list(
     Category = structure(c(1L, 1L, 1L, 1L, 1L, 2L, 2L, 2L, 2L, 2L, 2L, 3L, 3L, 3L, 3L), .Label = c("Subtidal", "Intertidal", "Supratidal"), class = "factor"), 
-    HMPU_TARGETS = c("Artificial Reefs",  "Hard Bottom", "Oyster Bars", "Seagrasses", "Tidal Flats", "Living Shorelines", 
-                     "Total Intertidal", "Mangrove Forests", "Salt Barrens", "Salt Marshes", "Tidal Tributaries", 
+    HMPU_TARGETS = c("Artificial Reefs",  "Hard Bottom", "Oyster Bars", "Seagrasses", "Tidal Flats",  
+                     "Total Intertidal", "Mangrove Forests", "Salt Barrens", "Salt Marshes", "Living Shorelines", "Tidal Tributaries", 
                      "Coastal Uplands", "Forested Freshwater Wetlands", "Native Uplands", 
                      "Non-Forested Freshwater Wetlands"), 
-    unis = c("ac", "ac", "ac", "ac", "ac", "mi", "ac", "ac", "ac", "ac", "mi", "ac", "ac", "ac", "ac"), 
-    `Current Extent` = c(166, 423, 171, 40653, 16220, 11.3, 20353, 15300, 496, 4557, 387, 3619, 152132, 140600, 67587)), 
+    unis = c("ac", "ac", "ac", "ac", "ac", "ac", "ac", "ac", "ac", "mi", "mi", "ac", "ac", "ac", "ac"), 
+    `Current Extent` = c(166, 423, 171, 40653, 16220, 20353, 15300, 496, 4557, 11.3, 387, 3619, 152132, 140600, 67587)), 
     class = "data.frame", row.names = c(NA, -15L))
   
   # restoresum
@@ -939,14 +939,14 @@ targetleg_fun <- function(trgs, cap){
     row.names = c(NA, -8L), class = c("tbl_df", "tbl", "data.frame"))
 
   # final table
-  out <- targetcmp_fun(cursum, restoresum, cap)
+  out <- targetcmp_fun(cursum, restoresum, trgs, strata, cap)
   
   return(out)
   
 }
 
 # final table compilation function for target_fun, targetleg_fun
-targetcmp_fun <- function(cursum, restoresum, cap){
+targetcmp_fun <- function(cursum, restoresum, trgs, strata, cap){
   
   # all summary
   allsum <- cursum %>% 
@@ -1007,13 +1007,13 @@ targetcmp_fun <- function(cursum, restoresum, cap){
     merge_at(i = 1, part = 'body') %>% 
     merge_at(i = 7, part = 'body') %>% 
     merge_at(i = 14, part = 'body') %>% 
-    merge_at(i = 10:11, j = 4, part = 'body') %>%
+    merge_at(i = 9:10, j = 4, part = 'body') %>%
     merge_at(i = 16:17, j = 4, part = 'body') %>%
     add_footer_lines(values = "") %>%
     add_footer_lines(value = as_paragraph("N/A - Not Applicable; I/D - Insufficient Data; LSSM - Living Shoreline Suitability Model; JU - Potential ", as_i("Juncus"), " Marsh Opportunity")) %>%
     add_footer_lines(values = "*Does not account for lands neither currently protected nor currently under consideration for acquisition") %>%
     fontsize(size = 8, part = 'footer') %>%
-    bold(i = 9) %>% 
+    bold(i = 8) %>% 
     align(j = c(2:8), align = "center", part = "header") %>%
     align(i = c(2:6, 8:13, 15:18), j = 3:8, align = "center", part = "body") %>%
     bg(i = c(1, 7, 14), bg = 'chartreuse3', part = "body") %>% 

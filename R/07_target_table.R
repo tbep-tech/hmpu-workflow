@@ -34,7 +34,7 @@ data(restorelyr)
 cap <- 'Summary of the Recommended 2030 Targets and 2050 Goals'
 
 tab <- target_fun(lulc, subt, hard, arti, tidt, livs, coastal, fluccs, strata, restorelyr, trgs, cap)
-# tab <- targetleg_fun(trgs, cap)
+# tab <- targetleg_fun(trgs, strata, cap)
 
-save_as_html(tab, path = 'docs/target_table.html', title = 'Target Table')
+save_as_html(tab, path = 'docs/target_table.html', title = NULL)
 
