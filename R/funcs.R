@@ -787,11 +787,11 @@ restdat_fun <- function(restorelyr, crplyr = NULL){
 # restorelyr is current existing/proposed restoration layer
 # trgs is input targets table
 # cap is chr string for caption
-# stratsel chr string for "All", "Subtidal", or "Not Subtidal"
+# stratsel chr string for "All", "Subtidal", "Not Subtidal", "Intertidal", or "Supratidal"
 # typ chr string indicating "targets", "goals", or "both"
 target_fun <- function(lulc, subt, hard, arti, tidt, livs, coastal, fluccs, strata, restorelyr, trgs, cap, stratsel = 'All', typ = 'both'){
   
-  stratsel <- match.arg(stratsel, c('All', 'Subtidal', 'Not Subtidal'))
+  stratsel <- match.arg(stratsel, c('All', 'Subtidal', 'Not Subtidal', 'Intertidal', 'Supratidal'))
   typ <- match.arg(typ, c('targets', 'goals', 'both'))
   
   # lulc area, all categories
@@ -927,11 +927,11 @@ target_fun <- function(lulc, subt, hard, arti, tidt, livs, coastal, fluccs, stra
 # trgs is input targets table
 # strata is strata data frame
 # cap is chr string for caption
-# stratsel chr string for "All", "Subtidal", or "Not Subtidal"
+# stratsel chr string for "All", "Subtidal", "Not Subtidal", "Intertidal", or "Supratidal"
 # typ chr string indicating "targets", "goals", or "both"
 targetleg_fun <- function(trgs, strata, cap, stratsel = 'All', typ = 'both'){
   
-  stratsel <- match.arg(stratsel, c('All', 'Subtidal', 'Not Subtidal'))
+  stratsel <- match.arg(stratsel, c('All', 'Subtidal', 'Not Subtidal', 'Intertidal', 'Supratidal'))
   typ <- match.arg(typ, c('targets', 'goals', 'both'))
   
   # cursum
@@ -1008,13 +1008,13 @@ targetcmp_fun <- function(cursum, restoresum, trgs, strata, cap, stratsel = 'All
   
   cap <- as_paragraph(as_chunk(cap, props = fp_text_default(font.size = 14, bold = T)))
 
-  if(stratsel == 'Subtidal')
-    allsum <- allsum %>% 
-      filter(Category == 'Subtidal')
-  
   if(stratsel == 'Not Subtidal')
     allsum <- allsum %>% 
       filter(Category != 'Subtidal')
+  
+  if(!stratsel %in% c('All', 'Not Subtidal'))
+    allsum <- allsum %>% 
+      filter(Category == stratsel)
 
   tab <- allsum %>% 
     as_grouped_data(groups = 'Category')
@@ -1055,7 +1055,7 @@ targetcmp_fun <- function(cursum, restoresum, trgs, strata, cap, stratsel = 'All
         `Goal2050` = '2050 Goal', 
         `Goal2050togo` = '2050 Goal to go'
       ) 
-  
+
   tab <- tab %>%  
     add_footer_lines(values = "") %>%
     add_footer_lines(value = as_paragraph("N/A - Not Applicable; I/D - Insufficient Data; LSSM - Living Shoreline Suitability Model; JU - Potential ", as_i("Juncus"), " Marsh Opportunity")) %>%
@@ -1071,11 +1071,14 @@ targetcmp_fun <- function(cursum, restoresum, trgs, strata, cap, stratsel = 'All
     border_inner_h(part = 'header') %>% 
     border_inner_v(part = 'header') %>% 
     merge_at(i = 1, part = 'body') %>% 
-    align(i = 2:6, j = 3:ncol_keys(.), align = "center", part = "body") %>%
     bg(i = 1, bg = '#00806E', part = "body") %>% 
     color(i = 1, color = 'white', part = "body") %>% 
     set_caption(caption = cap) %>% 
     font(part = 'all', fontname = 'Roboto')
+  
+  if(stratsel %in% c('All', 'Subtidal'))
+    tab <- tab %>% 
+      align(i = 2:6, j = 3:ncol_keys(.), align = "center", part = "body")
   
   if(stratsel == 'All')
     tab <- tab %>% 
@@ -1095,9 +1098,20 @@ targetcmp_fun <- function(cursum, restoresum, trgs, strata, cap, stratsel = 'All
       merge_at(i = 10:11, j = 4, part = 'body') %>%
       align(i = c(2:7, 9:12), j = 3:ncol_keys(.), align = "center", part = "body") %>%
       bold(i = 2) %>% 
-      bg(i = c(1, 8), bg = '#00806E', part = "body") %>% 
-      color(i = c(1, 8), color = 'white', part = "body") 
+      bg(i = 8, bg = '#00806E', part = "body") %>% 
+      color(i = 8, color = 'white', part = "body") 
   
+  if(stratsel == 'Intertidal')
+    tab <- tab %>% 
+      merge_at(i = 3:4, j = 4, part = 'body') %>%
+      align(i = 2:7, j = 3:ncol_keys(.), align = "center", part = "body") %>%
+      bold(i = 2)
+    
+  if(stratsel == 'Supratidal')
+    tab <- tab %>% 
+      merge_at(i = 3:4, j = 4, part = 'body') %>%
+      align(i = 2:5, j = 3:ncol_keys(.), align = "center", part = "body") 
+    
   return(tab)
   
 }
