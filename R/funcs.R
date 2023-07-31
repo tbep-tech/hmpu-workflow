@@ -466,9 +466,12 @@ curexcmp_fun <- function(cursum, nativesum, restoresum, strata, cap){
     fontsize(size = 8, part = 'footer') %>% 
     align(align = "center", part = "header") %>% 
     align(i = c(2:6, 8:12, 14:17), j = 3:8, align = "center", part = "body") %>% 
-    bg(i = c(1, 7, 13), bg = 'chartreuse3', part = "body") %>% 
-    bg(i = 1, bg = 'grey', part = "header") %>% 
-    bg(i = 2, j = 1:2, bg = 'grey', part = "header") %>% 
+    bg(i = c(1, 7, 13), bg = '#00806E', part = "body") %>% 
+    color(i = c(1, 7, 13), color = 'white', part = "body") %>% 
+    bg(i = 1, bg = '#004F7E', part = "header") %>% 
+    bg(i = 2, j = 1:2, bg = '#004F7E', part = "header") %>%
+    color(i = 1, color = 'white', part = "header") %>% 
+    color(i = 2, j = 1:2, color = 'white', part = "header") %>% 
     border_outer(part = 'body') %>% 
     border_outer(part = 'header') %>% 
     border_inner_h(part = 'body') %>% 
@@ -1025,7 +1028,8 @@ targetcmp_fun <- function(cursum, restoresum, trgs, strata, cap, stratsel = 'All
     add_footer_lines(values = "*Does not account for lands neither currently protected nor currently under consideration for acquisition") %>%
     fontsize(size = 8, part = 'footer') %>%
     align(j = c(2:8), align = "center", part = "header") %>%
-    bg(i = 1, bg = 'grey', part = "header") %>% 
+    bg(i = 1, bg = '#004F7E', part = "header") %>%
+    color(i = 1, color = 'white', part = 'header') %>% 
     border_outer(part = 'body') %>% 
     border_outer(part = 'header') %>% 
     border_inner_h(part = 'body') %>% 
@@ -1034,7 +1038,8 @@ targetcmp_fun <- function(cursum, restoresum, trgs, strata, cap, stratsel = 'All
     border_inner_v(part = 'header') %>% 
     merge_at(i = 1, part = 'body') %>% 
     align(i = 2:6, j = 3:8, align = "center", part = "body") %>%
-    bg(i = 1, bg = 'chartreuse3', part = "body") %>% 
+    bg(i = 1, bg = '#00806E', part = "body") %>% 
+    color(i = 1, color = 'white', part = "body") %>% 
     set_caption(caption = cap) %>% 
     font(part = 'all', fontname = 'Roboto')
   
@@ -1046,7 +1051,8 @@ targetcmp_fun <- function(cursum, restoresum, trgs, strata, cap, stratsel = 'All
       merge_at(i = 16:17, j = 4, part = 'body') %>%
       align(i = c(8:13, 15:18), j = 3:8, align = "center", part = "body") %>%
       bold(i = 8) %>% 
-      bg(i = c(7, 14), bg = 'chartreuse3', part = "body")
+      bg(i = c(7, 14), bg = '#00806E', part = "body") %>% 
+      color(i = c(7, 14), color = 'white', part = "body")
   
   if(stratsel == 'Not Subtidal')
     tab <- tab %>% 
@@ -1055,7 +1061,8 @@ targetcmp_fun <- function(cursum, restoresum, trgs, strata, cap, stratsel = 'All
       merge_at(i = 10:11, j = 4, part = 'body') %>%
       align(i = c(2:7, 9:12), j = 3:8, align = "center", part = "body") %>%
       bold(i = 2) %>% 
-      bg(i = c(1, 8), bg = 'chartreuse3', part = "body") 
+      bg(i = c(1, 8), bg = '#00806E', part = "body") %>% 
+      color(i = c(1, 8), color = 'white', part = "body") 
   
   return(tab)
   
