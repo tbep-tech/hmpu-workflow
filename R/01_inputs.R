@@ -26,7 +26,7 @@ trgs <- data.frame(
   `Target2030` = c(423, 166, 16220, 40000, 221,
                    21.3, 21353, 15300, 546, 4807, 4,
                    3769, 68937, 152282, 141050),
-  `Target2050` = c(423, 166, 16220, 40000, 471,
+  `Goal2050` = c(423, 166, 16220, 40000, 471,
                    56.3, 23803, 15300, 796, 5457, 18,
                    4219, 71787, 152732, 142100),
   rationale = c('Protect existing hard bottom; continue to identify new hard bottom area using proven mapping techniques',
