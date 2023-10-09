@@ -5,6 +5,7 @@ library(doParallel)
 library(foreach)
 library(esri2sf) # yonghah/esri2sf on github
 library(tbeptools)
+library(units)
 
 source(here('R', 'funcs.R'))
 
@@ -371,7 +372,21 @@ hard <- st_read('https://opendata.arcgis.com/datasets/130c6747048647398665e195aa
     Acres = as.numeric(Acres)
   ) %>% 
   select(Acres)
-  
+
+# additional manatee river hardbottom (~6.86 acres)
+hardmana <- st_read('data/raw/manavista.kml') %>% 
+  st_collection_extract('POLYGON') %>% 
+  st_zm(drop = T) %>% 
+  st_transform(prj) %>%
+  mutate(
+    Acres = st_area(.),
+    Acres = set_units(Acres, 'acres'),
+    Acres = as.numeric(Acres)
+  ) %>% 
+  select(Acres)
+
+hard <- bind_rows(hard, hardmana)
+
 # artificial reefs
 # arti <- esri2sf('https://gis.waterinstitute.usf.edu/arcgis/rest/services/Maps/TBEP_OpenData/MapServer/0') %>% 
 arti <- st_read('https://opendata.arcgis.com/datasets/dccf9329dffd4fb9a0436934c23487bb_0.geojson') %>% 
