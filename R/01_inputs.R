@@ -374,7 +374,8 @@ hard <- st_read('https://opendata.arcgis.com/datasets/130c6747048647398665e195aa
   select(Acres)
 
 # additional manatee river hardbottom (~6.86 acres)
-hardmana <- st_read('data/raw/manavista.kml') %>% 
+# also at /data/raw/manavista.kml
+hardmana <- st_read('https://gis.waterinstitute.usf.edu/arcgis/rest/services/Maps/TBEP_OpenData/MapServer/21/query?outFields=*&where=1%3D1&f=geojson') %>% 
   st_collection_extract('POLYGON') %>% 
   st_zm(drop = T) %>% 
   st_transform(prj) %>%
