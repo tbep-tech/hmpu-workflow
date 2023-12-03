@@ -15,6 +15,9 @@ prj <- 6443
 
 fluccs <- read.csv(here('data', 'FLUCCShabsclass.csv'), stringsAsFactors = F)
 
+# current subtidal year for fwc oyster difference
+subtfl <- 'sgdat2022'
+
 # restoration targets lookup table ----------------------------------------
 
 trgs <- data.frame(
@@ -345,18 +348,66 @@ for(i in 1:length(fls)){
   
 }
 
-# # oyster beds in florida ----------------------------------------------------------------------
-# 
-# load(file = here('data/tbshed.RData'))
-# 
-# # most up to date layer for FL, updated 1-2 times a year by FWC 
-# # for merge with SWFWMD subtidal oyster estimates
-# fwcoysterraw <- st_read('https://atoll.floridamarine.org/arcgis/rest/services/FWC_GIS/OpenData_MarineEco/MapServer/5/query?outFields=*&where=1%3D1&f=geojson')
-# 
-# fwcoyster <- fwcoysterraw %>% 
-#   st_transform(crs = st_crs(tbshed)) %>% 
-#   st_intersection(tbshed)
-  
+# fwc oyster beds in florida ------------------------------------------------------------------
+
+load(file = here('data/tbshed.RData'))
+
+# load current swfwmd subtidal layer
+load(here('data', paste0(subtfl, '.RData')))
+
+# most up to date layer for FL, updated 1-2 times a year by FWC
+# for merge with swfwmd subtidal oyster estimates
+# should be similar to swfwmd with a few extra beds
+fwcoysterraw <- st_read('https://atoll.floridamarine.org/arcgis/rest/services/FWC_GIS/OpenData_MarineEco/MapServer/5/query?outFields=*&where=1%3D1&f=geojson')
+
+# clip by tbshed and extract geometry
+fwcoyster <- fwcoysterraw %>%
+  st_transform(crs = st_crs(tbshed)) %>%
+  st_make_valid() %>% 
+  st_intersection(tbshed) %>% 
+  st_transform(crs = prj) %>% 
+  st_union() %>% 
+  st_geometry()
+
+# filter swfwmd subtidal by oyster beds fluccs code
+swfwmdoys <- filter(sgdat2022, FLUCCSCODE %in% 6540) %>% 
+  st_union() %>% 
+  st_geometry()
+
+swfwmdarea <- st_area(swfwmdoys) %>% sum() %>% units::set_units('acres') %>% as.numeric()
+# fwcarea <- st_area(fwcoyster) %>% sum() %>% units::set_units('acres') %>% as.numeric()
+
+# snap oyster beds to swfwmd using five foot tolerance
+# most are similar but offset
+fwcsnp <- st_snap(fwcoyster, swfwmdoys, units::set_units(5, 'feet')) %>% 
+  st_make_valid()
+
+# check total area, should match swfwmdarea + oysex at
+unioys <- st_union(fwcsnp, swfwmdoys)
+unioysarea <- unioys %>% st_area() %>% sum() %>% units::set_units('acres') %>% as.numeric()
+
+# get difference
+oysdif <- st_difference(fwcsnp, swfwmdoys) %>% 
+  st_as_sf() %>% 
+  st_collection_extract(c('POLYGON')) %>% 
+  mutate(
+    acres = st_area(.), 
+    acres = as.numeric(units::set_units(acres, 'acres'))
+  )
+
+# check sum, should be less than an acre
+sliv <- sum(oysdif$acres[as.numeric(oysdif$acres) <= 0.01])
+
+# remove most slivers
+oyse <- oysdif[as.numeric(oysdif$acres) >= 0.01, ]
+
+# check similar areas
+((sum(oyse$acres) + as.numeric(swfwmdarea)) + sliv)
+unioysarea
+
+# save oysters extra
+save(oyse, file = 'data/oyse.RData', version = 2)
+
 # habitats not in lulc ------------------------------------------------------
 
 # st_layers(gdb)
