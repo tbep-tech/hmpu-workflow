@@ -166,14 +166,18 @@ fixgeo <- function(dat){
 # lulc is current lulc sf object
 # subt is current subtidal sf object
 # hard is current hard bottom sf object
+# arti is current artificial reefs sf object
 # tidt is current tidal creeks sf object
+# livs is current living shoreline sf object
+# oyse is current fwc extra oysters sf object
 # coastal is coastal stratum sf object
 # fluccs is fluccs data frame
+# strata is strata data frame
 # nativelyr is current existing/proposed native sf object
 # restorelyr is current existing/proposed restoration layer
 # cap is chr string for caption
 # crplyr is optional cropping layer
-curex_fun <- function(lulc, subt, hard, arti, tidt, livs, coastal, fluccs, strata, nativelyr, restorelyr, cap, crplyr = NULL){
+curex_fun <- function(lulc, subt, hard, arti, tidt, livs, oyse, coastal, fluccs, strata, nativelyr, restorelyr, cap, crplyr = NULL){
 
   # crop all sf objects by optional crop layer
   if(!is.null(crplyr)){
@@ -184,6 +188,7 @@ curex_fun <- function(lulc, subt, hard, arti, tidt, livs, coastal, fluccs, strat
     arti <- st_intersection(arti, crplyr)
     tidt <- st_intersection(tidt, crplyr)
     livs <- st_intersection(livs, crplyr)
+    oyse <- st_intersection(oyse, crplyr)
     coastal <- st_intersection(coastal, crplyr)
     nativelyr <- st_intersection(nativelyr, crplyr)
     restorelyr <- st_intersection(restorelyr, crplyr)
@@ -209,6 +214,19 @@ curex_fun <- function(lulc, subt, hard, arti, tidt, livs, coastal, fluccs, strat
   subtsum <- subt %>% 
     subt_est(fluccs)
   
+  # add extra oysters to subtsum
+  oysesum <- oyse %>% 
+    pull(acres) %>%
+    sum() %>% 
+    as.numeric()
+  subtsum <- subtsum %>% 
+    mutate(
+      Acres = case_when(
+        HMPU_TARGETS == 'Oyster Bars' ~ Acres + oysesum, 
+        TRUE ~ Acres
+      )
+    )
+    
   # hard bottom
   hardsum <- hard %>% 
     mutate(
@@ -780,7 +798,10 @@ restdat_fun <- function(restorelyr, crplyr = NULL){
 # lulc is current lulc sf object
 # subt is current subtidal sf object
 # hard is current hard bottom sf object
+# arti is current artificial reefs sf object
 # tidt is current tidal creeks sf object
+# livs is current living shoreline sf object
+# oyse is current fwc extra oysters sf object
 # coastal is coastal stratum sf object
 # fluccs is fluccs data frame
 # strata is strata data frame
@@ -789,7 +810,7 @@ restdat_fun <- function(restorelyr, crplyr = NULL){
 # cap is chr string for caption
 # stratsel chr string for "All", "Subtidal", "Not Subtidal", "Intertidal", or "Supratidal"
 # typ chr string indicating "targets", "goals", or "both"
-target_fun <- function(lulc, subt, hard, arti, tidt, livs, coastal, fluccs, strata, restorelyr, trgs, cap, stratsel = 'All', typ = 'both'){
+target_fun <- function(lulc, subt, hard, arti, tidt, livs, oyse, coastal, fluccs, strata, restorelyr, trgs, cap, stratsel = 'All', typ = 'both'){
   
   stratsel <- match.arg(stratsel, c('All', 'Subtidal', 'Not Subtidal', 'Intertidal', 'Supratidal'))
   typ <- match.arg(typ, c('targets', 'goals', 'both'))
@@ -809,6 +830,19 @@ target_fun <- function(lulc, subt, hard, arti, tidt, livs, coastal, fluccs, stra
   
   # subtidal area, all categories
   subtsum <- subt_est(subt, fluccs)
+  
+  # add extra oysters to subtsum
+  oysesum <- oyse %>% 
+    pull(acres) %>%
+    sum() %>% 
+    as.numeric()
+  subtsum <- subtsum %>% 
+    mutate(
+      Acres = case_when(
+        HMPU_TARGETS == 'Oyster Bars' ~ Acres + oysesum, 
+        TRUE ~ Acres
+      )
+    )
   
   # hard bottom
   hardsum <- hard %>% 

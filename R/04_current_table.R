@@ -22,6 +22,7 @@ data(hard)
 data(arti)
 data(tidt)
 data(livs)
+data(oyse)
 data(coastal)
 data(strata)
 
@@ -41,7 +42,7 @@ data(pasco)
 # complete watershed ------------------------------------------------------
 
 cap <- 'Summary of the Opportunity Assessment Analysis'
-tab <- curex_fun(lulc, subt, hard, arti, tidt, livs, coastal, fluccs, strata, nativelyr, restorelyr, cap)
+tab <- curex_fun(lulc, subt, hard, arti, tidt, livs, oyse, coastal, fluccs, strata, nativelyr, restorelyr, cap)
 # tab <- curexleg_fun(strata, cap)
 
 save_as_html(tab, path = 'docs/current_table.html', title = NULL)
@@ -50,7 +51,7 @@ save_as_html(tab, path = 'docs/current_table.html', title = NULL)
 
 cap <- 'Summary of the Opportunity Assessment Analysis: Tampa'
 
-tab_tampa <- curex_fun(lulc, subt, hard, arti, tidt, livs, coastal, fluccs, strata, nativelyr, restorelyr, cap, tampa)
+tab_tampa <- curex_fun(lulc, subt, hard, arti, tidt, livs, oyse, coastal, fluccs, strata, nativelyr, restorelyr, cap, tampa)
 
 save_as_html(tab_tampa, path = 'docs/current_table_tampa.html', title = NULL)
 
@@ -58,7 +59,7 @@ save_as_html(tab_tampa, path = 'docs/current_table_tampa.html', title = NULL)
 
 cap <- cap <- 'Summary of the Opportunity Assessment Analysis: St. Pete'
 
-tab_stpet <- curex_fun(lulc, subt, hard, arti, tidt, livs, coastal, fluccs, strata, nativelyr, restorelyr, cap, stpet)
+tab_stpet <- curex_fun(lulc, subt, hard, arti, tidt, livs, oyse, coastal, fluccs, strata, nativelyr, restorelyr, cap, stpet)
 
 save_as_html(tab_stpet, path = 'docs/current_table_stpet.html', title = NULL)
 
@@ -66,7 +67,7 @@ save_as_html(tab_stpet, path = 'docs/current_table_stpet.html', title = NULL)
 
 cap <- cap <- 'Summary of the Opportunity Assessment Analysis: Clearwater'
 
-tab_clrwt <- curex_fun(lulc, subt, hard, arti, tidt, livs, coastal, fluccs, strata, nativelyr, restorelyr, cap, clrwt)
+tab_clrwt <- curex_fun(lulc, subt, hard, arti, tidt, livs, oyse, coastal, fluccs, strata, nativelyr, restorelyr, cap, clrwt)
 
 save_as_html(tab_clrwt, path = 'docs/current_table_clrwt.html', title = NULL)
 
@@ -74,7 +75,7 @@ save_as_html(tab_clrwt, path = 'docs/current_table_clrwt.html', title = NULL)
 
 cap <- cap <- 'Summary of the Opportunity Assessment Analysis: Hillsborough Co.'
 
-tab_hilco <- curex_fun(lulc, subt, hard, arti, tidt, livs, coastal, fluccs, strata, nativelyr, restorelyr, cap, hilco)
+tab_hilco <- curex_fun(lulc, subt, hard, arti, tidt, livs, oyse, coastal, fluccs, strata, nativelyr, restorelyr, cap, hilco)
 
 save_as_html(tab_hilco, path = 'docs/current_table_hilco.html', title = NULL)
 
@@ -82,7 +83,7 @@ save_as_html(tab_hilco, path = 'docs/current_table_hilco.html', title = NULL)
 
 cap <- cap <- 'Summary of the Opportunity Assessment Analysis: Pinellas Co.'
 
-tab_pinco <- curex_fun(lulc, subt, hard, arti, tidt, livs, coastal, fluccs, strata, nativelyr, restorelyr, cap, pinco)
+tab_pinco <- curex_fun(lulc, subt, hard, arti, tidt, livs, oyse, coastal, fluccs, strata, nativelyr, restorelyr, cap, pinco)
 
 save_as_html(tab_pinco, path = 'docs/current_table_pinco.html', title = NULL)
 
@@ -90,7 +91,7 @@ save_as_html(tab_pinco, path = 'docs/current_table_pinco.html', title = NULL)
 
 cap <- cap <- 'Summary of the Opportunity Assessment Analysis: Manatee Co.'
 
-tab_manco <- curex_fun(lulc, subt, hard, arti, tidt, livs, coastal, fluccs, strata, nativelyr, restorelyr, cap, manco)
+tab_manco <- curex_fun(lulc, subt, hard, arti, tidt, livs, oyse, coastal, fluccs, strata, nativelyr, restorelyr, cap, manco)
 
 save_as_html(tab_manco, path = 'docs/current_table_manco.html', title = NULL)
 
@@ -98,6 +99,6 @@ save_as_html(tab_manco, path = 'docs/current_table_manco.html', title = NULL)
 
 cap <- cap <- 'Summary of the Opportunity Assessment Analysis: Pasco Co.'
 
-tab_pasco <- curex_fun(lulc, subt, hard, arti, tidt, livs, coastal, fluccs, strata, nativelyr, restorelyr, cap, pasco)
+tab_pasco <- curex_fun(lulc, subt, hard, arti, tidt, livs, oyse, coastal, fluccs, strata, nativelyr, restorelyr, cap, pasco)
 
 save_as_html(tab_pasco, path = 'docs/current_table_pasco.html', title = NULL)
