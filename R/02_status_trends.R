@@ -78,7 +78,8 @@ res <- list.files('data', '^sgdat') %>%
 subtacres <- res %>% 
   select(name = value, acres) %>% 
   unnest(acres) %>% 
-  mutate(name = gsub('^sgdat|\\.RData$', '', name))
+  mutate(name = gsub('^sgdat|\\.RData$', '', name)) %>% 
+  ungroup()
 
 # load extra fwc oyster
 load(file = here('data/oyse.RData'))
@@ -88,7 +89,7 @@ oysesum <- oyse %>%
   pull(acres) %>%
   sum() %>% 
   as.numeric()
-subtacres <- subtacres %>% 
+subtacres <-  subtacres %>% 
   mutate(
     Acres = case_when(
       HMPU_TARGETS == 'Oyster Bars' & name == max(as.numeric(name)) ~ Acres + oysesum, 
