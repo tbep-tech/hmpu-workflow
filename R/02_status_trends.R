@@ -80,6 +80,22 @@ subtacres <- res %>%
   unnest(acres) %>% 
   mutate(name = gsub('^sgdat|\\.RData$', '', name))
 
+# load extra fwc oyster
+load(file = here('data/oyse.RData'))
+
+# add extra oysters to subtsum
+oysesum <- oyse %>% 
+  pull(acres) %>%
+  sum() %>% 
+  as.numeric()
+subtacres <- subtacres %>% 
+  mutate(
+    Acres = case_when(
+      HMPU_TARGETS == 'Oyster Bars' & name == max(as.numeric(name)) ~ Acres + oysesum, 
+      TRUE ~ Acres
+    )
+  )
+
 save(subtacres, file = here('data', 'subtacres.RData'), version = 2)
 
 # LULC change analysis ----------------------------------------------------
