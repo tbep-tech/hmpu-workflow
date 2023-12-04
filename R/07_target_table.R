@@ -34,8 +34,20 @@ data(restorelyr)
 
 cap <- 'Summary of the Recommended 2030 Targets and 2050 Goals'
 
+# complete
 tab <- target_fun(lulc, subt, hard, arti, tidt, livs, oyse, coastal, fluccs, strata, restorelyr, trgs, cap, stratsel = 'All')
-# tab <- targetleg_fun(trgs, strata, cap, stratsel = 'All')
 
 save_as_html(tab, path = 'docs/target_table.html', title = NULL)
+
+# simple
+tabsimp <- target_fun(lulc, subt, hard, arti, tidt, livs, oyse, coastal, fluccs, strata, restorelyr, trgs, cap, stratsel = 'All', simple = T)
+
+# fix dimensions for simple approximat eto tab
+bodrow <- (length(ncol(tabsimp)$heights) - 1)
+tabsimp <- tabsimp %>% 
+  width(j = 1:ncol_keys(.), width = flextable_dim(tab)$widths / ncol_keys(.)) %>% 
+  height(i = 1:bodrow, height = flextable_dim(tab)$heights / bodrow) 
+flextable_dim(tabsimp2)$aspect_ratio
+
+save_as_html(tabsimp, path = 'docs/target_table_simple.html', title = NULL)
 

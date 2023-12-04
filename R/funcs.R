@@ -810,7 +810,8 @@ restdat_fun <- function(restorelyr, crplyr = NULL){
 # cap is chr string for caption
 # stratsel chr string for "All", "Subtidal", "Not Subtidal", "Intertidal", or "Supratidal"
 # typ chr string indicating "targets", "goals", or "both"
-target_fun <- function(lulc, subt, hard, arti, tidt, livs, oyse, coastal, fluccs, strata, restorelyr, trgs, cap, stratsel = 'All', typ = 'both'){
+# simple logical indicating if simple table should be returned, stratum combined with habitat, no restoration target info
+target_fun <- function(lulc, subt, hard, arti, tidt, livs, oyse, coastal, fluccs, strata, restorelyr, trgs, cap, stratsel = 'All', typ = 'both', simple = F){
   
   stratsel <- match.arg(stratsel, c('All', 'Subtidal', 'Not Subtidal', 'Intertidal', 'Supratidal'))
   typ <- match.arg(typ, c('targets', 'goals', 'both'))
@@ -950,7 +951,7 @@ target_fun <- function(lulc, subt, hard, arti, tidt, livs, oyse, coastal, fluccs
   restoresum <- bind_rows(restoresum, intrsum)
   
   # final table
-  out <- targetcmp_fun(cursum, restoresum, trgs, strata, cap, stratsel, typ)
+  out <- targetcmp_fun(cursum, restoresum, trgs, strata, cap, stratsel, typ, simple)
   
   return(out)
   
@@ -995,7 +996,7 @@ targetleg_fun <- function(trgs, strata, cap, stratsel = 'All', typ = 'both'){
 }
 
 # final table compilation function for target_fun, targetleg_fun
-targetcmp_fun <- function(cursum, restoresum, trgs, strata, cap, stratsel = 'All', typ = 'both'){
+targetcmp_fun <- function(cursum, restoresum, trgs, strata, cap, stratsel = 'All', typ = 'both', simple = F){
   
   # all summary
   allsum <- cursum %>% 
@@ -1053,6 +1054,19 @@ targetcmp_fun <- function(cursum, restoresum, trgs, strata, cap, stratsel = 'All
   tab <- allsum %>% 
     as_grouped_data(groups = 'Category')
   
+  if(simple)
+    tab <- tab %>% 
+      mutate(
+        HMPU_TARGETS = case_when(
+          is.na(HMPU_TARGETS) ~ Category,
+          T ~ HMPU_TARGETS
+        )
+      ) %>% 
+    select(-Category, -`total restorable`)
+  
+  # index to start center align
+  startc <- which(names(tab) == 'Current Extent')
+  
   if(typ == 'both')
     tab <- tab %>% 
       flextable() %>% 
@@ -1091,11 +1105,7 @@ targetcmp_fun <- function(cursum, restoresum, trgs, strata, cap, stratsel = 'All
       ) 
 
   tab <- tab %>%  
-    add_footer_lines(values = "") %>%
-    add_footer_lines(value = as_paragraph("N/A - Not Applicable; I/D - Insufficient Data; LSSM - Living Shoreline Suitability Model; JU - Potential ", as_i("Juncus"), " Marsh Opportunity")) %>%
-    add_footer_lines(values = "*Does not account for lands neither currently protected nor currently under consideration for acquisition") %>%
-    fontsize(size = 8, part = 'footer') %>%
-    align(j = c(2:ncol_keys(.)), align = "center", part = "header") %>%
+    align(j = c((startc - 1):ncol_keys(.)), align = "center", part = "header") %>%
     bg(i = 1, bg = '#004F7E', part = "header") %>%
     color(i = 1, color = 'white', part = 'header') %>% 
     border_outer(part = 'body') %>% 
@@ -1110,42 +1120,66 @@ targetcmp_fun <- function(cursum, restoresum, trgs, strata, cap, stratsel = 'All
     set_caption(caption = cap) %>% 
     font(part = 'all', fontname = 'Roboto')
   
+  # footer for not simple
+  if(!simple)
+    tab <- tab %>% 
+      add_footer_lines(values = "") %>%
+      add_footer_lines(value = as_paragraph("N/A - Not Applicable; I/D - Insufficient Data; LSSM - Living Shoreline Suitability Model; JU - Potential ", as_i("Juncus"), " Marsh Opportunity")) %>%
+      add_footer_lines(values = "*Does not account for lands neither currently protected nor currently under consideration for acquisition") %>%
+      fontsize(size = 8, part = 'footer')
+  
   if(stratsel %in% c('All', 'Subtidal'))
     tab <- tab %>% 
-      align(i = 2:6, j = 3:ncol_keys(.), align = "center", part = "body")
+      align(i = 2:6, j = startc:ncol_keys(.), align = "center", part = "body")
   
-  if(stratsel == 'All')
+  if(stratsel == 'All'){
     tab <- tab %>% 
       merge_at(i = 7, part = 'body') %>% 
       merge_at(i = 14, part = 'body') %>% 
-      merge_at(i = 9:10, j = 4, part = 'body') %>%
-      merge_at(i = 16:17, j = 4, part = 'body') %>%
-      align(i = c(8:13, 15:18), j = 3:ncol_keys(.), align = "center", part = "body") %>%
+      align(i = c(8:13, 15:18), j = startc:ncol_keys(.), align = "center", part = "body") %>%
       bold(i = 8) %>% 
       bg(i = c(7, 14), bg = '#00806E', part = "body") %>% 
       color(i = c(7, 14), color = 'white', part = "body")
+    
+    if(!simple)
+      tab <- tab %>% 
+        merge_at(i = 9:10, j = 4, part = 'body') %>%
+        merge_at(i = 16:17, j = 4, part = 'body')
+  }
   
-  if(stratsel == 'Not Subtidal')
+  if(stratsel == 'Not Subtidal'){
     tab <- tab %>% 
       merge_at(i = 8, part = 'body') %>% 
-      merge_at(i = 3:4, j = 4, part = 'body') %>%
-      merge_at(i = 10:11, j = 4, part = 'body') %>%
-      align(i = c(2:7, 9:12), j = 3:ncol_keys(.), align = "center", part = "body") %>%
+      align(i = c(2:7, 9:12), j = startc:ncol_keys(.), align = "center", part = "body") %>%
       bold(i = 2) %>% 
       bg(i = 8, bg = '#00806E', part = "body") %>% 
-      color(i = 8, color = 'white', part = "body") 
+      color(i = 8, color = 'white', part = "body")
+    
+    if(!simple)
+      tab <- tab %>% 
+        merge_at(i = 3:4, j = 4, part = 'body') %>%
+        merge_at(i = 10:11, j = 4, part = 'body') 
+  }
   
-  if(stratsel == 'Intertidal')
+  if(stratsel == 'Intertidal'){
     tab <- tab %>% 
-      merge_at(i = 3:4, j = 4, part = 'body') %>%
-      align(i = 2:7, j = 3:ncol_keys(.), align = "center", part = "body") %>%
+      align(i = 2:7, j = startc:ncol_keys(.), align = "center", part = "body") %>%
       bold(i = 2)
     
-  if(stratsel == 'Supratidal')
+    if(!simple)
+      tab <- tab %>% 
+        merge_at(i = 3:4, j = 4, part = 'body')
+  }
+  
+  if(stratsel == 'Supratidal'){
     tab <- tab %>% 
-      merge_at(i = 3:4, j = 4, part = 'body') %>%
-      align(i = 2:5, j = 3:ncol_keys(.), align = "center", part = "body") 
+      align(i = 2:5, j = startc:ncol_keys(.), align = "center", part = "body") 
     
+    if(!simple)
+      tab <- tab %>% 
+        merge_at(i = 3:4, j = 4, part = 'body')
+  }
+  
   return(tab)
   
 }
