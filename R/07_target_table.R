@@ -42,12 +42,12 @@ save_as_html(tab, path = 'docs/target_table.html', title = NULL)
 # simple
 tabsimp <- target_fun(lulc, subt, hard, arti, tidt, livs, oyse, coastal, fluccs, strata, restorelyr, trgs, cap, stratsel = 'All', simple = T)
 
-# fix dimensions for simple approximat eto tab
+# fix dimensions for simple approximate to tab
 bodrow <- (length(ncol(tabsimp)$heights) - 1)
 tabsimp <- tabsimp %>% 
   width(j = 1:ncol_keys(.), width = flextable_dim(tab)$widths / ncol_keys(.)) %>% 
   height(i = 1:bodrow, height = flextable_dim(tab)$heights / bodrow) 
-flextable_dim(tabsimp2)$aspect_ratio
+flextable_dim(tabsimp)$aspect_ratio
 
 save_as_html(tabsimp, path = 'docs/target_table_simple.html', title = NULL)
 

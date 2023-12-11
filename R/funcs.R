@@ -1052,17 +1052,18 @@ targetcmp_fun <- function(cursum, restoresum, trgs, strata, cap, stratsel = 'All
       filter(Category == stratsel)
 
   tab <- allsum %>% 
-    as_grouped_data(groups = 'Category')
-  
+    as_grouped_data(groups = 'Category') %>% 
+    mutate(
+      HMPU_TARGETS = case_when(
+        is.na(HMPU_TARGETS) ~ Category,
+        T ~ HMPU_TARGETS
+      )
+    ) %>% 
+    select(-Category)
+
   if(simple)
     tab <- tab %>% 
-      mutate(
-        HMPU_TARGETS = case_when(
-          is.na(HMPU_TARGETS) ~ Category,
-          T ~ HMPU_TARGETS
-        )
-      ) %>% 
-    select(-Category, -`total restorable`)
+      select(-`total restorable`)
   
   # index to start center align
   startc <- which(names(tab) == 'Current Extent')
@@ -1071,7 +1072,6 @@ targetcmp_fun <- function(cursum, restoresum, trgs, strata, cap, stratsel = 'All
     tab <- tab %>% 
       flextable() %>% 
       set_header_labels(
-        Category = 'Stratum',
         HMPU_TARGETS = 'Habitat Type',
         `total restorable` = 'Total Restoration Opportunity*',
         `Target2030` = '2030 Target', 
@@ -1085,7 +1085,6 @@ targetcmp_fun <- function(cursum, restoresum, trgs, strata, cap, stratsel = 'All
       select(-matches('^Goal')) %>% 
       flextable() %>% 
       set_header_labels(
-        Category = 'Stratum',
         HMPU_TARGETS = 'Habitat Type',
         `total restorable` = 'Total Restoration Opportunity*',
         `Target2030` = '2030 Target', 
@@ -1097,7 +1096,6 @@ targetcmp_fun <- function(cursum, restoresum, trgs, strata, cap, stratsel = 'All
       select(-matches('^Target')) %>% 
       flextable() %>% 
       set_header_labels(
-        Category = 'Stratum',
         HMPU_TARGETS = 'Habitat Type',
         `total restorable` = 'Total Restoration Opportunity*',
         `Goal2050` = '2050 Goal', 
@@ -1124,7 +1122,7 @@ targetcmp_fun <- function(cursum, restoresum, trgs, strata, cap, stratsel = 'All
   if(!simple)
     tab <- tab %>% 
       add_footer_lines(values = "") %>%
-      add_footer_lines(value = as_paragraph("N/A - Not Applicable; I/D - Insufficient Data; LSSM - Living Shoreline Suitability Model; JU - Potential ", as_i("Juncus"), " Marsh Opportunity")) %>%
+      add_footer_lines(value = as_paragraph("N/A - Not Applicable; I/D - Insufficient Data; LSSM - Living Shoreline Suitability Model")) %>%
       add_footer_lines(values = "*Does not account for lands neither currently protected nor currently under consideration for acquisition") %>%
       fontsize(size = 8, part = 'footer')
   
@@ -1137,38 +1135,36 @@ targetcmp_fun <- function(cursum, restoresum, trgs, strata, cap, stratsel = 'All
       merge_at(i = 7, part = 'body') %>% 
       merge_at(i = 14, part = 'body') %>% 
       align(i = c(8:13, 15:18), j = startc:ncol_keys(.), align = "center", part = "body") %>%
-      bold(i = 8) %>% 
       bg(i = c(7, 14), bg = '#00806E', part = "body") %>% 
       color(i = c(7, 14), color = 'white', part = "body")
     
     if(!simple)
       tab <- tab %>% 
-        merge_at(i = 9:10, j = 4, part = 'body') %>%
-        merge_at(i = 16:17, j = 4, part = 'body')
+        merge_at(i = 9:10, j = 3, part = 'body') %>%
+        merge_at(i = 16:17, j = 3, part = 'body')
   }
   
   if(stratsel == 'Not Subtidal'){
     tab <- tab %>% 
       merge_at(i = 8, part = 'body') %>% 
       align(i = c(2:7, 9:12), j = startc:ncol_keys(.), align = "center", part = "body") %>%
-      bold(i = 2) %>% 
       bg(i = 8, bg = '#00806E', part = "body") %>% 
       color(i = 8, color = 'white', part = "body")
     
     if(!simple)
       tab <- tab %>% 
-        merge_at(i = 3:4, j = 4, part = 'body') %>%
-        merge_at(i = 10:11, j = 4, part = 'body') 
+        merge_at(i = 3:4, j = 3, part = 'body') %>%
+        merge_at(i = 10:11, j = 3, part = 'body') 
+    
   }
   
   if(stratsel == 'Intertidal'){
     tab <- tab %>% 
-      align(i = 2:7, j = startc:ncol_keys(.), align = "center", part = "body") %>%
-      bold(i = 2)
+      align(i = 2:7, j = startc:ncol_keys(.), align = "center", part = "body")
     
     if(!simple)
       tab <- tab %>% 
-        merge_at(i = 3:4, j = 4, part = 'body')
+        merge_at(i = 3:4, j = 3, part = 'body')
   }
   
   if(stratsel == 'Supratidal'){
@@ -1177,9 +1173,27 @@ targetcmp_fun <- function(cursum, restoresum, trgs, strata, cap, stratsel = 'All
     
     if(!simple)
       tab <- tab %>% 
-        merge_at(i = 3:4, j = 4, part = 'body')
+        merge_at(i = 3:4, j = 3, part = 'body')
   }
   
+  # bold targets/goals with acres/miles to go
+  if(simple){
+    
+    if(typ == 'targets')
+      tab <- tab %>% 
+        bold(j = 4, i = !grepl('^\\-', .$body$dataset$Target2030togo), part = 'body')
+
+    if(typ == 'goals')
+      tab <- tab %>% 
+        bold(j = 4, i = !grepl('^\\-', .$body$dataset$Goal2050togo), part = 'body')
+    
+    if(typ == 'both')
+      tab <- tab %>% 
+        bold(j = 4, i = !grepl('^\\-', .$body$dataset$Target2030togo), part = 'body') %>% 
+        bold(j = 6, i = !grepl('^\\-', .$body$dataset$Goal2050togo), part = 'body')
+    
+  }
+
   return(tab)
   
 }
