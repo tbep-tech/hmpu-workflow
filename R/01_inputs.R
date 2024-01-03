@@ -382,14 +382,14 @@ swfwmdarea <- st_area(swfwmdoys) %>% sum() %>% units::set_units('acres') %>% as.
 fwcsnp <- st_snap(fwcoyster, swfwmdoys, units::set_units(5, 'feet')) %>% 
   st_make_valid()
 
-# check total area, should match swfwmdarea + oysex at
+# check total area, should match swfwmdarea + oyse, see below
 unioys <- st_union(fwcsnp, swfwmdoys)
 unioysarea <- unioys %>% st_area() %>% sum() %>% units::set_units('acres') %>% as.numeric()
 
 # get difference
 oysdif <- st_difference(fwcsnp, swfwmdoys) %>% 
   st_as_sf() %>% 
-  st_collection_extract(c('POLYGON')) %>% 
+  st_cast(c('POLYGON')) %>% 
   mutate(
     acres = st_area(.), 
     acres = as.numeric(units::set_units(acres, 'acres'))
