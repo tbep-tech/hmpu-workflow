@@ -244,12 +244,12 @@ maxdat <- maxdat %>%
   mutate(
     Category = paste0(Category, ', ', maxyr),
     Category = case_when(
-      grepl('Mangrove|Salt', Category) ~ paste0('Coastal Wetlands, ', maxyr),
-      grepl('Wetlands', Category) ~ paste0('Freshwater Wetlands, ', maxyr), 
+      grepl('Mangrove|Salt|Wetlands', Category) ~ paste0('Wetlands, ', maxyr),
       grepl('Uplands', Category) ~ paste0('Forested, ', maxyr), 
       T ~ Category
     )
-  )
+  ) %>% 
+  filter(!grepl('Open Water', Category))
 
 # change analysis comparing each year to max
 strt <- Sys.time()
@@ -279,12 +279,12 @@ for(i in 1:nrow(inds)){
     mutate(
       Category = paste0(Category, ', ', yr),
       Category = case_when(
-        grepl('Mangrove|Salt', Category) ~ paste0('Coastal Wetlands, ', yr),
-        grepl('Wetlands', Category) ~ paste0('Freshwater Wetlands, ', yr), 
+        grepl('Mangrove|Salt|Wetlands', Category) ~ paste0('Wetlands, ', yr),
         grepl('Uplands', Category) ~ paste0('Forested, ', yr), 
         T ~ Category
       )
-    )
+    ) %>% 
+    filter(!grepl('Open Water', Category))
     
   b <- maxdat
   
