@@ -818,7 +818,8 @@ restdat_fun <- function(restorelyr, crplyr = NULL){
 # stratsel chr string for "All", "Subtidal", "Not Subtidal", "Intertidal", or "Supratidal"
 # typ chr string indicating "targets", "goals", or "both"
 # simple logical indicating if simple table should be returned, stratum combined with habitat, no restoration target info
-target_fun <- function(lulc, subt, hard, arti, tidt, livs, oyse, coastal, fluccs, strata, restorelyr, trgs, cap, stratsel = 'All', typ = 'both', simple = F){
+# totintertid logical indicating of the row for total intertidal is shown
+target_fun <- function(lulc, subt, hard, arti, tidt, livs, oyse, coastal, fluccs, strata, restorelyr, trgs, cap, stratsel = 'All', typ = 'both', simple = F, totintertid = T){
   
   stratsel <- match.arg(stratsel, c('All', 'Subtidal', 'Not Subtidal', 'Intertidal', 'Supratidal'))
   typ <- match.arg(typ, c('targets', 'goals', 'both'))
@@ -958,7 +959,7 @@ target_fun <- function(lulc, subt, hard, arti, tidt, livs, oyse, coastal, fluccs
   restoresum <- bind_rows(restoresum, intrsum)
   
   # final table
-  out <- targetcmp_fun(cursum, restoresum, trgs, strata, cap, stratsel, typ, simple)
+  out <- targetcmp_fun(cursum, restoresum, trgs, strata, cap, stratsel, typ, simple, totintertid)
   
   return(out)
   
@@ -1003,7 +1004,7 @@ targetleg_fun <- function(trgs, strata, cap, stratsel = 'All', typ = 'both'){
 }
 
 # final table compilation function for target_fun, targetleg_fun
-targetcmp_fun <- function(cursum, restoresum, trgs, strata, cap, stratsel = 'All', typ = 'both', simple = F){
+targetcmp_fun <- function(cursum, restoresum, trgs, strata, cap, stratsel = 'All', typ = 'both', simple = F, totintertid = T){
   
   # all summary
   allsum <- cursum %>% 
@@ -1201,6 +1202,13 @@ targetcmp_fun <- function(cursum, restoresum, trgs, strata, cap, stratsel = 'All
     
   }
 
+  if(!totintertid){
+    
+    tab <- tab %>% 
+      delete_rows(i = 8, part = 'body')
+    
+  }
+  
   return(tab)
   
 }
