@@ -819,7 +819,8 @@ restdat_fun <- function(restorelyr, crplyr = NULL){
 # typ chr string indicating "targets", "goals", or "both"
 # simple logical indicating if simple table should be returned, stratum combined with habitat, no restoration target info
 # totintertid logical indicating of the row for total intertidal is shown
-target_fun <- function(lulc, subt, hard, arti, tidt, livs, oyse, coastal, fluccs, strata, restorelyr, trgs, cap, stratsel = 'All', typ = 'both', simple = F, totintertid = T){
+# j1width numeric indicating the width of the first column, optional
+target_fun <- function(lulc, subt, hard, arti, tidt, livs, oyse, coastal, fluccs, strata, restorelyr, trgs, cap, stratsel = 'All', typ = 'both', simple = F, totintertid = T, j1width = NULL){
   
   stratsel <- match.arg(stratsel, c('All', 'Subtidal', 'Not Subtidal', 'Intertidal', 'Supratidal'))
   typ <- match.arg(typ, c('targets', 'goals', 'both'))
@@ -959,7 +960,7 @@ target_fun <- function(lulc, subt, hard, arti, tidt, livs, oyse, coastal, fluccs
   restoresum <- bind_rows(restoresum, intrsum)
   
   # final table
-  out <- targetcmp_fun(cursum, restoresum, trgs, strata, cap, stratsel, typ, simple, totintertid)
+  out <- targetcmp_fun(cursum, restoresum, trgs, strata, cap, stratsel, typ, simple, totintertid, j1width)
   
   return(out)
   
@@ -1004,7 +1005,7 @@ targetleg_fun <- function(trgs, strata, cap, stratsel = 'All', typ = 'both'){
 }
 
 # final table compilation function for target_fun, targetleg_fun
-targetcmp_fun <- function(cursum, restoresum, trgs, strata, cap, stratsel = 'All', typ = 'both', simple = F, totintertid = T){
+targetcmp_fun <- function(cursum, restoresum, trgs, strata, cap, stratsel = 'All', typ = 'both', simple = F, totintertid = T, j1width = NULL){
   
   # all summary
   allsum <- cursum %>% 
@@ -1208,6 +1209,10 @@ targetcmp_fun <- function(cursum, restoresum, trgs, strata, cap, stratsel = 'All
       delete_rows(i = 8, part = 'body')
     
   }
+  
+  if(!is.null(j1width))
+    tab <- tab %>% 
+      width(j = 1, width = j1width)
   
   return(tab)
   
