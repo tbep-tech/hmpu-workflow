@@ -1006,7 +1006,7 @@ targetleg_fun <- function(trgs, strata, cap, stratsel = 'All', typ = 'both'){
 
 # final table compilation function for target_fun, targetleg_fun
 targetcmp_fun <- function(cursum, restoresum, trgs, strata, cap, stratsel = 'All', typ = 'both', simple = F, totintertid = T, j1width = NULL){
-  
+
   # all summary
   allsum <- cursum %>% 
     left_join(restoresum, by = 'HMPU_TARGETS') %>% 
@@ -1024,6 +1024,10 @@ targetcmp_fun <- function(cursum, restoresum, trgs, strata, cap, stratsel = 'All
       ), 
       val = case_when(
         var %in% c('Target2030', 'Goal2050') & HMPU_TARGETS %in% c('Hard Bottom', 'Artificial Reefs', 'Seagrasses', 'Mangrove Forests') ~ paste0('>', val), 
+        T ~ val
+      ),
+      val = case_when(
+        grepl('togo$', var) & grepl('^\\-', val) ~ '\u2713', 
         T ~ val
       ),
       Category = factor(Category, levels = c('Subtidal', 'Intertidal', 'Supratidal')), 
@@ -1185,24 +1189,6 @@ targetcmp_fun <- function(cursum, restoresum, trgs, strata, cap, stratsel = 'All
         merge_at(i = 3:4, j = 3, part = 'body')
   }
   
-  # bold targets/goals with acres/miles to go
-  if(simple){
-    
-    if(typ == 'targets')
-      tab <- tab %>% 
-        bold(j = 4, i = !grepl('^\\-', .$body$dataset$Target2030togo), part = 'body')
-
-    if(typ == 'goals')
-      tab <- tab %>% 
-        bold(j = 4, i = !grepl('^\\-', .$body$dataset$Goal2050togo), part = 'body')
-    
-    if(typ == 'both')
-      tab <- tab %>% 
-        bold(j = 4, i = !grepl('^\\-', .$body$dataset$Target2030togo), part = 'body') %>% 
-        bold(j = 6, i = !grepl('^\\-', .$body$dataset$Goal2050togo), part = 'body')
-    
-  }
-
   if(!totintertid){
     
     tab <- tab %>% 
