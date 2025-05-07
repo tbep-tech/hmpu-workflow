@@ -1,9 +1,12 @@
+# setup ---------------------------------------------------------------------------------------
+
 library(sf)
 library(tidyverse)
 library(here)
 library(doParallel)
 library(foreach)
 library(esri2sf) # yonghah/esri2sf on github
+library(lwgeom)
 library(tbeptools)
 library(units)
 
@@ -118,7 +121,7 @@ save(salin, file = here('data', 'salin.RData'), compress = 'xz')
 
 # proposed and conservation lands ------------------------------------------
 
-data(tbshed)
+load(file = here("data/tbshed.RData"))
 
 bbox <- sf::st_bbox(tbshed)
 
@@ -126,33 +129,22 @@ bbox <- sf::st_bbox(tbshed)
 
 ## from FNAI website
 
-# URL links for these layers are from here: https://www.fnai.org/gisdata.cfm
-# layers are also available through ESRI servers: https://geodata.fnai.org/
+# zipped layers available: https://www.fnai.org/publications/gis-data
+# all use get_cons which downloads the full zipped geodatabase, imports the shapefiles, 
+# reprojects, applies geometry fixes, then clips by watershed
 
 # FLMA, florida conservation lands
 # remove Macdill (custom polygon from original layer)
-flma <- esri2sf('https://services.arcgis.com/9Jk4Zl9KofTtvg3x/arcgis/rest/services/FL_Conservation_Lands_web/FeatureServer/0',
-        bbox = bbox) %>% 
+flma <- get_cons('https://www.fnai.org/shapefiles/flma_202503.zip', prj = prj, tbshed) %>% 
   dplyr::filter(!MANAME %in% 'MacDill Air Force Base') %>% 
-  st_transform(st_crs(tbshed)) %>% 
-  st_buffer(dist = 0) %>% 
-  st_intersection(tbshed) %>% 
   st_union 
 
 # FFBOT, future forever board of trustees projects
-ffbot <- esri2sf('https://services.arcgis.com/9Jk4Zl9KofTtvg3x/arcgis/rest/services/Florida_Forever_BOT_Projects/FeatureServer/0', 
-                 bbox = bbox) %>% 
-  st_transform(st_crs(tbshed)) %>% 
-  st_buffer(dist = 0) %>% 
-  st_intersection(tbshed) %>% 
+ffbot <- get_cons('https://www.fnai.org/shapefiles/ffbot_202503.zip', prj = prj, tbshed) %>% 
   st_union 
 
 # FFA, future forever acquisitions
-ffa <- esri2sf('https://services.arcgis.com/9Jk4Zl9KofTtvg3x/arcgis/rest/services/Florida_Forever_Acquisitions/FeatureServer/0', 
-               bbox = bbox) %>% 
-  st_transform(st_crs(tbshed)) %>% 
-  st_buffer(dist = 0) %>% 
-  st_intersection(tbshed) %>% 
+ffa <- get_cons('https://www.fnai.org/shapefiles/ff_acquired_202502.zip', prj = prj, tbshed) %>% 
   st_union
 
 ## aquatic preserves, from DEP
@@ -237,10 +229,13 @@ save(exst, file = here('data', 'exst.RData'), version = 2)
 
 # import each lulc layer, crop by tbshed, save ----------------------------
 
-data (tbshed)
+load(file = here('data/tbshed.RData'))
 
 # https://data-swfwmd.opendata.arcgis.com/search?groupIds=880fc95697ce45c3a8b078bb752faf40
+# note that these endpoints probably don't work anymore, hardcoding to local URL starting with 2023
+# then just using the index from urls object to process new data
 urls <- list(
+  `2023` = 'T:/05_GIS/SWFWMD/LULC_2023/LANDUSELANDCOVER2023.shp',
   `2020` = 'https://opendata.arcgis.com/datasets/6049aef268114f7dab8df36e103ff5c5_2.geojson',
   `2017` = 'https://opendata.arcgis.com/datasets/bedb342c692d4be6891b899e4cf7f4a6_1.geojson',
   `2014` = 'https://opendata.arcgis.com/datasets/e8cefca7d0d94fbaaa6b8dfa5403d984_0.geojson',

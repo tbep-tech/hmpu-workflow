@@ -132,14 +132,25 @@ get_cons <- function(url, prj, tbshed){
   download.file(url, destfile = tmp1, method = 'libcurl')
   unzip(tmp1, exdir = tmp2)
   
-  shp <- list.files(tmp2, pattern = '\\.shp$', full.names = T)
-  out <- st_read(shp) %>%
+  # get gdb
+  gdb <- list.files(tmp2, pattern = '\\.gdb$', full.names = T)
+  
+  # list layers in gdb
+  shp <- sf::st_layers(gdb)$name
+
+  out <- st_read(gdb, shp, quiet = T) %>%
     st_transform(crs = prj) %>%
+    {
+      geom <- st_geometry(.)
+      valid_geom <- lwgeom::lwgeom_make_valid(geom)
+      st_set_geometry(., valid_geom)
+    } %>% 
     st_buffer(dist = 0) %>%
     st_intersection(tbshed) 
   
-  file.remove(list.files(tmp1, full.names = T))
-  file.remove(list.files(tmp2, full.names = T))
+  gc() # closes connection
+  unlink(tmp1, recursive = T, force = T)
+  unlink(tmp2, recursive = T, force = T)
   
   return(out)
   
