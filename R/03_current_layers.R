@@ -16,7 +16,7 @@ data(soils)
 data(salin)
 
 # current year
-lulcfl <- 'lulc2020'
+lulcfl <- 'lulc2023'
 load(here('data', paste0(lulcfl, '.RData')))
 
 # existing, proposed conservation and restoration opps --------------------
@@ -173,7 +173,8 @@ for(typ in c('Proposed', 'Existing')){
 # existing conservation (native and restorable), unioned for difference
 uniexstall <- exstall %>% 
   st_combine() %>% 
-  st_union()
+  st_union() %>% 
+  st_make_valid()
 
 # native currently proposed
 nativersrv <- nativelyr %>% 
