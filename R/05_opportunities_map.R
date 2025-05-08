@@ -112,7 +112,8 @@ st_write(oppdat_hilco, 'data/shapefiles/oppmap_hilco.shp', delete_layer = TRUE)
 
 oppdat_hilco <- st_read('data/shapefiles/oppmap_hilco.shp')
 
-p <- oppmap_fun(oppdat_hilco, hilco, ttl = 'Hillsborough Co. Combined Opportunities', northloc = 'tl', scaleloc = 'br', buffdist = 2e4)
+p <- oppmap_fun(oppdat_hilco, hilco, ttl = 'Hillsborough Co. Combined Opportunities', northloc = 'tl', scaleloc = 'br', 
+                buffdist = 2e4)
 
 png('docs/oppmap_hilco.png', height = 5, width = 8, res = 300, units = 'in')
 p
@@ -140,7 +141,8 @@ st_write(oppdat_manco, 'data/shapefiles/oppmap_manco.shp', delete_layer = TRUE)
 
 oppdat_manco <- st_read('data/shapefiles/oppmap_manco.shp')
 
-p <- oppmap_fun(oppdat_manco, manco, ttl = 'Manatee Co. Combined Opportunities', northloc = 'bl', scaleloc = 'tl', buffdist = 2e4)
+p <- oppmap_fun(oppdat_manco, manco, ttl = 'Manatee Co. Combined Opportunities', northloc = 'bl', scaleloc = 'tl', 
+                buffdist = 2e4)
 
 png('docs/oppmap_manco.png', height = 5, width = 8, res = 300, units = 'in')
 p
@@ -154,7 +156,8 @@ st_write(oppdat_pasco, 'data/shapefiles/oppmap_pasco.shp', delete_layer = TRUE)
 
 oppdat_pasco <- st_read('data/shapefiles/oppmap_pasco.shp')
 
-p <- oppmap_fun(oppdat_pasco, pasco, ttl = 'Pasco Co. Combined Opportunities', northloc = 'tl', scaleloc = 'tr', buffdist = 2e4)
+p <- oppmap_fun(oppdat_pasco, pasco, ttl = 'Pasco Co. Combined Opportunities', northloc = 'tl', scaleloc = 'tr', 
+                buffdist = 2e4)
 
 png('docs/oppmap_pasco.png', height = 5, width = 8, res = 300, units = 'in')
 p

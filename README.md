@@ -24,7 +24,7 @@ For an assessment of land use changes using Shiny, see the separate repository h
      * Tampa Bay watershed: [map](https://tbep-tech.github.io/hmpu-workflow/restmap.png)
      * Tampa municipal boundaries: [map](https://tbep-tech.github.io/hmpu-workflow/restmap_tampa.png) 
      * St. Pete municipal boundaries: [map](https://tbep-tech.github.io/hmpu-workflow/restmap_stpet.png)
-     * Clearwater municipal boundaries: [map](https://tbep-tech.github.io/hmpu-workflow/restmap_clrwt.png)
+     * Clearwater municipal boundaries: none with 2023 land use update
      * Hillsborough Co. boundaries: [map](https://tbep-tech.github.io/hmpu-workflow/restmap_hilco.png)
      * Pinellas Co. boundaries: [map](https://tbep-tech.github.io/hmpu-workflow/restmap_pinco.png)
      * Manatee Co. boundaries: [map](https://tbep-tech.github.io/hmpu-workflow/restmap_manco.png)

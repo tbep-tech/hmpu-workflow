@@ -8,7 +8,8 @@ library(mapview)
 library(grid)
 library(htmlwidgets)
 library(googledrive)
-library(ggmap)
+library(maptiles)
+library(tidyterra)
 library(ggspatial)
 library(tbeptools)
 
@@ -47,8 +48,7 @@ st_write(restdat, 'data/shapefiles/restmap.shp', delete_layer = TRUE)
 
 restdat <- st_read('data/shapefiles/restmap.shp')
 
-p <- restmap_fun(restdat, tbshed, ttl = 'Tampa Bay Watershed Restoration Potential', northloc = 'tr', scaleloc = 'tl', 
-                buffdist = 0.04)
+p <- restmap_fun(restdat, tbshed, ttl = 'Tampa Bay Watershed Restoration Potential', northloc = 'tr', scaleloc = 'tl')
 
 png('docs/restmap.png', height = 5, width = 8, res = 300, units = 'in')
 p
@@ -62,8 +62,7 @@ st_write(restdat_tampa, 'data/shapefiles/restmap_tampa.shp', delete_layer = TRUE
 
 restdat_tampa <- st_read('data/shapefiles/restmap_tampa.shp')
 
-p <- restmap_fun(restdat_tampa, tampa, ttl = 'Tampa Restoration Potential', northloc = 'tl', scaleloc = 'br', 
-                buffdist = 0.02)
+p <- restmap_fun(restdat_tampa, tampa, ttl = 'Tampa Restoration Potential', northloc = 'tl', scaleloc = 'br')
 
 png('docs/restmap_tampa.png', height = 5, width = 8, res = 300, units = 'in')
 p
@@ -77,27 +76,26 @@ st_write(restdat_stpet, 'data/shapefiles/restmap_stpet.shp', delete_layer = TRUE
 
 restdat_stpet <- st_read('data/shapefiles/restmap_stpet.shp')
 
-p <- restmap_fun(restdat_stpet, stpet, 'St. Petersburg Restoration Potential', northloc = 'tl', scaleloc = 'br',
-                buffdist = 0.02)
+p <- restmap_fun(restdat_stpet, stpet, 'St. Petersburg Restoration Potential', northloc = 'tl', scaleloc = 'br')
 
 png('docs/restmap_stpet.png', height = 5, width = 8, res = 300, units = 'in')
 p
 dev.off()
 
-# clearwater only ---------------------------------------------------------
-
-restdat_clrwt <- restdat_fun(restorelyr, clrwt)
-
-st_write(restdat_clrwt, 'data/shapefiles/restmap_clrwt.shp', delete_layer = TRUE)
-
-restdat_clrwt <- st_read('data/shapefiles/restmap_clrwt.shp')
-
-p <- restmap_fun(restdat_clrwt, clrwt, 'Clearwater Restoration Potential', northloc = 'tl', scaleloc = 'br', 
-                buffdist = 0.01)
-
-png('docs/restmap_clrwt.png', height = 5, width = 8, res = 300, units = 'in')
-p
-dev.off()
+# # clearwater only ---------------------------------------------------------
+# 
+# # nothing with 2023 lulc update
+# restdat_clrwt <- restdat_fun(restorelyr, clrwt)
+# 
+# st_write(restdat_clrwt, 'data/shapefiles/restmap_clrwt.shp', delete_layer = TRUE)
+# 
+# restdat_clrwt <- st_read('data/shapefiles/restmap_clrwt.shp')
+# 
+# p <- restmap_fun(restdat_clrwt, clrwt, 'Clearwater Restoration Potential', northloc = 'tl', scaleloc = 'br')
+# 
+# png('docs/restmap_clrwt.png', height = 5, width = 8, res = 300, units = 'in')
+# p
+# dev.off()
 
 # hilco only --------------------------------------------------------------
 
@@ -108,7 +106,7 @@ st_write(restdat_hilco, 'data/shapefiles/restmap_hilco.shp', delete_layer = TRUE
 restdat_hilco <- st_read('data/shapefiles/restmap_hilco.shp')
 
 p <- restmap_fun(restdat_hilco, hilco, ttl = 'Hillsborough Co. Restoration Potential', northloc = 'tl', scaleloc = 'br', 
-                buffdist = 0.02)
+                buffdist = 2e4)
 
 png('docs/restmap_hilco.png', height = 5, width = 8, res = 300, units = 'in')
 p
@@ -122,8 +120,7 @@ st_write(restdat_pinco, 'data/shapefiles/restmap_pinco.shp', delete_layer = TRUE
 
 restdat_pinco <- st_read('data/shapefiles/restmap_pinco.shp')
 
-p <- restmap_fun(restdat_pinco, pinco, ttl = 'Pinellas Co. Restoration Potential', northloc = 'bl', scaleloc = 'br', 
-                buffdist = 0.02)
+p <- restmap_fun(restdat_pinco, pinco, ttl = 'Pinellas Co. Restoration Potential', northloc = 'bl', scaleloc = 'br')
 
 png('docs/restmap_pinco.png', height = 5, width = 8, res = 300, units = 'in')
 p
@@ -138,7 +135,7 @@ st_write(restdat_manco, 'data/shapefiles/restmap_manco.shp', delete_layer = TRUE
 restdat_manco <- st_read('data/shapefiles/restmap_manco.shp')
 
 p <- restmap_fun(restdat_manco, manco, ttl = 'Manatee Co. Restoration Potential', northloc = 'bl', scaleloc = 'tl', 
-                buffdist = 0.025)
+                buffdist = 2e4)
 
 png('docs/restmap_manco.png', height = 5, width = 8, res = 300, units = 'in')
 p
@@ -153,7 +150,7 @@ st_write(restdat_pasco, 'data/shapefiles/restmap_pasco.shp', delete_layer = TRUE
 restdat_pasco <- st_read('data/shapefiles/restmap_pasco.shp')
 
 p <- restmap_fun(restdat_pasco, pasco, ttl = 'Pasco Co. Restoration Potential', northloc = 'tl', scaleloc = 'tr', 
-                buffdist = 0.04)
+                buffdist = 2e4)
 
 png('docs/restmap_pasco.png', height = 5, width = 8, res = 300, units = 'in')
 p
@@ -164,6 +161,8 @@ dev.off()
 fls <- list.files('data/shapefiles/', pattern = '^restmap', full.names = T)
 zip('data/shapefiles/restoration-layers', fls)
 
+# https://drive.google.com/drive/folders/1CsuYXCpFzSJAPdHHfdKDZgYkXFeHes6y?usp=sharing/
+# not working as of 5/8/25, uploaded manually
 drive_upload('data/shapefiles/restoration-layers.zip', 
-             path = 'https://drive.google.com/drive/folders/1CsuYXCpFzSJAPdHHfdKDZgYkXFeHes6y?usp=sharing/', overwrite = T)
+             path = '1CsuYXCpFzSJAPdHHfdKDZgYkXFeHes6y', overwrite = T)
 
