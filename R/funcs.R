@@ -607,10 +607,10 @@ oppdat_fun <- function(nativersrv, restorersrv, nativelyr, restorelyr, coastal, 
 # ttle is chr string of plot title
 # northloc location of north arrow
 # scaleloc location of scale bar
-# buffdist is buffer for boundary layer
+# buffdist is buffer for boundary layer, in meters
 #
 # requires ggsn, ggmap, ggplot, sf
-oppmap_fun <- function(oppmap, bndry, ttl, northloc = 'tr', scaleloc = 'tl', buffdist = 0.01){
+oppmap_fun <- function(oppmap, bndry, ttl, northloc = 'tr', scaleloc = 'tl', buffdist = 1e4){
   
   # colors 
   cols <- list(
@@ -622,44 +622,34 @@ oppmap_fun <- function(oppmap, bndry, ttl, northloc = 'tr', scaleloc = 'tl', buf
     `Reservation Restorable` = 'violetred3'
     ) %>% 
     unlist
+
+  # layer extent as bbox plus buffer
+  mapbbox <- bndry %>% 
+    st_bbox() %>% 
+    st_as_sfc() %>% 
+    st_buffer(dist = buffdist) %>%
+    st_transform(crs = 4326) %>%
+    st_bbox()
   
-  # transform to wgs to work with ggmap
+  # for bounding the plot
+  bbox <- bndry %>% 
+    st_bbox() %>% 
+    st_as_sfc() %>% 
+    st_transform(crs = 4326) %>% 
+    st_bbox() 
+ 
+  # transform to wgs
   tomap <- oppmap %>%
     st_transform(crs = 4326)
   
-  # trasnfrom to wgs to work with ggmap
+  # transform to wgs
   bndry <- bndry %>% 
     st_transform(crs = 4326)
   
-  # layer extent as bbox plus buffer
-  dat_ext <- bndry %>% 
-    st_bbox %>% 
-    st_as_sfc %>% 
-    st_buffer(dist = buffdist) %>%
-    st_bbox %>% 
-    unname
+  tls <- get_tiles(mapbbox, provider = 'CartoDB.PositronNoLabels', zoom = 11, crop = T)
 
-  # reference data for ggsn, MUST have geometry named column
-  ggsnref <- bndry %>% 
-    st_bbox %>% 
-    st_as_sfc %>%
-    st_buffer(dist = buffdist / 2) %>% 
-    st_as_sf %>%
-    st_cast('POINT') %>% 
-    rename(geometry = x)
-  
-  # stamen base map
-  bsmap1 <- get_stamenmap(bbox = dat_ext, maptype = 'toner-background', zoom = 12)
-  
-  # change opacity of basemap
-  mapatt <- attributes(bsmap1)
-  bsmap1_transparent <- matrix(adjustcolor(bsmap1, 
-                                           alpha.f = 0.2), 
-                               nrow = nrow(bsmap1))
-  attributes(bsmap1_transparent) <- mapatt
-
-  # plot
-  p <- ggmap(bsmap1_transparent) +
+  m <- ggplot() + 
+    geom_spatraster_rgb(data = tls, maxcell = 1e8, alpha = 0.8) +
     geom_sf(data = tomap, aes(fill = cat), color = NA, inherit.aes = F, alpha = 0.8) +
     geom_sf(data = bndry, fill = NA, color = 'black', inherit.aes = F, size = 0.3) +
     scale_fill_manual(values = cols, drop = F) +
@@ -681,9 +671,10 @@ oppmap_fun <- function(oppmap, bndry, ttl, northloc = 'tr', scaleloc = 'tl', buf
       ) +
     annotation_scale(location = scaleloc) +
     annotation_north_arrow(location = northloc, which_north = "true", height = grid::unit(0.75, "cm"), 
-                           width = grid::unit(0.75, "cm"))
+                           width = grid::unit(0.75, "cm")) +
+    coord_sf(xlim = bbox[c('xmin', 'xmax')], ylim = bbox[c('ymin', 'ymax')], crs = 4326, expand = T)
   
-  return(p)
+  return(m)
   
 }
 
