@@ -137,7 +137,7 @@ for(i in 1:nrow(inds)){
   # year
   yr <- inds[i, ] %>% pull(yr)
   
-  if(yr == '2020')
+  if(yr == maxyr)
     next()
   
   cat(yr, 'importing\n')
