@@ -10,7 +10,7 @@ source(here('R', 'funcs.R'))
 
 fluccs <- read.csv(here('data', 'FLUCCShabsclass.csv'), stringsAsFactors = F)
 
-lulcfl <- 'lulc2020'
+lulcfl <- 'lulc2023'
 subtfl <- 'sgdat2022'
 
 # from 01_inputs
@@ -57,7 +57,7 @@ save_as_html(tab_tampa, path = 'docs/current_table_tampa.html', title = NULL)
 
 # st pete -----------------------------------------------------------------
 
-cap <- cap <- 'Summary of the Opportunity Assessment Analysis: St. Pete'
+cap <- 'Summary of the Opportunity Assessment Analysis: St. Pete'
 
 tab_stpet <- curex_fun(lulc, subt, hard, arti, tidt, livs, oyse, coastal, fluccs, strata, nativelyr, restorelyr, cap, stpet)
 
@@ -65,7 +65,7 @@ save_as_html(tab_stpet, path = 'docs/current_table_stpet.html', title = NULL)
 
 # clearwater --------------------------------------------------------------
 
-cap <- cap <- 'Summary of the Opportunity Assessment Analysis: Clearwater'
+cap <- 'Summary of the Opportunity Assessment Analysis: Clearwater'
 
 tab_clrwt <- curex_fun(lulc, subt, hard, arti, tidt, livs, oyse, coastal, fluccs, strata, nativelyr, restorelyr, cap, clrwt)
 
@@ -73,7 +73,7 @@ save_as_html(tab_clrwt, path = 'docs/current_table_clrwt.html', title = NULL)
 
 # hillsborough co ---------------------------------------------------------
 
-cap <- cap <- 'Summary of the Opportunity Assessment Analysis: Hillsborough Co.'
+cap <- 'Summary of the Opportunity Assessment Analysis: Hillsborough Co.'
 
 tab_hilco <- curex_fun(lulc, subt, hard, arti, tidt, livs, oyse, coastal, fluccs, strata, nativelyr, restorelyr, cap, hilco)
 
@@ -81,7 +81,7 @@ save_as_html(tab_hilco, path = 'docs/current_table_hilco.html', title = NULL)
 
 # pinellas co -------------------------------------------------------------
 
-cap <- cap <- 'Summary of the Opportunity Assessment Analysis: Pinellas Co.'
+cap <- 'Summary of the Opportunity Assessment Analysis: Pinellas Co.'
 
 tab_pinco <- curex_fun(lulc, subt, hard, arti, tidt, livs, oyse, coastal, fluccs, strata, nativelyr, restorelyr, cap, pinco)
 
@@ -89,7 +89,7 @@ save_as_html(tab_pinco, path = 'docs/current_table_pinco.html', title = NULL)
 
 # manatee co --------------------------------------------------------------
 
-cap <- cap <- 'Summary of the Opportunity Assessment Analysis: Manatee Co.'
+cap <- 'Summary of the Opportunity Assessment Analysis: Manatee Co.'
 
 tab_manco <- curex_fun(lulc, subt, hard, arti, tidt, livs, oyse, coastal, fluccs, strata, nativelyr, restorelyr, cap, manco)
 
@@ -97,7 +97,7 @@ save_as_html(tab_manco, path = 'docs/current_table_manco.html', title = NULL)
 
 # pasco co ----------------------------------------------------------------
 
-cap <- cap <- 'Summary of the Opportunity Assessment Analysis: Pasco Co.'
+cap <- 'Summary of the Opportunity Assessment Analysis: Pasco Co.'
 
 tab_pasco <- curex_fun(lulc, subt, hard, arti, tidt, livs, oyse, coastal, fluccs, strata, nativelyr, restorelyr, cap, pasco)
 

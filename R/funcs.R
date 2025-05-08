@@ -205,7 +205,7 @@ curex_fun <- function(lulc, subt, hard, arti, tidt, livs, oyse, coastal, fluccs,
     restorelyr <- st_intersection(restorelyr, crplyr)
     
   }
-  
+
   # current lulc summary
 
   # # from HMPU deliverables 
@@ -309,13 +309,14 @@ curex_fun <- function(lulc, subt, hard, arti, tidt, livs, oyse, coastal, fluccs,
       Acres = st_area(.),
       Acres = set_units(Acres, acres), 
       Acres = as.numeric(Acres), 
-      typ = paste('native', typ)
+      typ = paste('native', typ), 
+      typ = factor(typ, levels = c('native Existing', 'native Proposed'))
     ) %>% 
     st_set_geometry(NULL) %>%
     group_by(typ, HMPU_TARGETS) %>%
     summarise(Acres = sum(Acres), .groups = 'drop') %>% 
     arrange(typ, HMPU_TARGETS) %>% 
-    spread(typ, Acres)
+    spread(typ, Acres, fill = 0, drop = F)
   
   # restorable summary
   
@@ -324,7 +325,8 @@ curex_fun <- function(lulc, subt, hard, arti, tidt, livs, oyse, coastal, fluccs,
       Acres = st_area(.),
       Acres = set_units(Acres, acres),
       Acres = as.numeric(Acres),
-      typ = paste('restorable', typ)
+      typ = paste('restorable', typ), 
+      typ = factor(typ, levels = c('restorable Existing', 'restorable Proposed'))
     ) %>% 
     st_set_geometry(NULL) %>%
     group_by(typ, HMPU_TARGETS) %>%
@@ -340,7 +342,7 @@ curex_fun <- function(lulc, subt, hard, arti, tidt, livs, oyse, coastal, fluccs,
   dups2 <- restoresum %>% 
     filter(HMPU_TARGETS %in% !!duplab2) %>% 
     mutate(HMPU_TARGETS = 'Non-Forested Freshwater Wetlands')
-  
+
   restoresum <- restoresum %>% 
     bind_rows(dups1) %>%
     bind_rows(dups2) %>% 
@@ -351,7 +353,7 @@ curex_fun <- function(lulc, subt, hard, arti, tidt, livs, oyse, coastal, fluccs,
         T ~ HMPU_TARGETS
       )
     ) %>% 
-    spread(typ, Acres, fill = 0) %>% 
+    spread(typ, Acres, fill = 0, drop = F) %>% 
     mutate(
       `total restorable` = `restorable Existing` + `restorable Proposed`
     )
