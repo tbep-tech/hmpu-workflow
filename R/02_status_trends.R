@@ -97,6 +97,9 @@ subtacres <-  subtacres %>%
     )
   )
 
+# manually add previous yrs of data for oysters since oyse is a running total
+subtacres$Acres[subtacres$HMPU_TARGETS == 'Oyster Bars' & subtacres$name == 2022] <- 230.29898
+
 save(subtacres, file = here('data', 'subtacres.RData'), version = 2)
 
 # LULC change analysis ----------------------------------------------------
@@ -255,7 +258,7 @@ for(i in 1:nrow(inds)){
   # year
   yr <- inds[i, ] %>% pull(yr)
   
-  if(yr == '2022')
+  if(yr == maxyr)
     next()
   
   cat(yr, 'importing\n')
