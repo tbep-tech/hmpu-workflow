@@ -19,7 +19,7 @@ prj <- 6443
 fluccs <- read.csv(here('data', 'FLUCCShabsclass.csv'), stringsAsFactors = F)
 
 # current subtidal year for fwc oyster difference
-subtfl <- 'sgdat2022'
+subtfl <- 'sgdat2024'
 
 # restoration targets lookup table ----------------------------------------
 
@@ -285,14 +285,20 @@ foreach(i = 1:nrow(urls), .packages = c('tidyverse', 'sf', 'here', 'tbeptools'))
 # import each subtidal layer, crop by tbshed, save ------------------------
 
 data(swfwmdtbseg)
+data(swfwmdtbseg2024)
 
 toint <- swfwmdtbseg %>% 
   st_transform(crs = prj) %>% 
   st_union()
 
+# slightly different for 2024
+toint2024 <- swfwmdtbseg2024 %>% 
+  st_transform(crs = prj) %>% 
+  st_union()
+
 # all zipped files on amazon s3
 # downloaded from here https://data-swfwmd.opendata.arcgis.com/
-fls <- c('88', '90', '92', '94', '96', '99', '01', '04', '06', '08', '10', '12', '14', '16', '18', '20', '22') %>% 
+fls <- c('88', '90', '92', '94', '96', '99', '01', '04', '06', '08', '10', '12', '14', '16', '18', '20', '22', '24') %>% 
   paste0('https://swfwmd-seagrass.s3.amazonaws.com/sg', ., '.zip')
 
 # setup parallel backend
@@ -317,8 +323,8 @@ for(i in 1:length(fls)){
   # delete files
   unlink(tmpdir, recursive = T)
   
-  if(any(c('FLUCCS_CODE', 'FLUCCS_COD') %in% names(dat_raw)))
-    names(dat_raw) <- gsub('^FLUCCS\\_COD$|^FLUCCS\\_CODE$', 'FLUCCSCODE', names(dat_raw))
+  if(any(c('FLUCCS_CODE', 'FLUCCS_COD', 'FLUCCS_Cod') %in% names(dat_raw)))
+    names(dat_raw) <- gsub('^FLUCCS\\_COD$|^FLUCCS\\_CODE$|^FLUCCS\\_Cod$', 'FLUCCSCODE', names(dat_raw))
 
   # crop by watershed and select fluccs
   # 9113 is patchy, 9116 is continuous
@@ -326,8 +332,15 @@ for(i in 1:length(fls)){
     st_transform(crs = prj) %>%
     dplyr::select(FLUCCSCODE) %>% 
     filter(FLUCCSCODE %in% fluccs$FLUCCSCODE) %>%
-    st_buffer(dist = 0) %>% 
-    st_intersection(toint)
+    st_buffer(dist = 0)
+  
+  if(!grepl('sg24', fls[i]))
+    dat_crp <- dat_crp %>% 
+      st_intersection(toint)
+  
+  if(grepl('sg24', fls[i]))
+    dat_crp <- dat_crp %>% 
+      st_intersection(toint2024)
   
   # name assignment and save
   flnm <- gsub('^sg|\\.zip$', '', basename(fls[i])) %>% 
@@ -365,7 +378,7 @@ fwcoyster <- fwcoysterraw %>%
   st_geometry()
 
 # filter swfwmd subtidal by oyster beds fluccs code
-swfwmdoys <- filter(sgdat2022, FLUCCSCODE %in% 6540) %>% 
+swfwmdoys <- filter(sgdat2024, FLUCCSCODE %in% 6540) %>% 
   st_union() %>% 
   st_geometry()
 
