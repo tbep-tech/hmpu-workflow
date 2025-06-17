@@ -11,7 +11,7 @@ source(here('R', 'funcs.R'))
 fluccs <- read.csv(here('data', 'FLUCCShabsclass.csv'), stringsAsFactors = F)
 
 lulcfl <- 'lulc2023'
-subtfl <- 'sgdat2022'
+subtfl <- 'sgdat2024'
 
 # from 01_inputs
 load(here('data', paste0(lulcfl, '.RData')))
